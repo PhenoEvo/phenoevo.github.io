@@ -1,36 +1,22 @@
 ---
   title: "Schedule"
 ---
-Daily Schedule of Activities
+## Daily Schedule of Activities
 
-* Monday
-    + Morphometrics: History, Introduction and Data Types
-    + Review of Matrix Algebra and Multivariate Statistics 
-    + Superimposition: Generalized Procrustes Analysis (GPA)
-    + Laboratory Tutorial-Individual Research
+### Monday: Introduction to Morphometrics
+- Morphometrics: History, Introduction and Data Types
+- Superimposition: Generalized Procrustes Analysis (GPA)
+- **Practical session:** data acquisition
     
-* Tuesday
-    + Shape Spaces, Shape Variables, & PCA 
-    + GPA with Semilandmarks
-    + Shape Covariation
-    + Laboratory Tutorial-Individual Research
+### Tuesday: Basic shape analyses
+- Shape Variables & PCA 
+- Linear models: group differences and allometry
+- **Practical session:** statistical models and visualization of shape change
     
-* Wednesday
-    + Group Differences 
-    + Procrustes Trajectory Analysis
-    + Allometry
-    + Phylogenetic Comparative Methods
-    + Laboratory Tutorial-Individual Research    
+### Wednesday: Miscellaneous
+- Asymmetry 
+- Semilandmarks
+- Missing data
+- Articulated structures
+- **Practical session:** funcions and possibilities in *geomorph*    
 
-* Thursday
-    + Asymmetry
-    + Missing Data
-    + Integration and Modularity 
-    + Disparity 
-    + Laboratory Tutorial-Individual Research
-    
-* Friday
-    + Future Directions and Prospectus
-    + Student Presentations
-    
-    

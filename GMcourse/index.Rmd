@@ -1,14 +1,14 @@
 ---
-  title: "Geometric Morphometrics in R"
+  title: "Introduction to Geometric Morphometrics"
+  subtitle: "Universidad de San Francisco de Quito"
+  author: "Antigoni Kaliontzopoulou"
+  date: "1-3 June 2026"
+
 ---
   
-Geometric Morphometric Analysis in Ecology and Evolutionary Biology Using R
+Morphometrics is the study of shape variation and its covariation with other variables. This course provides a general review of the theory and methods used to analyze the shape of organisms. The primary objective is to provide participants with fundamental knowledge of these methods and their utility.
 
-8 APRIL - 12 APRIL 2019, Concepcion, Chile
+To this end, the course focuses not only on establishing a solid understanding of these methods but also on providing a brief overview of the practical aspects of morphometric analysis, such as data acquisition, processing to obtain variables that describe organismal shape, statistical treatment, and the visualization of results.
 
-The field of geometric morphometrics (GM) is concerned with the quantification and analysis of patterns of shape variation, and its covariation with other variables. The goal of this workshop is to provide participants with both working knowledge of the theory of geometric morphometrics, as well as practical training in the application of these methods. 
-
-The course is organized in both theoretical and practical sessions. Lectures provide a solid theoretical understanding of the mathematical underpinnings of the procedures for proper analysis of shape data from landmark coordinates. Laboratory sessions put these concepts into practice, and include worked examples, giving participants the opportunity to gain hands-on experience in the treatment of shape data using the R package geomorph. All stages of a morphometric analysis will be covered: data collection, the statistical treatment of shape variation with respect to biological hypotheses, and the visualization of patterns of shape variation and of the shapes themselves for interpretation of statistical findings, using the R language for statistical programming. While practice datasets will be available, it is strongly recommended that participants come with their own datasets.
-
-Note: Because this is a geometric morphometrics workshop in R, it is assumed that participants have some working knowledge in R, as the practical sessions will focus on GM-based analyses (not basic R use). It is therefore strongly recommended that participants refresh their R skills prior to attending the workshop.
+To ensure a more direct understanding of morphometric methods, core theoretical concepts will be reviewed and subsequently put into practice using biological examples, allowing participants to become familiar with the available tools. All procedures will be conducted using the R programming language; therefore, having basic prior knowledge of R is highly recommended to successfully follow the course and maximize the learning experience.
 
