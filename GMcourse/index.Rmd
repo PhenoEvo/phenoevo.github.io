@@ -1,7 +1,6 @@
 ---
   title: "Introduction to Geometric Morphometrics"
   subtitle: "Universidad de San Francisco de Quito"
-  author: "Antigoni Kaliontzopoulou"
   date: "1-3 June 2026"
 
 ---
@@ -10,5 +9,17 @@ Morphometrics is the study of shape variation and its covariation with other var
 
 To this end, the course focuses not only on establishing a solid understanding of these methods but also on providing a brief overview of the practical aspects of morphometric analysis, such as data acquisition, processing to obtain variables that describe organismal shape, statistical treatment, and the visualization of results.
 
-To ensure a more direct understanding of morphometric methods, core theoretical concepts will be reviewed and subsequently put into practice using biological examples, allowing participants to become familiar with the available tools. All procedures will be conducted using the R programming language; therefore, having basic prior knowledge of R is highly recommended to successfully follow the course and maximize the learning experience.
+To ensure a more direct understanding of morphometric methods, core theoretical concepts will be reviewed and subsequently put into practice using biological examples, allowing participants to become familiar with the available tools. All procedures will be conducted using the R programming language; therefore, having basic prior knowledge of R is highly recommended to successfully follow the course and maximize the learning experience.  
+  
+\
+\
+\
+
+#####  Instructor: Antigoni Kaliontzopoulou
+###### Departament de Biologia Evolutiva, Ecologia i Ciències Ambientals (BEECA)
+###### IRBio, Institut de Recerca de la Biodiversitat
+###### Universitat de Barcelona
+
+
+
 
