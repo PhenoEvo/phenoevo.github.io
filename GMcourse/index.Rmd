@@ -24,6 +24,8 @@ To ensure a more direct understanding of morphometric methods, core theoretical 
 \
 \
 
-![](IntroGM_USFQ2026.jpeg)
+<center>
+![](IntroGM_USFQ2026.jpeg){width=60% height=60%}
+<center>
 
 
