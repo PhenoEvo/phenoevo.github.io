@@ -1,11 +1,15 @@
 ---
 title: "Morphometric Analysis"
-author: "Dean Adams, Iowa State University"
+author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"
 subtitle: A Brief History and Data Types
 output:
   slidy_presentation: default
   ioslides_presentation: default
+  template: "LectureData/01.Intro/DarcyThompson.png"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
+  
+
+
 ---
 
 ```{r setup, include=FALSE, echo = TRUE, tidy = TRUE}
