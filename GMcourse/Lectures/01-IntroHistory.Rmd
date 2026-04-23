@@ -1,16 +1,51 @@
 ---
-title: "Morphometric Analysis"
+title: |
+      "Morphometric Analysis"
+      <br><img src="LectureData/01.Intro/DarcyThompson.png" style="width:350px; margin: 20px auto -180px auto;"><br>
+subtitle: "A Brief History and Data Types"
 author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"
-subtitle: A Brief History and Data Types
 output:
-  slidy_presentation: default
+  slidy_presentation: 
+  incremental: true
   ioslides_presentation: default
-  template: "LectureData/01.Intro/DarcyThompson.png"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
   
-
-
 ---
+<style>
+.slide h1 {
+  margin-top: 15px !important;
+}
+
+/* This creates the fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* This applies it to every slide */
+.slide {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Target the incremental list items */
+.incremental > li, .incremental > p {
+  animation: fadeIn 0.6s ease-in-out;
+}
+</style>
+
+<style>
+/* Remove extra indentation from the incremental container */
+.incremental {
+  margin-left: 0.2 !important;
+  padding-left: 0.5 !important;
+}
+
+/* Ensure the list items themselves match your standard list style */
+ul.incremental, ol.incremental {
+  margin-left: 1.5em; /* Adjust this value to match your main theme */
+}
+
+</style>
 
 ```{r setup, include=FALSE, echo = TRUE, tidy = TRUE}
 library(knitr)
@@ -22,9 +57,13 @@ opts_chunk$set(echo = TRUE)
 
 #  Motivation
 
-“The study of form may be descriptive merely, or it may become analytical.  We begin by describing the shape of an object in simple words of common speech: we end by defining it in the precise language of mathematics; and the one method tends to follow the other in strict scientific order and historical continuity.”
+“The study of form may be descriptive merely, or it may become analytical.  
+\
+We begin by describing the shape of an object in simple words of common speech:  
+we end by defining it in the precise language of mathematics;  
+and the one method tends to follow the other in strict scientific order and historical continuity.”
 
-######D'Arcy Thompson. (1915). *Trans. Roy. Soc. Edinburgh*
+###### D'Arcy Thompson. (1915). *Trans. Roy. Soc. Edinburgh*
 
 # Morphometrics
 
@@ -37,16 +76,11 @@ opts_chunk$set(echo = TRUE)
 
 >- The quantification of form (Lestrel, 2000)
 
->- The study of shape variation and its covariation with other variables (Bookstein, 1991)
+>- **The study of shape variation and its covariation with other variables (Bookstein, 1991)**
 
->- This workshop is concerned with the quantification of shape as derived from landmark-based methods, and a proper evaluation of patterns of shape variation relative to explanatory variables
+\
 
-# Why Study Shape?
-
-- Historical reasons: natural history studies are largely morphological
-- Shape differences delineate obvious biological groups (i.e. alpha-taxonomy)
-- Shape covaries with other variables
-- Understanding shape and biological form may lead to understanding function
+>- This workshop is concerned with the **quantification of shape as derived from landmark-based methods**, and a proper **evaluation of patterns of shape variation relative to explanatory variables**
 
 # Why Study Shape?
 
@@ -54,51 +88,54 @@ opts_chunk$set(echo = TRUE)
 - Shape differences delineate obvious biological groups (i.e. alpha-taxonomy)
 - Shape covaries with other variables
 - Understanding shape and biological form may lead to understanding function
+
+. . .
 
 **To properly study shape we require a definition of it**
 
->- The geometric properties of an object that are invariant to changes in translation, rotation, and scale (Bookstein 1991); Dryden and Mardia (1998)
+. . .
 
->- or... The variation that remains once position, orientation, and scale have been mathematically held constant
+- The geometric properties of an object that are invariant to changes in translation, rotation, and scale (Bookstein 1991; Dryden and Mardia 1998)
+
+. . .
+
+- or... the variation that remains once position, orientation, and scale have been mathematically held constant
 
 # Form and Shape
 
-- For much of the history of biological inquiry, form and shape were synonymous 
-
+- For much of the history of biological inquiry, form and shape were synonymous
 - Plato & Aristotle: believed that understanding form lead to understanding of function
-
 - Geothe: ‘morphology’ the form of an organism
-
 - Form and shape historically used interchangeably
 
->- Now, more formal definitions of form and shape exist, which provide important distinctions
+. . . 
 
->- Specifically, `Form = size + shape` (current definition)
+- Now, more formal definitions of form and shape exist, which provide important distinctions
+
+. . . 
+
+- Specifically,    `Form = size + shape` (current definition)
 
 # Early Uses of Morphology
 
 - For centuries, biologists used morphology to compare organisms
-
 - Species taxonomy, classification, and ecological specialization were all addressed using anatomical properties
-
 - However, morphology was typically described qualitatively, leading to limitations
-
 - Much of the richness of morphological variation not captured
-
 - Limits comparisons to 2 objects (same or different)
 For > 2 objects, only rank-orderings could be done (A >B >C)
-
 - Rank-ordering implies differences on a continuous scale
-
 - Thus, there was a need to quantitatively compare morphology
 
->- **This moves towards a notion of shape and shape differences**
+. . . 
+
+- **This moves towards a notion of shape and shape differences**
 
 # Transformation Grids in Art: Durer (1528)
 
 - An intuitive use of shape differences from art!
 
-```{r, echo = FALSE, out.width="60%"}
+```{r, echo = FALSE, out.width="50%"}
 include_graphics("LectureData/01.Intro/Durer.png")  
 ```
 
@@ -110,69 +147,48 @@ include_graphics("LectureData/01.Intro/Durer.png")
 include_graphics("LectureData/01.Intro/DiodonMola.png")  
 ```
 
-######Early versions were qualitative. This week we learn the thin-plate spline which enables accurate shape transformations
+###### Early versions were qualitative. This week we learn the thin-plate spline which enables accurate shape transformations
 
 # The Biometric Tradition
 
 - Use of quantitative data began in the late 1800s: variables were measured (e.g., wing length) and group means compared
-
 - Morphometric advances concurrent with statistical advances
-
 - **LATE 1800s – EARLY 1900s**
-
 - Galton: variation, correlation, regression
-
 - Pearson: more on correlation, $\small\chi^2$ 
-
 - From this the Biometric tradition was formed, believing that most of biological variation was continuous
-
 - Early 1900s: BIG biological debate: Biometric vs. Mendelian (continuous vs. discontinuous biological variation)
 
 # Development of Statistics
 
 - Statistics developed (as a field) with evolutionary biology
-
 - ANOVA / Variance partitioning (Fisher: for quantitative genetics and more generally)
-
 - Discriminant Function Analysis (DFA/CVA), MANOVA, 
-
 - Generalized distance (Fisher, Mahalanobis, Rao)
-
 - Principal Components Analysis (Pearson, Hotelling)
-
 - Multivariate t-test (Hotelling)
-
 - Factor Analysis (Spearman)
-
 - Path Analysis (Wright)
 
->- Most data used were biological
+. . . 
 
->- *THIS* paved the way for morphometrics
+- Most data used were biological
+
+. . . 
+
+- *THIS* paved the way for morphometrics
 
 # Multivariate Morphometrics
 
 - Multivariate analysis of morphological measurements 
-
 - Within- and between-group variation described and compared 
-
 - Commonly used methods: principal components, canonical variates, discriminant function (see Blackith and Reyment, 1971)
 
 ```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/01.Intro/LizardMultiMorph.png")  
 ```
 
-# Multivariate Morphometrics
-
-- Multivariate analysis of morphological measurements 
-
-- Within- and between-group variation described and compared 
-
-- Commonly used methods: principal components, canonical variates, discriminant function (see Blackith and Reyment, 1971)
-
-```{r, echo = FALSE, out.width="80%"}
-include_graphics("LectureData/01.Intro/LizardMultiMorph.png")  
-```
+. . . 
 
 - Related topics: 
     - Numerical Taxonomy: Sokal and Sneath, 1963; Sneath and Sokal, 1973
@@ -181,15 +197,10 @@ include_graphics("LectureData/01.Intro/LizardMultiMorph.png")
 # Geometric Morphometrics
 
 - 1980s-1990s: Theoretical advances and data types caused radical shift in morphometric methods
-
 - **Geometric Morphometric Methods (GMM) emerged**
-
 - Rigorous quantification of shape coupled with sound statistics and graphical visualization
-
 - Emphasis on landmarks due to more formal statistical theory
-
 - Procrustes Paradigm: rigorous quantification of shape from points, curves, and surfaces
-
 - Analysis of shape variation with graphical description of results 
 
 ```{r, echo = FALSE, out.width="60%"}
@@ -199,32 +210,18 @@ include_graphics("LectureData/01.Intro/PlethHeadLand.png")
 # Measuring Shapes
 
 - **Morphometrics: the study of shape variation and its covariation**
-
 - How to quantify shape?  There are no *natural* units for shape
 
-# Measuring Shapes
+. . . 
 
-- **Morphometrics: the study of shape variation and its covariation**
-
-- How to quantify shape?  There are no *natural* units for shape
-    - Use a set of proxy variables to represent shape (morphometric traits)
-    - Different approaches use different types of variables and methodologies to obtain them
-
-# Measuring Shapes
-
-- **Morphometrics: the study of shape variation and its covariation**
-
-- How to quantify shape?  There are no *natural* units for shape
+ 
     - Use a set of proxy variables to represent shape (morphometric traits)
     - Different approaches use different types of variables and methodologies to obtain them
 
 - **Data should**
-
-- Register shape in a repeatable manner and archive it for statistical analyses
-
-- Contain enough information to reconstruct a graphical representation of the structure of interest
-
-- Be appropriate to address the biological question of interest
+  - Register shape in a repeatable manner and archive it for statistical analyses
+  - Contain enough information to reconstruct a graphical representation of the structure of interest
+  - Be appropriate to address the biological question of interest
 
 # Morphometric Data
 
