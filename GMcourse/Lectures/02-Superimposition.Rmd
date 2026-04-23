@@ -1,9 +1,56 @@
 ---
-title: "Superimposition"
-author: "Antigoni Kaliontzopoulou, CIBIO/InBIO, University of Porto"
+title: |
+      "Superimposition"
+      <br><img src="LectureData/02.Superimposition/Fish.png" style="width:350px; margin: 20px auto 20px auto;"><br>
+author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"
 output: slidy_presentation
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 ---
+
+<style>
+.slide h1 {
+  margin-top: 15px !important;
+}
+
+/* This creates the fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* This applies it to every slide */
+.slide {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Target the incremental list items */
+.incremental > li, .incremental > p {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Remove extra indentation from the incremental container */
+.incremental {
+  margin-left: 0.2 !important;
+  padding-left: 0.5 !important;
+}
+
+/* Ensure the list items themselves match your standard list style */
+ul.incremental, ol.incremental {
+  margin-left: 1.5em; /* Adjust this value to match your main theme */
+}
+
+/* This changes the body text */
+body, div, p {
+  font-family: Lucida Console, sans-serif;
+}
+
+/* This changes the headers */
+h1, h2, h3 {
+  font-family: Lucida Console, sans-serif;
+  color: #6954b0;
+}
+
+</style>
 
 ```{r setup, include=FALSE, echo = TRUE, tidy = TRUE}
 library(knitr)
@@ -13,72 +60,49 @@ opts_chunk$set(echo = TRUE)
 ```
 
 # What is Shape?
-
 - **Morphometrics**: variation in shape and its covariation with other variables
-
 - What is shape?
     - The 'form' of an object
     - Subtractive definition: whatever is NOT size
     - In GM: the geometric properties of an object that are invariant to effects of location, scale and orientation
-    
-# What is Shape?
 
-- **Morphometrics**: variation in shape and its covariation with other variables
-
-- What is shape?
-    - The 'form' of an object
-    - Subtractive definition: whatever is NOT size
-    - In GM: the geometric properties of an object that are invariant to effects of location, scale and orientation
+. . . 
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/03.superimposition/SuperIdea.png")  
+include_graphics("LectureData/02.Superimposition/SuperIdea.png")  
 ```
 
 # Scale and Size
-
 - Position and orientation are due to digitizing procedures, and are not biologically relevant for most applications
-
 - **Scale** includes the combined effects of focal distance during digitizing and “real” size variation
-
 - Digitizing scale is calibrated during data acquisition
-
 - **Size** is of biological interest. So, we standardize for it to obtain shape variables, but record it for subsequent analyses
 
-```{r, echo = FALSE, out.width="50%"}
-  include_graphics("LectureData/03.superimposition/scale.png")  
+<div style="text-align: center;">
+```{r, echo = FALSE, out.width="30%"}
+  include_graphics("LectureData/02.Superimposition/scale.png")  
 ```
-
+</div>
 
 ###### Note: one can perform GM analyses without recording digitizing 'scale', but in this case one has no inherent size estimate, and no notion of its effect on shape
 
 # Size in GM Studies
-
 - Small objects: landmarks are closer together
-
 - Large objects: landmarks are further apart
-
 - So, in GM, size is associated to the dispersion of landmark coordinates
-
-# Size in GM Studies
-
-- Small objects: landmarks are closer together
-
-- Large objects: landmarks are further apart
-
-- So, in GM, size is associated to the dispersion of landmark coordinates
-
-- **Centroid size**: the square root of the sum of the squared distances between each landmark and the centroid (center of mass of the object) of the landmark configuration:
+>- **Centroid size**: the square root of the sum of the squared distances between each landmark and the centroid (center of mass of the object) of the landmark configuration:
 
 $$\small{CS}=\sqrt{\sum_{i,j}^{k,p}\left(\mathbf{Y}_{ij}-\mathbf{Y}_{ic}\right)^2}$$
 
 where $\small{p}$ is the number of landmarks and $\small{k}$ is the number of coordinate dimensions
 
-```{r, echo = FALSE, out.width="40%"}
-  include_graphics("LectureData/03.superimposition/CSize.png")  
+<div style="text-align: center;">
+```{r, echo = FALSE, out.width="20%"}
+  include_graphics("LectureData/02.Superimposition/CSize.png")  
 ```
+</div>
 
 # Centroid Size (CS): Properties
-
 - One could use other size measures (a baseline, area, perimeter, …)
 - BUT, centroid size has some useful properties
     - CS is **uncorrelated with shape** in the absence of allometry
@@ -87,76 +111,50 @@ where $\small{p}$ is the number of landmarks and $\small{k}$ is the number of co
     - Of different size measures proposed, CS is the only one that has this property
 
 # Shape Differences
-
 - No difference in shape: landmark coordinates completely coincident
 - **Difference** in shape: difference in landmark coordinates
 - This provides a measure of shape differences
 
 ```{r, echo = FALSE, out.width="100%"}
-  include_graphics("LectureData/03.superimposition/TwoShapes.png")  
+  include_graphics("LectureData/02.Superimposition/TwoShapes.png")  
 ```
 
-# Shape Differences
-
-- No difference in shape: landmark coordinates completely coincident
-- **Difference** in shape: difference in landmark coordinates
-- This provides a measure of shape differences
-
-```{r, echo = FALSE, out.width="100%"}
-  include_graphics("LectureData/03.superimposition/TwoShapes.png")  
-```
+. . . 
 
 - **Procrustes distance**: the square root of the sum of squared deviations of landmark locations between two objects
-
 $$\small{D}_{Proc}=\sqrt{\sum_{i,j}^{k,p}\left(\mathbf{Y}_{1.ij}-\mathbf{Y}_{2.ij}\right)^2}$$
 
 # Shape from Landmarks
-
 - To obtain shape variables, we first need to standardize position, scale and orientation: superimposition
 - Several approaches have been proposed (see further on)
 - The most robust for most situations, and the main tool of morphometrics is:
 
-# Shape from Landmarks
+. . . 
 
-- To obtain shape variables, we first need to standardize position, scale and orientation: superimposition
-- Several approaches have been proposed (see further on)
-- The most robust for most situations, and the main tool of morphometrics is:
 - *Least-squares superimposition* aka **Procrustes Superimposition**
-
-```{r, echo = FALSE, out.width="60%"}
-  include_graphics("LectureData/03.superimposition/ProcImage.png")  
+<div style="position: absolute; bottom: 20px; right: 200px;">
+```{r, echo = FALSE, out.width="150%"}
+  include_graphics("LectureData/02.Superimposition/ProcImage.png")  
 ```
+</div>
 
-# Shape from Landmarks
-
-- To obtain shape variables, we first need to standardize position, scale and orientation: superimposition
-- Several approaches have been proposed (see further on)
-- The most robust for most situations, and the main tool of morphometrics is:
-- *Least-squares superimposition* aka **Procrustes Superimposition**
-
-```{r, echo = FALSE, out.width="60%"}
-  include_graphics("LectureData/03.superimposition/ProcImage.png")  
-```
+. . . 
 
 - Method
     - Translate centroid to origin
     - Scale to unit CS
-    - Optimally rotate
-
+    - Optimally rotate  
 $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
 
 # Procrustes Superimposition: Translation
-
 - Translate object to origin (mean centering)
-
 <video width="640" height="480" controls="controls">
-  <source  src="LectureData/03.superimposition/Trans.mp4"></source>
+  <source  src="LectureData/02.Superimposition/Trans.mp4"></source>
 </video>
 
 # Procrustes Superimposition: Scale
-
 ```{r, echo = FALSE, out.width="80%"}
-  include_graphics("LectureData/03.superimposition/GPA-scale.png")  
+  include_graphics("LectureData/02.Superimposition/GPA-scale.png")  
 ```
 
 - Scale object to $\small{CS}=1$
@@ -167,18 +165,16 @@ $$\small{[tr}[\mathbf{(Y-\overline{Y})(Y-\overline{Y})^T}]]^{-1/2}=1$$
 
 
 # Procrustes Superimposition: Rotation
-
 - Optimally align $\small\mathbf{Y}_2$ to  $\small\mathbf{Y}_1$  via rigid rotation ('optimally' in the least squares sense)
 
 <video width="640" height="480" controls="controls">
-  <source  src="LectureData/03.superimposition/Rot.mp4"></source>
+  <source  src="LectureData/02.Superimposition/Rot.mp4"></source>
 </video>
 
 # How Much to Rotate?
-
 $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
 
-- In Procrustes, rotation accomplished by rigid rotation using as: : $\small\mathbf{H}=\begin{bmatrix} 
+- In Procrustes, rotation accomplished by rigid rotation using as: $\small\mathbf{H}=\begin{bmatrix} 
     \cos\theta       & \sin\theta \\
     -\sin\theta       & \cos\theta
 \end{bmatrix}$
@@ -187,50 +183,23 @@ $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
     - Conceptually: optimal fit of landmarks between configurations
     - Mathematically: use least-squares to find $\small\theta$
 
-# How Much to Rotate?
-
-$\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
-
-- In Procrustes, rotation is accomplished by rigid rotation using: $\small\mathbf{H}=\begin{bmatrix} 
-    \cos\theta       & \sin\theta \\
-    -\sin\theta       & \cos\theta
-\end{bmatrix}$
-
-- How to find the angle $\small\theta$?
-    - Conceptually: optimal fit of landmarks between configurations
-    - Mathematically: use least-squares to find $\small\theta$
+. . . 
 
 - $\small\mathbf{H}$ found via `SVD` as: $\small\mathbf{H}=\mathbf{VSU}^T$
 - Where $\small\mathbf{Y}_1^T\mathbf{Y}_2=\mathbf{U\Sigma{V}}^T$
     - A regression of $\small\mathbf{Y}_2$ on $\small\mathbf{Y}_1$ 
 
-# How Much to Rotate?
+. . . 
 
-$\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
-
-- In Procrustes, rotation accomplished by rigid rotation using as: : $\small\mathbf{H}=\begin{bmatrix} 
-    \cos\theta       & \sin\theta \\
-    -\sin\theta       & \cos\theta
-\end{bmatrix}$
-
-- How to find the angle $\small\theta$?
-    - Conceptually: optimal fit of landmarks between configurations
-    - Mathematically: use least-squares to find $\small\theta$
-
-- $\small\mathbf{H}$ found via `SVD` as: $\small\mathbf{H}=\mathbf{VSU}^T$
-- Where $\small\mathbf{Y}_1^T\mathbf{Y}_2=\mathbf{U\Sigma{V}}^T$
-    - A regression of $\small\mathbf{Y}_2$ on $\small\mathbf{Y}_1$ 
-    
 - Here $\small\mathbf{S}$ has diagonals of $\small{1}$ and of the same sign
     - Diagonals of $\small{1}$ so rigid rotation
     - Of same sign to eliminate reflections
     
 # Ordinary Procrustes Analysis: Review
-
 $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
 
 ```{r, echo = FALSE, out.width="60%"}
-  include_graphics("LectureData/03.superimposition/OPA-steps.png")  
+  include_graphics("LectureData/02.Superimposition/OPA-steps.png")  
 ```
 
 - With OPA
@@ -241,9 +210,7 @@ $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
     - **BUT**, OPA is for $\small{n=2}$ objects only
 
 # Generalized Procrustes Analysis
-
 - Perform OPA in iterative fashion
-
 - Steps
     - 1: Using the $\small{1}^{st}$ object as the reference
     - 2: Obtain OPA alignment for all other objects
@@ -251,35 +218,21 @@ $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
     - 4: Estimate the total variation in the data ($\small{TSS}$)
     - 5: Repeat steps 2 - 4, using  $\small\mathbf{\overline{Y}}$   as the reference until convergence of $\small{TSS}$ (which will reduce each time)
     
-# Generalized Procrustes Analysis
+. . . 
 
-- Perform OPA in iterative fashion
-
-- Steps
-    - 1: Using the $\small{1}^{st}$ object as the reference
-    - 2: Obtain OPA alignment for all other objects
-    - 3: Calculate the consensus (mean) configuration ($\small\mathbf{\overline{Y}}$ )
-    - 4: Estimate the total variation in the data ($\small{TSS}$)
-    - 5: Repeat steps 2 - 4, using  $\small\mathbf{\overline{Y}}$   as the reference until convergence of $\small{TSS}$ (which will reduce each time)
-    
 ```{r, echo = FALSE, out.width="60%"}
-  include_graphics("LectureData/03.superimposition/GPAEquationNote.png")  
+  include_graphics("LectureData/02.Superimposition/GPAEquationNote.png")  
 ```
 
 # GPA: Example
-
 - Sexual dimorphism in head shape of *Podarcis* wall lizards
-
 - 12 lateral 2D landmarks
-
 - Males and females
-
 - MANOVA to test for shape differences
-
 - PCA to visualize shape space
 
 ```{r, echo = FALSE, out.width="60%"}
-  include_graphics("LectureData/03.superimposition/LizardLand.png")  
+  include_graphics("LectureData/02.Superimposition/LizardLand.png")  
 ```
 
 # GPA: Example (Cont.)
@@ -344,7 +297,7 @@ plotRefToTarget(ref, female, links = links, mag = 10,
 - Principal components visualization
 
 ```{r echo=FALSE, out.width="60%" }
-res<-plotTangentSpace(Y.gpa$coords,warpgrids = FALSE, groups=col.gp)
+res <- plot(gm.prcomp(Y.gpa$coords), pch = 2, bg = col.gp)
 zapsmall(res$sdev)
 ```
 
@@ -358,42 +311,10 @@ zapsmall(res$sdev)
     - Translation in Y
     - Scaling
     - Rotation
-
 - Therefore, the shape space for GPA-aligned specimens has $\small{2p-4}$ dimensions for 2D data
-
 - For 3D data, dimensionality is $\small{3p-7}$ (general form is: $\small{pk – k – k(k – 1)/2 – 1}$
-
-# GPA: Data Dimensionality
-
-- 2D data initially contain $\small{2p}$ variables: $\small{2}$ coordinates for $\small{p}$ landmarks
-- GPA standardized $\small{4}$ dimensions:
-    - Translation in X
-    - Translation in Y
-    - Scaling
-    - Rotation
-
-- Therefore, the shape space for GPA-aligned specimens has $\small{2p-4}$ dimensions for 2D data
-
-- For 3D data, dimensionality is $\small{3p-7}$ (general form is: $\small{pk – k – k(k – 1)/2 – 1}$
-
-- Because these dimensions are redundant, standard parametric statistical hypothesis testing will not work (singular covariance matrix... means divide by zero)
-
-# GPA: Data Dimensionality
-
-- 2D data initially contain $\small{2p}$ variables: $\small{2}$ coordinates for $\small{p}$ landmarks
-- GPA standardized $\small{4}$ dimensions:
-    - Translation in X
-    - Translation in Y
-    - Scaling
-    - Rotation
-
-- Therefore, the shape space for GPA-aligned specimens has $\small{2p-4}$ dimensions for 2D data
-
-- For 3D data, dimensionality is $\small{3p-7}$ (general form is: $\small{pk – k – k(k – 1)/2 – 1}$
-
-- Because these dimensions are redundant, standard parametric statistical hypothesis testing will not work (singular covariance matrix... means divide by zero)
-
-- One can eliminate these dimensions via **Orthogonal Projection** or the **thin-plate spline**
+>- Because these dimensions are redundant, standard parametric statistical hypothesis testing will not work (singular covariance matrix... means divide by zero)
+>- One can eliminate these dimensions via **Orthogonal Projection** or the **thin-plate spline**
 
 ######NOTE: as we'll see later, use of permutation methods (RRPP) alleviates this issue.
 
@@ -402,7 +323,7 @@ zapsmall(res$sdev)
 - GPA works the same with 3D data (matrices simply have $\small{3}^{rd}$ column)
 
 ```{r, echo = FALSE, out.width="30%"}
-  include_graphics("LectureData/03.superimposition/GorillaSkull.png")  
+  include_graphics("LectureData/02.Superimposition/GorillaSkull.png")  
 ```
 
 Now we have: $\tiny{Y}=\begin{bmatrix} X_1 & Y_1 & Z_1 \\ 
@@ -416,7 +337,7 @@ X_p & Y_p & Z_p \\
 - GPA works the same with 3D data (matrices simply have $\small{3}^{rd}$ column)
 
 ```{r, echo = FALSE, out.width="30%"}
-  include_graphics("LectureData/03.superimposition/GorillaSkull.png")  
+  include_graphics("LectureData/02.Superimposition/GorillaSkull.png")  
 ```
 
 Now we have: $\tiny{Y}=\begin{bmatrix} X_1 & Y_1 & Z_1 \\ 
@@ -458,7 +379,7 @@ X_p & Y_p & Z_p \\
     - Size: distance between landmarks $\small{1}$ & $\small{2}$
     
 ```{r, echo = FALSE, out.width="80%"}
-  include_graphics("LectureData/03.superimposition/BookShapeCoords.png")  
+  include_graphics("LectureData/02.Superimposition/BookShapeCoords.png")  
 ```
 
 # Bookstein's Shape Coordinates
@@ -487,7 +408,7 @@ X_p & Y_p & Z_p \\
 - One may desire methods resistant to this effect
 
 ```{r, echo = FALSE, out.width="50%"}
-  include_graphics("LectureData/03.superimposition/Pinoccio.png")  
+  include_graphics("LectureData/02.Superimposition/Pinoccio.png")  
 ```
 
 # Resistant-Fit Superimposition
@@ -497,7 +418,7 @@ X_p & Y_p & Z_p \\
 - Example: two shapes that differ only in the front triangle
 
 ```{r, echo = FALSE, out.width="80%"}
-  include_graphics("LectureData/03.superimposition/GRF-Example.png")  
+  include_graphics("LectureData/02.Superimposition/GRF-Example.png")  
 ```
 
 # Resistant-Fit: Comments
@@ -556,7 +477,7 @@ plot<-scatterplot3d(pc.tri[,1],pc.tri[,2],mult.pc*pc.tri[,3], asp=1, pch=21,bg="
 - Solution: project to a linear space *tangent* to shape space (tangent at the consensus [mean], to minimize distortion)
 
 ```{r, echo = FALSE, out.width="50%"}
-  include_graphics("LectureData/03.superimposition/ShapeTang.png")  
+  include_graphics("LectureData/02.Superimposition/ShapeTang.png")  
 ```
 
 # Tangent Space
@@ -565,7 +486,7 @@ plot<-scatterplot3d(pc.tri[,1],pc.tri[,2],mult.pc*pc.tri[,3], asp=1, pch=21,bg="
 - Solution: project to a linear space *tangent* to shape space (tangent at the consensus [mean], to minimize distortion)
 
 ```{r, echo = FALSE, out.width="50%"}
-  include_graphics("LectureData/03.superimposition/ShapeTang.png")  
+  include_graphics("LectureData/02.Superimposition/ShapeTang.png")  
 ```
 
 - How? 
