@@ -1,7 +1,7 @@
 ---
 title: |
       "Morphometric Analysis"
-      <br><img src="LectureData/01.Intro/DarcyThompson.png" style="width:350px; margin: 20px auto -180px auto;"><br>
+      <br><img src="LectureData/01.Intro/DarcyThompson.png" style="width:350px; margin: 20px auto -170px auto;"><br>
 subtitle: "A Brief History and Data Types"
 author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"
 output:
@@ -214,9 +214,13 @@ include_graphics("LectureData/01.Intro/PlethHeadLand.png")
 
 . . . 
 
- 
+- Solutions:
     - Use a set of proxy variables to represent shape (morphometric traits)
     - Different approaches use different types of variables and methodologies to obtain them
+
+\
+
+. . . 
 
 - **Data should**
   - Register shape in a repeatable manner and archive it for statistical analyses
@@ -226,39 +230,29 @@ include_graphics("LectureData/01.Intro/PlethHeadLand.png")
 # Morphometric Data
 
 - Morphometric data may quantify:
-
 - The location of discrete anatomic features (**points**)
-
 - Distances between anatomic features (**lines**)
-
 - Outlines of a structure (**curves**)
-
 - The surface of a structure (**surfaces**)
-
 >- The modern morphometric synthesis permits the combination of ALL these types of data
 
 # Homology in Morphometrics
 
 - Data must quantify shape in a repeatable manner
-
 - Homology: correspondence across specimens
-
 - Evolutionary homology: structures derived from the same tissue of the most recent common ancestor
-
 - Operational homology: correspondence in the position of structures
-
 - In Morphometrics, we may use both, depending on the question to answer
+
+\
 
 - The important point is to obtain **repeatable** data
 
 # Data Types: Linear Measurements
 
 - Use linear measurements, angles, etc., between anatomic features, or structures (e.g. head width)
-
 - Use some method to eliminate non-shape variation (size)
-
 - Analyze the data using multivariate statistics
-
 - aka 'traditional' or “multivariate” morphometrics
 
 ```{r, echo = FALSE, out.width="80%"}
@@ -270,18 +264,16 @@ include_graphics("LectureData/01.Intro/LizardMultiMorph.png")
 **Advantages**
 
 - Allow comparison to previous studies
-
 - The variables used are very intuitive and easy to interpret biologically
+
+\
 
 **Disadvantages**
 
 - Size is a latent factor and there is no global consensus on how to account for it – different approaches provide different results
-
-- The same values may represent different shapes
-
 - Homology is difficult to evaluate and guarantee
-
 - Usually it is difficult to obtain a graphical representation of variation in shape (because the geometry of the structure is not preserved in the analysis)
+- The same values may represent different shapes
 
 # Linear Measures: Same Values Different Shapes
 
@@ -304,11 +296,8 @@ Something is missing! The relative positions of the distances on the structure
 # The Truss
 
 - An interconnected network of distance measurements between anatomical points
-
 - An effort to maintain the relative positions between traits
-
 - Can provide a graphical representation
-
 - BUT statistical treatment is problematic
 
 ```{r, echo = FALSE, out.width="80%"}
@@ -318,36 +307,28 @@ include_graphics("LectureData/01.Intro/Truss.png")
 # The Morphometric Revolution
 
 - In the 1980s, there is a radical shift in methodology
-
 - Linear measurements do not capture all of the properties required to describe shape
-
 - The truss was an attempt to record relative positions
-
 - This information is inherent in the common endpoints of linear distances
-
 - Change from linear measurements to the locations of points themselves
-
 - Use **landmark coordinates** as the raw data
-
 This advance was aided by the simultaneous development of mathematical shape theory
 
 # Data Types: Landmark Coordinates
 
 - Use x, y (or x, y, z) coordinates of anatomic locations to quantify anatomical variation
-
 - Eliminate non-shape variation (size and others, see further on)
-
 - Multivariate data analysis
 
 ```{r, echo = FALSE, out.width="50%"}
 include_graphics("LectureData/01.Intro/LandLIzard.png")  
 ```
 
-- 'Landmarks are the points at which one’s explanations of biological processes are grounded.'  Bookstein (1990)
+***'Landmarks are the points at which one’s explanations of biological processes are grounded.'  Bookstein (1990)***
 
 # Types of Landmarks
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/01.Intro/LandmarkTypes.png")  
 ```
 
@@ -356,24 +337,24 @@ include_graphics("LectureData/01.Intro/LandmarkTypes.png")
 **Advantages**
 
 - Easy to assess homology, so biological interpretation is more robust
-
 - The geometry of the studied structure is maintained in relative landmark locations
-
 - Can obtain a visual representation of shape variation
+
+\
 
 **Disadvantages**
 
 - Raw data include information that is NOT about form (e.g. location, scale, orientation)
 - Some structures have few or no landmarks
 
-###### These issues are alleviated through Geometric Morphometric methods and its extensions to other data types, see further on
+\
+
+##### These issues are alleviated through Geometric Morphometric methods and its extensions to other data types, see further on
 
 # Data Types: Curves
 
 - Some structures have few, or no, landmarks
-
 - One may be interested in outlines, or other curves, to quantify shape
-
 - Types of curves
     - **Partial**: different starting and ending points
     - **Complete**: the starting and ending point coincide (closed curves)
@@ -387,29 +368,24 @@ include_graphics("LectureData/01.Intro/Curves.png")
 **Advantages**
 
 - Useful when there are few, or no, landmarks
-
 - They register a full representation of the outline (and therefore we can obtain a graphical representation of shape variation)
+
+\
 
 **Disadvantages**
 
 - Difficult to assess homology
-
 - Several analytical approaches exist, which provide different variables, and comparison among them is not straightforward (there is no globally accepted way to measure the shape of a curve)
-
 - Most methods do not allow the combination of curves and landmarks
-
 - Some curves may represent different shapes
 
-###### But see next! – The Procrustes paradigm allows the combination of points, curves and surfaces
+##### But see next! – The Procrustes paradigm allows the combination of points, curves and surfaces
 
 # Semilandmarks
 
 - They resolve the problems encountered when working with curves
-
 - Can be quantified on curves (2D) or surfaces (3D)
-
 - They are treated as “degenerate” landmarks, the position of which is limited to slide on a curve (or surface) during analysis
-
 - Only variation perpendicular to the curve is relevant
 
 ```{r, echo = FALSE, out.width="80%"}
@@ -421,37 +397,34 @@ include_graphics("LectureData/01.Intro/Semilandmarks.png")
 **Advantages**
 
 - Good representation of curves, outlines and surfaces
-
 - They allow the examination of curves and surfaces in Procrustes shape space (which has known statistical properties)
-
 - It is possible to combine different morphological features (points, curves, surfaces) in a single analysis of form
 
 # The Procrustes Paradigm
 
 - Combining landmarks and semilandmarks there is a general solution for quantifying biological shape variation
-
 - We obtain quantitative information that represents:
     - Discrete anatomical points
     - Curves (outlines) of structures
     - Surfaces of structures
-
 - We can combine it all in a single analysis!
 
-```{r, echo = FALSE, out.width="50%"}
+<div style="position: absolute; bottom: 50px; right: 50px;">
+```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/01.Intro/Friess.png")  
 ```
+</div>
 
 # General Morphometric Protocol
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/01.Intro/GenGMProtocol.png")  
 ```
 
 # Special Considerations: Missing Data
 
 - Sometimes landmarks are missing
-
-- Methods to estimate their location exist (discussed later this week)
+- Methods to estimate their location exist (discussed later)
 
 ```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/01.Intro/Missing.png")  
@@ -460,19 +433,9 @@ include_graphics("LectureData/01.Intro/Missing.png")
 # Special Considerations: Symmetry
 
 - Sometimes objects display symmetry
-
-- GMM procedures adjusted slightly for this  (discussed later this week)
+- GMM procedures adjusted slightly for this  (discussed later)
 
 ```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/01.Intro/Symmetry.png")  
 ```
-
-#Dean's View of Quantitative Biology
-
-- Methods are a product of theory and data type
-
-- Choose methods that are mathematically sound, but also theoretically and biologically sound
-
-- METHODS SHOULD NOT INTRODUCE PATTERNS!!!!
-
 
