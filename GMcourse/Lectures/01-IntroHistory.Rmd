@@ -11,6 +11,8 @@ output:
 date: '`r format(Sys.time(), "%d %B, %Y")`'
   
 ---
+
+#  Motivation
 <style>
 .slide h1 {
   margin-top: 15px !important;
@@ -63,8 +65,6 @@ library(geomorph)
 library(scatterplot3d)
 opts_chunk$set(echo = TRUE)
 ```
-
-#  Motivation
 
 “The study of form may be descriptive merely, or it may become analytical.  
 \
