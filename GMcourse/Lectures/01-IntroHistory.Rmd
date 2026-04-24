@@ -1,6 +1,6 @@
 ---
 title: |
-      "Morphometric Analysis"
+      Morphometric Analysis
       <br><img src="LectureData/01.Intro/DarcyThompson.png" style="width:350px; margin: 20px auto -170px auto;"><br>
 subtitle: "A Brief History and Data Types"
 author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"

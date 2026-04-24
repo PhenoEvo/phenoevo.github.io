@@ -1,6 +1,6 @@
 ---
 title: |
-      "Superimposition"
+      Superimposition
       <br><img src="LectureData/02.Superimposition/Fish.png" style="width:350px; margin: 20px auto 20px auto;"><br>
 author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"
 output: slidy_presentation
@@ -185,18 +185,6 @@ $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
     - Conceptually: optimal fit of landmarks between configurations
     - Mathematically: use least-squares to find $\small\theta$
 
-. . . 
-
-- $\small\mathbf{H}$ found via `SVD` as: $\small\mathbf{H}=\mathbf{VSU}^T$
-- Where $\small\mathbf{Y}_1^T\mathbf{Y}_2=\mathbf{U\Sigma{V}}^T$
-    - A regression of $\small\mathbf{Y}_2$ on $\small\mathbf{Y}_1$ 
-
-. . . 
-
-- Here $\small\mathbf{S}$ has diagonals of $\small{1}$ and of the same sign
-    - Diagonals of $\small{1}$ so rigid rotation
-    - Of same sign to eliminate reflections
-    
 # Ordinary Procrustes Analysis: Review
 $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
 
@@ -238,7 +226,6 @@ $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
 ```
 
 # GPA: Example (Cont.)
-
 - GPA-aligned specimens
 
 ```{r echo=FALSE, eval=TRUE}
@@ -273,14 +260,11 @@ par(mfrow=c(1,1))
 ```
 
 # GPA: Group Differences
-
 - Males and females differ in shape:
-
 ```{r echo=FALSE, out.width="40%" }
 res <- procD.lm(Y.gpa$coords ~ gp, data = gdf, print.progress = FALSE)
 res$aov.table
 ```
-
 
 ```{r echo=FALSE, out.width="40%"}
 male <- mshape(Y.gpa$coords[,,which(liz.lab$SEX=='M')])
@@ -292,15 +276,17 @@ plotRefToTarget(ref, female, links = links, mag = 10,
                 gridPars = gridPar(tar.link.col = "red", tar.pt.bg = "red"))
 ```
 
-######TPS of male vs. female *Podarcis* (10X magnification)
+###### TPS of male vs. female *Podarcis* (10x magnification)
 
 # GPA: Exploring Shape Variation
-
 - Principal components visualization
 
 ```{r echo=FALSE, out.width="60%" }
-res <- plot(gm.prcomp(Y.gpa$coords), pch = 2, bg = col.gp)
-zapsmall(res$sdev)
+pca <- gm.prcomp(Y.gpa$coords)
+plot(pca, pch = 21, bg = col.gp)
+
+pca.r <- prcomp(two.d.array(Y.gpa$coords))
+summary(pca.r)
 ```
 
 - Why 4 dimensions with zero variation??
