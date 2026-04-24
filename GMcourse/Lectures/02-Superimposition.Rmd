@@ -7,6 +7,7 @@ output: slidy_presentation
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 ---
 
+# What is Shape?
 <style>
 .slide h1 {
   margin-top: 15px !important;
@@ -59,7 +60,6 @@ library(scatterplot3d)
 opts_chunk$set(echo = TRUE)
 ```
 
-# What is Shape?
 - **Morphometrics**: variation in shape and its covariation with other variables
 - What is shape?
     - The 'form' of an object
@@ -90,8 +90,10 @@ include_graphics("LectureData/02.Superimposition/SuperIdea.png")
 - Small objects: landmarks are closer together
 - Large objects: landmarks are further apart
 - So, in GM, size is associated to the dispersion of landmark coordinates
->- **Centroid size**: the square root of the sum of the squared distances between each landmark and the centroid (center of mass of the object) of the landmark configuration:
 
+. . . 
+
+**Centroid size**: the square root of the sum of the squared distances between each landmark and the centroid (center of mass of the object) of the landmark configuration:
 $$\small{CS}=\sqrt{\sum_{i,j}^{k,p}\left(\mathbf{Y}_{ij}-\mathbf{Y}_{ic}\right)^2}$$
 
 where $\small{p}$ is the number of landmarks and $\small{k}$ is the number of coordinate dimensions
