@@ -288,11 +288,9 @@ plot(pca, pch = 21, bg = col.gp)
 pca.r <- prcomp(two.d.array(Y.gpa$coords))
 summary(pca.r)
 ```
-
 - Why 4 dimensions with zero variation??
 
 # GPA: Data Dimensionality
-
 - 2D data initially contain $\small{2p}$ variables: $\small{2}$ coordinates for $\small{p}$ landmarks
 - GPA standardized $\small{4}$ dimensions:
     - Translation in X
