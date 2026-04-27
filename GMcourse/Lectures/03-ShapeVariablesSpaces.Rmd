@@ -148,8 +148,10 @@ include_graphics("LectureData/03.shape.vars/OrthProj.png")
 plot(pc.tri[,1:2], asp=1, pch=21, bg="red")
 
 ```
-
-##### Same set of 2,000 randomly generated triangles
+<p style="font-size: 0.7em; color: gray;">
+    Same set of 2,000 randomly generated triangles.
+  </p>
+</div>
 
 # Shape Differences as Deformations
 
