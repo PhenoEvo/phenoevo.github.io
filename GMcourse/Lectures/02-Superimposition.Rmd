@@ -312,7 +312,7 @@ summary(pca.r)
 
 - GPA works the same with 3D data (matrices simply have $\small{3}^{rd}$ column)
 
-<div style="position: absolute; bottom: 250px; right: 50px;">
+<div style="position: absolute; bottom: 250px; right: 100px;">
 ```{r, echo = FALSE, out.width="150%"}
   include_graphics("LectureData/02.Superimposition/GorillaSkull.png")  
 ```
@@ -378,8 +378,6 @@ X_p & Y_p & Z_p \\
 
 >- Recommendation: choose long baseline
 
-\
-
 >- Conclusion: while intuitive and easy to understand, GPA is preferred
 
 # Superimposition: Summary
@@ -403,7 +401,6 @@ X_p & Y_p & Z_p \\
 $$\tiny{D}_{Proc}=\sqrt{\sum_{i,j}^{k,p}\left(\mathbf{Y}_{1.ij}-\mathbf{Y}_{2.ij}\right)^2}$$
 
 - **Shape space is curved!** 
-
 <div style="text-align: center;">
 ```{r echo=FALSE, eval=TRUE, out.width="50%"}
 n=2000
@@ -430,17 +427,9 @@ plot <- scatterplot3d(pc.tri[,1],pc.tri[,2],mult.pc*pc.tri[,3], asp=1, pch=21, b
   include_graphics("LectureData/02.Superimposition/ShapeTang.png")  
 ```
 
-# Tangent Space
-
-- Statistics in curved spaces become tricky
-- Solution: project to a linear space *tangent* to shape space (tangent at the consensus [mean], to minimize distortion)
-
-```{r, echo = FALSE, out.width="50%"}
-  include_graphics("LectureData/02.Superimposition/ShapeTang.png")  
-```
+. . . 
 
 - How? 
     - Orthogonal Projection (via Burnaby's equation)
     - Thin-plate spline
-
 - Methods turn out to be identical (next lecture)
