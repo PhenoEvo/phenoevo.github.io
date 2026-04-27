@@ -196,6 +196,7 @@ include_graphics("LectureData/03.shape.vars/TPSConcept.png")
 - Which ones should we use?
 
 . . . 
+
 <div style="text-align: center;">
 ```{r echo=FALSE, eval=TRUE,out.width="40%"}
 Y.gpa2 <- gpagen(lizards, Proj = FALSE, print.progress = FALSE)
