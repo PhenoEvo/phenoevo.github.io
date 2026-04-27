@@ -229,9 +229,9 @@ $\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$
 - GPA-aligned specimens
 
 ```{r echo=FALSE, eval=TRUE}
-lizards <- readland.nts('LectureData/04.shape.vars/lizards_LAT.nts')
-links <- read.csv('LectureData/04.shape.vars/links.txt', header=FALSE, sep = " ")
-liz.lab <- read.csv('LectureData/04.shape.vars/liz_groups.csv',header=TRUE, sep="\t")
+lizards <- readland.nts('LectureData/03.shape.vars/lizards_LAT.nts')
+links <- read.csv('LectureData/03.shape.vars/links.txt', header=FALSE, sep = " ")
+liz.lab <- read.csv('LectureData/03.shape.vars/liz_groups.csv',header=TRUE, sep="\t")
 col.gp <- rep("red",nrow(liz.lab))
 col.gp[which(liz.lab$SEX=='M')] <- 'blue'
 
@@ -414,7 +414,8 @@ mult.pc <- ifelse(which.min(abs(range(pc.tri[,3])))==1,-1,1) #make'up-facing'
 plot <- scatterplot3d(pc.tri[,1],pc.tri[,2],mult.pc*pc.tri[,3], asp=1, pch=21, bg="red", tick.marks = FALSE, box=FALSE)
 ```
 <p style="font-size: 0.7em; color: gray;">
-    Example with 2,000 random (uniform) triangles. Note overabundance of shapes near 'north pole'.
+    Example with 2,000 random (uniform) triangles.   
+    Note overabundance of shapes near 'north pole'.
   </p>
 </div>
 
