@@ -1,9 +1,58 @@
 ---
-title: "(A)symmetry"
-author: "Antigoni Kaliontzopoulou, CIBIO/InBIO, University of Porto"
+title: |
+        (A)symmetry
+        <br><img src="LectureData/06.asymmetry/SymmLizard.png" style="width:500px; margin: 20px auto 20px auto;"><br>
+
+author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"
 output: slidy_presentation
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 ---
+
+# Symmetry and Asymmetry
+<style>
+.slide h1 {
+  margin-top: 15px !important;
+}
+
+/* This creates the fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* This applies it to every slide */
+.slide {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Target the incremental list items */
+.incremental > li, .incremental > p {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Remove extra indentation from the incremental container */
+.incremental {
+  margin-left: 0.2 !important;
+  padding-left: 0.5 !important;
+}
+
+/* Ensure the list items themselves match your standard list style */
+ul.incremental, ol.incremental {
+  margin-left: 1.5em; /* Adjust this value to match your main theme */
+}
+
+/* This changes the body text */
+body, div, p {
+  font-family: Lucida Console, sans-serif;
+}
+
+/* This changes the headers */
+h1, h2, h3 {
+  font-family: Lucida Console, sans-serif;
+  color: #6954b0;
+}
+
+</style>
 
 ```{r setup, include=FALSE, echo = TRUE, tidy = TRUE}
 library(knitr)
@@ -11,8 +60,6 @@ library(geomorph)
 library(scatterplot3d)
 opts_chunk$set(echo = TRUE)
 ```
-
-# Symmetry and Asymmetry
 
 - Many objects are built symmetrically
 - Paired structures and serially homologous body parts are organized in a symmetric way
@@ -28,7 +75,7 @@ opts_chunk$set(echo = TRUE)
 - **Object symmetry**: single structure with internal structural symmetry (e.g. structures in vertebrate skull)
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/11.asymmetry/SymmTypes.png")  
+include_graphics("LectureData/06.asymmetry/SymmTypes.png")  
 ```
 
 # The Problem with Symmetrical Objects
@@ -40,23 +87,15 @@ include_graphics("LectureData/11.asymmetry/SymmTypes.png")
     - This causes issues with parametric statistical hypothesis-testing methods ('divide' by zero)
     
 ```{r, echo = FALSE, out.width="40%"}
-include_graphics("LectureData/11.asymmetry/SymmLizard.png")  
+include_graphics("LectureData/06.asymmetry/SymmLizard.png")  
 ```  
 
 >- The problem becomes worse as objects become more symmetric!
 
-# The Problem with Symmetrical Objects
-
-- The data in reality have less dimensions, so use less data. How?
-    - Digitize only half structure
-    - Reflect structure and take the average: make a symmetrical structure
-
->- Problem: using only $\small\frac{1}{2}$ structure can introduce asymmetry, because the midline is not “anchored” as such
-
 >- Solution: use **entire structure** and **RRPP** for statistical evaluation!
 
 >-
-###### As we've seen this week, RRPP, combined with robust summary test statistics, does not require inverting (nearly) singular covariance matrices, so model evaluation is not compromised by this issue.
+###### As we have seen, RRPP, combined with robust summary test statistics, does not require inverting (nearly) singular covariance matrices, so model evaluation is not compromised by this issue.
 
 # Symmetric Objects: Example
 
@@ -76,7 +115,7 @@ plotAllSpecimens(Y.gpa$coords)
 ```
 
 ```{r, echo = FALSE, out.width="60%"}
-include_graphics("LectureData/11.asymmetry/PCASymmLizards.png")  
+include_graphics("LectureData/06.asymmetry/PCASymmLizards.png")  
 ``` 
 
 # The Biology of Asymmetry
@@ -86,7 +125,7 @@ include_graphics("LectureData/11.asymmetry/PCASymmLizards.png")
 - **Directional asymmetry**: consistent difference skewed towards one of the sides (at the population level); thought to reflect difference in use, e.g. fiddler crabs feeding vs. fighting displays
 
 ```{r, echo = FALSE, out.width="60%"}
-include_graphics("LectureData/11.asymmetry/FiddlerCrab.png")  
+include_graphics("LectureData/06.asymmetry/FiddlerCrab.png")  
 ``` 
 
 >- **Fluctuating asymmetry**: thought to reflect instability during development (genetic, environmental etc)
@@ -102,7 +141,7 @@ include_graphics("LectureData/11.asymmetry/FiddlerCrab.png")
 >- **3: Antisymmetry**: consistent $\small{(R-L)}$ differences, but larger side random
 
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/SymmTypesHist.png")  
+include_graphics("LectureData/06.asymmetry/SymmTypesHist.png")  
 ``` 
 
 # Analysis of Symmetry: General Procedure
@@ -114,13 +153,13 @@ include_graphics("LectureData/11.asymmetry/SymmTypesHist.png")
 >- ANOVA then often set up as:
 >-
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/AnovaDesign.png")  
+include_graphics("LectureData/06.asymmetry/AnovaDesign.png")  
 ``` 
 
 # Extensions to GM Shape Data 
 
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/ReflectObjects.png")  
+include_graphics("LectureData/06.asymmetry/ReflectObjects.png")  
 ```
 
 - **Procedure**
@@ -149,13 +188,13 @@ $$\small{SST}=\sum^n_1{D}^2_{(X_i,Y_i)}=nD^2_{(\overline{X},\overline{Y})}+\sum^
 # Matching Symmetry: Example
 
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/MatchExWings.png")  
+include_graphics("LectureData/06.asymmetry/MatchExWings.png")  
 ``` 
 
 # Object Symmetry: Example
 
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/ObjExLizards.png")  
+include_graphics("LectureData/06.asymmetry/ObjExLizards.png")  
 ``` 
 
 # Other Types of Asymmetry
@@ -164,7 +203,7 @@ include_graphics("LectureData/11.asymmetry/ObjExLizards.png")
 - How can we quantify asymmetry for these structures?
 
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/HigherSymm.png")  
+include_graphics("LectureData/06.asymmetry/HigherSymm.png")  
 ``` 
 
 # Symmetry Groups
@@ -176,7 +215,7 @@ include_graphics("LectureData/11.asymmetry/HigherSymm.png")
 - e.g.: bilateral symmetry = reflection across the midline
 
 ```{r, echo = FALSE, out.width="60%"}
-include_graphics("LectureData/11.asymmetry/SymmGroups.png")  
+include_graphics("LectureData/06.asymmetry/SymmGroups.png")  
 ``` 
 
 - Symmetry groups define transformations such that there are invariances in those symmetric 'dimensions'
@@ -196,7 +235,7 @@ include_graphics("LectureData/11.asymmetry/SymmGroups.png")
 - For other types, decompose asymmetry to the components defining the symmetry type based on the appropriate symmetry groups
 
 ```{r, echo = FALSE, out.width="20%"}
-include_graphics("LectureData/11.asymmetry/RadialSymm.png")  
+include_graphics("LectureData/06.asymmetry/RadialSymm.png")  
 ``` 
 
 - Example: Radial Symmetry
@@ -211,7 +250,7 @@ include_graphics("LectureData/11.asymmetry/RadialSymm.png")
 - Symmetry Analysis in corals
 
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/CoralSymmetry.png")  
+include_graphics("LectureData/06.asymmetry/CoralSymmetry.png")  
 ``` 
 
 # A Note on Geometric Transformations
@@ -224,7 +263,7 @@ include_graphics("LectureData/11.asymmetry/CoralSymmetry.png")
 >- Shape effects + positional effects
 
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/ArticConcept.png")  
+include_graphics("LectureData/06.asymmetry/ArticConcept.png")  
 ``` 
 
 # Geometric Transformations: Articulations
@@ -234,7 +273,7 @@ For articulated structures, several solutions exist
     - Separating the subsets to analyse separately, etc. 
     
 ```{r, echo = FALSE, out.width="90%"}
-include_graphics("LectureData/11.asymmetry/ArticMath.png")  
+include_graphics("LectureData/06.asymmetry/ArticMath.png")  
 ``` 
 
 ###### Adams. (1999). *Evol. Ecol. Res.*
@@ -278,7 +317,7 @@ mtext("Jaws Standardized to Common Angle")
 - It is represented by a sequence of shapes (a trajectory) in shape space 
 
 ```{r, echo = FALSE, out.width="60%"}
-include_graphics("LectureData/11.asymmetry/MotionAnal.png")  
+include_graphics("LectureData/06.asymmetry/MotionAnal.png")  
 ``` 
 
 ###### NOTE: see Phenotypic Trajectory Analysis lecture for analytical details

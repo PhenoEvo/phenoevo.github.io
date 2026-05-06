@@ -14,9 +14,9 @@
 - **Practical session:** statistical models and visualization of shape change
     
 ### Wednesday: Miscellaneous
-- Asymmetry 
+- Asymmetry
+- Articulated structures
 - Semilandmarks
 - Missing data
-- Articulated structures
 - **Practical session:** funcions and possibilities in *geomorph*    
 
