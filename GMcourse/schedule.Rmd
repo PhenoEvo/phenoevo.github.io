@@ -18,5 +18,5 @@
 - Articulated structures
 - Semilandmarks
 - Missing data
-- **Practical session:** functions and possibilities in *geomorph*    
+- **Practical session:** functions and possibilities in *geomorph*  and *gmShiny*  
 
