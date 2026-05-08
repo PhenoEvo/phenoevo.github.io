@@ -14,7 +14,7 @@
 
 [06-Asymmetry](https://phenoevo.github.io/GMcourse/Lectures/06-Asymmetry.html)
 
-[07-GPA with Semilandmarks](https://phenoevo.github.io/GMcourse/Lectures/07-Semilandmarks.html)
+[07-Semilandmarks](https://phenoevo.github.io/GMcourse/Lectures/07-Semilandmarks.html)
 
 [08-Missing Data](https://phenoevo.github.io/GMcourse/Lectures/08-MissingData.html)
 
