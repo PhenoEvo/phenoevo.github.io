@@ -54,16 +54,13 @@ Y.gpa <- gpagen(shapesGM)
 plot(Y.gpa)
 
 # Too many semilandmarks?
-
 shapesGM <- readland.shapes(shapes, nCurvePts = 0.5 * curves.list)
 
 Y.gpa <- gpagen(shapesGM)
 plot(Y.gpa)
 
 # Attributes
-
 class(shapesGM)
-
 attributes(shapesGM)
 
 shapesGM$fixed
@@ -87,13 +84,8 @@ mydata <- readland.nts("Data/RATS.nts")
 str(mydata)
 mydata[,,1]
 
-# Read Morphologika
-mydata <- read.morphologika("Data/mophologikaexample.txt")
-str(mydata)
-dim(mydata$coords)
-mydata$coords[,,1]
-
 # Read PLY
+library(rgl)
 new <- read.ply("Data/Mandible.ply")
 str(new)
 
@@ -111,6 +103,9 @@ plot(mytree)
 
 # Check for Outliers
 data(plethodon)
+newland <- plethodon$land
+newland[c(1,8),,2] <- newland[c(8,1),,2]
+newland[c(3,11),,26] <- newland[c(11,3),,2]
 Y <- gpagen(newland, print.progress = FALSE) 
 
 plotOutliers(Y$coords, inspect.outliers = T)
@@ -124,20 +119,18 @@ gpa.fixed <- gpagen(jaw.fixed, print.progress = FALSE)
 plotAllSpecimens(gpa.fixed$coords, links = plethodon$links)
 
 # Estimate Missing Landmarks
-
 #### build some missing data (EXAMPLE ONLY)
 data(plethodon)
-plethland<-plethodon$land
-plethland[3,,2]<-plethland[8,,2]<-NA  #create missing landmarks
-plethland[3,,5]<-plethland[8,,5]<-plethland[9,,5]<-NA  
-plethland[3,,10]<-NA  
+plethland <- plethodon$land
+plethland[3,,2] <- plethland[8,,2] <- NA  #create missing landmarks
+plethland[3,,5] <- plethland[8,,5] <- plethland[9,,5]<-NA  
+plethland[3,,10] <- NA  
 
 # Estimate via TPS or Regression
 estimate.missing(plethland,method="TPS")
 estimate.missing(plethland,method="Reg")
 
 ##### 4: Generalized Procrustes Analysis: GPA
-
 data(plethodon)
 pleth.gpa <- gpagen(plethodon$land, print.progress = F)
 summary(pleth.gpa)
