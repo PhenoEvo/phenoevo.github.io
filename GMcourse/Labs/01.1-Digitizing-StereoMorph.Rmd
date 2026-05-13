@@ -1,6 +1,6 @@
 ---
 title: "01.1: Digitizing Landmarks in StereoMorph"
-author: "Antigoni Kaliontzopoulou"
+author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---

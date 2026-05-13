@@ -1,6 +1,6 @@
 ---
 title: "01.3: Data Pre-Processing"
-author: "Dean Adams, Michael Collyer & Antigoni Kaliontzopoulou"
+author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer "
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---
@@ -44,6 +44,8 @@ Notice that landmark plots of the outliers relative to the mean show the problem
 
 ## **Fixing Articulation Angles**
 
+#### NOTE: see comments on this topic in the lecture about *Asymmetry* on Wednesday!
+
 Sometimes, we obtain landmarks from specimens containing more than one anatomical component, and the relative positions of those components cannot be standardized *a priori*. In such cases, we must 'fix' their relative positions prior to GPA.  `Geomorph` has this ability through the function `fixed.angle`, which implements one approach to the problem as outlined in Adams (1999) *Evol. Ecol. Res.*
 
 Here we provide a simple example: 
@@ -82,7 +84,7 @@ mtext("Jaws Standardized to Common Angle")
 
 ## **Estimating Missing Landmarks**
 
-#### NOTE: we will discuss this topic at length in our *Missing Data* lecture on Thursday!
+#### NOTE: we will discuss this topic at length in our *Missing Data* lecture on Wednesday!
 
 Sometimes, specimens are not fully intact, and are missing landmarks. For these specimens, one cannot digitize the locations of those points, as the are found in broken, or otherwise absent regions. Because geometric morphometric methods requires objects containing a complete set of landmarks for subsequent analyses (GPA superimposition and downstream statistical assessments), one must do one of the following:
 
