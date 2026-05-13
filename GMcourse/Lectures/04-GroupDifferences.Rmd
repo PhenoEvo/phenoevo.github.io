@@ -1,223 +1,128 @@
 ---
-title: "Group Shape Differences"
-subtitle: "More on the general lineal model"
-author: "Michael Collyer, Chatham University"
-output: slidy_presentation
+title: |
+      Group Shape Differences
+      <br><img src="LectureData/04.groupdifferences/ANOVA_titlepage.png" style="width:350px; margin: 20px auto -170px auto;"><br>
+subtitle: "& the general lineal model"
+author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"
+output:
+  slidy_presentation: 
+  incremental: true
+  ioslides_presentation: default
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 ---
-
-```{r setup, include=FALSE}
-library(knitr)
-knitr::opts_chunk$set(echo = FALSE)
-```
-
-# Vectors are Points in Space
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide1.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide2.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide3.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide4.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide5.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide6.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide7.png")  
-```
-
-
 # Overview:
+<style>
+.slide h1 {
+  margin-top: 15px !important;
+}
 
-- Shapes are points in space
-- Design matrices for grouping variables (factors)
-- Linear models for group shape differences
-- Example single-factor (one-way) analysis
-- Posthoc comparisons
-- Factorial models
-- Sequential sums of squares and cross-products
-- Other types of sums of squares and cross-products
-- Factorial model example
-- Randomized residual permutation procedure
-- Overview of hypothesis tests for linear models
+/* This creates the fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 
+/* This applies it to every slide */
+.slide {
+  animation: fadeIn 0.8s ease-in-out;
+}
 
+/* Target the incremental list items */
+.incremental > li, .incremental > p {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Remove extra indentation from the incremental container */
+.incremental {
+  margin-left: 0.2 !important;
+  padding-left: 0.5 !important;
+}
+
+/* Ensure the list items themselves match your standard list style */
+ul.incremental, ol.incremental {
+  margin-left: 1.5em; /* Adjust this value to match your main theme */
+}
+
+/* This changes the body text */
+body, div, p {
+  font-family: Lucida Console, sans-serif;
+}
+
+/* This changes the headers */
+h1, h2, h3 {
+  font-family: Lucida Console, sans-serif;
+  color: #6954b0;
+}
+
+</style>
+
+```{r setup, include=FALSE, echo = TRUE, tidy = TRUE}
+library(knitr)
+library(RRPP)
+library(geomorph)
+opts_chunk$set(echo = TRUE)
+```
+
+- Types of GLMs
+- GLMs in matrix format
+
+\
+
+- Design matrices for groups
+- Testing for group differences
+- One-way MANOVA
+- Post-hoc comparisons
+- Factorial MANOVA
+- Types of Sums of Squares
+- Randomized residual permutation procedure (RRPP)
+
+# Thoughts on model names
+```{r, echo = FALSE, out.width="100%"}
+include_graphics("LectureData/04.groupdifferences/GLM_names.png")  
+```
+
+# Thoughts on nomenclature
+```{r, echo = FALSE, out.width="100%"}
+include_graphics("LectureData/04.groupdifferences/GLM_nomenclature.png")  
+```
 
 # The General Linear Model
-$$\huge \mathbf{Y}=\mathbf{X}\mathbf{\beta } +\mathbf{E}$$
+```{r, echo = FALSE, out.width="80%"}
+include_graphics("LectureData/04.groupdifferences/GLM_structure.png")  
+```
 
-Component | Dimension | Description
-:------- | :----------- | :--------------
-$\mathbf{Y}$ | $n \times p$ | Data matrix with $n$ observations for $p$ variables
-$\mathbf{X}$ | $n \times k$ | Linear model design matrix with $n$ observations for $k$ parameters
-$\mathbf{\beta}$ | $k \times p$ | Matrix of coefficients expressing change in values for the $k$ model parameters for each of $p$ variables
-$\mathbf{E}$ | $n \times p$ | Matrix of residuals (error) for $n$ observations for $p$ variables
+>- The goal is to find a solution for which the estimated value of a data vector, given a vector of predictors, is expected to be true.
+>- The term, **Least Squares** (LS), references the fact that coefficients estimated from the model design, $\mathbf{X}$, will minimize the sum squared error between observed data and expected values.  
 
-Like any area of statistics, the coefficients for a linear model (which has parameters for variable change associated with some hypothetical process) are generally unknown but exist in a population, and are, therefore, estimated from a sample.  We can solve this algebraically as the solution that would be true if there was no error in the model (i.e., $\mathbf{E}$ = 0).  The goal is to solve for $\mathbf{\beta}$.  **We will accomplish this goal by first recognizing some important properties of general linear models (LM)**.
+# GLM types
+```{r, echo = FALSE, out.width="100%"}
+include_graphics("LectureData/04.groupdifferences/GLM_types.png")  
+```
 
-# The General Linear Model: Least Squares
+# More on nomenclature
+```{r, echo = FALSE, out.width="100%"}
+include_graphics("LectureData/04.groupdifferences/GLM_nomenclature2.png")  
+```
 
-The goal of LM is to find a solution for which the estimated value of a data vector, given a vector of predictors, is expected to be true,
+>- **Multivariate** refers to the response variable(s) $\mathbf{Y}$
+>- Sometimes the term *“multiple”* is used to denote > 1 explanatory variables $\mathbf{X}$
 
-$$\mathbb{E}\left( \mathbf{y}^T | \mathbf{x}^T\right) = \mathbf{\mu}_{ \mathbf{y} | \mathbf{x}}$$
-
-The term, **Least Squares** (LS), references the fact that coefficients estimated from the model design, $\mathbf{X}$, will minimize the sum squared error between observed data and expected values.  
-
-LS calculation of coefficients starts with first standardizing the design matrix by the expected covariance of the data, $\mathbf{\Omega}$.  This is done via
-
-$$\mathbf{\Omega}^{-1}\mathbf{X}$$
-
-If there is no expected covariance structure, then $\mathbf{\Omega}$ is $\mathbf{I}$, and because $\mathbf{I}^{-1} = \mathbf{I}$, no change in $\mathbf{X}$ would be required.  Note that $\mathbf{\Omega}$ is an $n \times n$ symmetric matrix.
-
-# The General Linear Model: Coefficients
-
-Solving for the coefficients via LS:
-$$\mathbf{Y}=\mathbf{X}\mathbf{\beta } $$
-$$\left(\mathbf{\Omega}^{-1} \mathbf{X} \right)^T \mathbf{Y} = \left(\mathbf{\Omega}^{-1} \mathbf{X} \right)^T\mathbf{X}\mathbf{\beta } $$
-$$\mathbf{X}^T \mathbf{\Omega}^{-1} \mathbf{Y} =\mathbf{X}^T \mathbf{\Omega}^{-1}  \mathbf{X}\mathbf{\beta } $$
-
-$$\left( \mathbf{X}^T \mathbf{\Omega}^{-1}  \mathbf{X}\right)^{-1}
-\mathbf{X}^T \mathbf{\Omega}^{-1} \mathbf{Y} =
-\left( \mathbf{X}^T \mathbf{\Omega}^{-1}  \mathbf{X}\right)^{-1}
-\mathbf{X}^T \mathbf{\Omega}^{-1}  \mathbf{X}\mathbf{\beta } = \mathbf{I\beta}$$
-
-
-$$\hat{\mathbf{\beta }} = 
-\left( \mathbf{X}^T \mathbf{\Omega}^{-1}  \mathbf{X}\right)^{-1}
-\mathbf{X}^T \mathbf{\Omega}^{-1} \mathbf{Y} $$
-
-The ^ reminds us that this is a matrix of estimated values.  This is the **generalized least squares (GLS)** solution.  If $\mathbf{\Omega} = \mathbf{I}$, then the solution simplifies to 
-
-$$\hat{\mathbf{\beta }} = 
-\left( \mathbf{X}^T   \mathbf{X}\right)^{-1}
-\mathbf{X}^T  \mathbf{Y} $$
-
-which is the ordinary **least squares (OLS)** solution.
-
-One might notice that because of the various matrix inversions, this can be computationally intensive and if $\mathbf{\Omega} = \mathbf{I}$, it would be easier to use the OLS solution.  It is also possible to use the OLS for GLS calculations through an algebraic short-cut.
-
-# The General Linear Model: Simplified Coefficient Estimation
-
-The simpler method of coefficient estimation is found through a transformation (projection) matrix, to transform the data and model design prior to the algebraic steps.
-
-Step 1: Perform eigen analysis on $\mathbf{\Omega}$ and obtain a set of eigenvectors, $\mathbf{U}$ and eigenvalues, $\mathbf{W}$.
-
-Step 2: Generate an $n \times n$ transformation matrix as
-
-$$\mathbf{T} = \left( \mathbf{UW}^{-1/2} \mathbf{U}^T \right)^{-1}$$
-Step 3: Project both data and model design matrix onto $\mathbf{T}$.
-
-$$\mathbf{\tilde{Y}} = \mathbf{TY}$$
-
-$$\mathbf{\tilde{X}} = \mathbf{TX}$$
-
-Step 4: Perform OLS estimation of coefficients using transformed values
-
-$$\hat{\mathbf{\beta }}=\left ( \mathbf{\tilde{X}}^{T} \mathbf{\tilde{X}}\right )^{-1}\left ( \mathbf{\tilde{X}}^{T} \mathbf{\tilde{Y}}\right )$$
-
-##### Note that $\mathbf{T}$ is often referred to as,  $\mathbf{P}$, as it is a projection matrix.  Later we refer to a matrix of projected principal component scores as $\mathbf{P}$, so we use $\mathbf{T}$ here for "transformation" rather than projection.
-
-# The General Linear Model: Simplified Coefficient Estimation (Cont.)
-
-The important condition is that 
-
-$$\hat{\mathbf{\beta }} = 
-\left( \mathbf{X}^T \mathbf{\Omega}^{-1}  \mathbf{X}\right)^{-1}
-\mathbf{X}^T \mathbf{\Omega}^{-1} \mathbf{Y} =
-\left ( \mathbf{\tilde{X}}^{T} \mathbf{\tilde{X}}\right )^{-1}\left ( \mathbf{\tilde{X}}^{T} \mathbf{\tilde{Y}}\right )
+# The GLM matrices
 $$
-However, these two methods are not the same in terms of exchangeable units under the null hypothesis for resampling procedures, a topic we address later.
+\begin{aligned}
+Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + + \beta_nX_n + \epsilon  
+\end{aligned}
+$$
+$$
+\begin{aligned}
+Y = X\beta + E 
+\end{aligned}
+$$
+- They are **all the same model!**
+- Only difference: data in $\mathbf{X}$
+- Works equally for univariate and multivariate $\mathbf{Y}$
 
-Coefficients are the tools for making predictions from the linear model, namely
 
-$$\mathbf{\hat{y}} = \mathbf{x\hat{\beta}}$$
-is an estimated vector of values for variables of, $\mathbf{Y}$, given the predictors in $\mathbf{x}$.  
-
-If performed for all representations in $\mathbf{X}$, we get a matrix of **fitted** values
-
-$$\mathbf{\hat{Y}} = \mathbf{X\hat{\beta}}$$
-and expanding this equation
-
-$$\hat{\mathbf{Y}}=\mathbf{X}\hat{\mathbf{\beta }}=\mathbf{X}\left ( \mathbf{\tilde{X}}^{T} \mathbf{\tilde{X}}\right )^{-1} \mathbf{\tilde{X}}^{T} \mathbf{\tilde{Y}} = \mathbf{H\tilde{Y}}$$
-
-# The General Linear Model: Fitted Values 
-
-$$\hat{\mathbf{Y}}=\mathbf{X}\hat{\mathbf{\beta }}=\mathbf{X}\left ( \mathbf{\tilde{X}}^{T} \mathbf{\tilde{X}}\right )^{-1} \mathbf{\tilde{X}}^{T} \mathbf{\tilde{Y}} = \mathbf{H\tilde{Y}}$$
-The matrix, $\mathbf{H}$ is an $n\times n$ projection matrix.  Notice that this is a projection matrix for transformed data.  If we prefer to work with the original data, we can let  $\mathbf{H}' = \mathbf{HT}$, be a projection matrix that accounts for both the linear model and transformation, then $\hat{\mathbf{Y}} = \mathbf{H}'\mathbf{Y}$.  This means that a linear model can be thought of as a means to project data into a tangent space that best describes a hypothetical pattern (associated with a process), including accounting for a hypothetical covariance structure.
-
-$\mathbf{H}^{'}$ is positive-definite and idempotent.  If it is symmetric, then it produces an **orthogonal projection** (typical with OLS).  If it is not symmetric, it produces an **oblique projection** (typical with GLS).
-
-As a Reminder, if no covariance structure is used, $\mathbf{\Omega} = \mathbf{I}$, thus, $\mathbf{H}^{'} = \mathbf{H}$, and $\mathbf{H}$ is an orthogonal projection matrix.
-
-# The General Linear Model: Residuals
-
-The unexplained component of the data is the matrix of residuals, $\mathbf{E}$, found as
-$$\mathbf{E} = \mathbf{Y} - \hat{\mathbf{Y}}=\mathbf{Y} - \mathbf{H}'\mathbf{Y} =\left(\mathbf{I}-\mathbf{H}'\right)\mathbf{Y}$$
-$\left(\mathbf{I}-\mathbf{H}'\right)$ is also a projection matrix, meaning the residuals are a projection of $\mathbf{Y}$ into a different tangent space, where attributes of the points can be examined, especially with reference to the fitted value projections.  
-
-Therefore, the general linear model finds projections of data as fitted values and residuals, $\mathbf{H}'\mathbf{Y}$ and $\left(\mathbf{I}-\mathbf{H}'\right)\mathbf{Y}$, respectively.  We will learn how and why this is important in just about every subsequent lecture.
-
-$\left(\mathbf{I}-\mathbf{H}'\right)$ is positive-definite and idempotent.  If it is symmetric, then it produces an **orthogonal projection** (typical with OLS).  If it is not symmetric, it produces an **oblique projection** (typical with GLS).
-
-As a Reminder, if no covariance structure is used, $\mathbf{\Omega} = \mathbf{I}$, thus, $\left(\mathbf{I}-\mathbf{H}'\right) = \left(\mathbf{I}-\mathbf{H}\right)$, and $\left(\mathbf{I}-\mathbf{H}\right)$ is an orthogonal projection matrix.
-
-# SSCP and Covariance matrices
-
-Projection of data into tangent spaces of their model predictions (fit) and error (dispersion of residuals) allows one to determine if there are latent patterns in the data, as predicted by the parameters in the design matrix, and hopefully no pattern in the residuals (if assumptions are upheld).  The best way to do this is via PCA on covariance matrices.  PCA finds the axes of greatest variation in the projections, which allows a low-dimensional visual interpretation of even high-dimensional spaces.
-
-To calculate a model (residual) covariance matrix, first calculate the sums of squares and cross-products ($SSCP$) via a cross-product of the residuals.
-
-Residuals $SSCP$
-
-$$\mathbf{S} =  \left(\Omega^{-1}\mathbf{E}\right)^T \Omega^{-1} \mathbf{E}$$
-
-And the covariance matrices is 
-
-$$\mathbf{\hat{\Sigma}}_{\mathbf{E}} = \left( n-1\right)^{-1} \mathbf{S}$$
-
-Note that any covariance structure must be accounted for in order for the residual $SSCP$ to be independent.
-
-# Henceforth, for simplicity:
-
-$$\mathbf{\hat{Y}} = \mathbf{H}\mathbf{\tilde{Y}}$$
-
-$$\mathbf{\tilde{E}} =\left(\mathbf{I}-\mathbf{H}\right)\mathbf{\tilde{Y}}$$
-
-In words, **fitted values** are obtained from a model projection of transformed data (untransformed if there is no model covariance).  **Modified residuals** are obtained also from a projection of transformed data (unmodified if there is no model covariance).
-
-#### We can compare two model projections as:
-
-$$\mathbf{\Delta\hat{Y}} = \left(\mathbf{H}_2 - \mathbf{H}_1 \right)\mathbf{\tilde{Y}}$$
-
-or
-
-$$\mathbf{\Delta\tilde{E}} = \left(\left(\mathbf{I}-\mathbf{H}_1\right) - \left(\mathbf{I}-\mathbf{H}_2 \right) \right) \ \mathbf{\tilde{Y}} = \left(\mathbf{H}_2 - \mathbf{H}_1 \right)\mathbf{\tilde{Y}}$$
-
-In other words, the difference in model projections is a projection of a data, defined as $\mathbf{\Delta{H}}$.  (How does changing the model affect our ability to estimate the data, $\mathbf{Y}$?)
-
-### Thus, a model difference is henceforth defined as:
-
-$$\mathbf{\Delta{H}}\mathbf{\tilde{Y}}$$
 
 
 # A Tale of Two Linear Models
@@ -235,7 +140,7 @@ Much of life is like this - the absolute definition of a state is difficult or m
 ### An example
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/pupfish.example.png")  
+include_graphics("LectureData/04.groupdifferences/pupfish.example.png")  
 ```
 
 
@@ -290,37 +195,37 @@ Let's revisit this description from before (next slide)
 
 # Vectors are Points in Space
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide1.png")  
+include_graphics("LectureData/04.groupdifferences/points/Slide1.png")  
 ```
 
 # Vectors are Points in Space (Cont.)
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide2.png")  
+include_graphics("LectureData/04.groupdifferences/points/Slide2.png")  
 ```
 
 # Vectors are Points in Space (Cont.)
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide3.png")  
+include_graphics("LectureData/04.groupdifferences/points/Slide3.png")  
 ```
 
 # Vectors are Points in Space (Cont.)
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide4.png")  
+include_graphics("LectureData/04.groupdifferences/points/Slide4.png")  
 ```
 
 # Vectors are Points in Space (Cont.)
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide5.png")  
+include_graphics("LectureData/04.groupdifferences/points/Slide5.png")  
 ```
 
 # Vectors are Points in Space (Cont.)
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide6.png")  
+include_graphics("LectureData/04.groupdifferences/points/Slide6.png")  
 ```
 
 # Vectors are Points in Space (Cont.)
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/points/Slide7.png")  
+include_graphics("LectureData/04.groupdifferences/points/Slide7.png")  
 ```
 
 # Design Matrices: Factors
@@ -371,50 +276,50 @@ by(y, df$Group, mean)
 Remember that fitted values are found as $\mathbf{\hat{Y}} = \mathbf{X\hat{\beta}}$.  Remember also *run amok computational demon*!
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/XB.png")  
+include_graphics("LectureData/04.groupdifferences/XB.png")  
 by(y, df$Group, mean)
 ```
 
 # Geometric Interpretation of Model Effects
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/stats/Slide1.png")  
+include_graphics("LectureData/04.groupdifferences/stats/Slide1.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/stats/Slide2.png")  
+include_graphics("LectureData/04.groupdifferences/stats/Slide2.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/stats/Slide3.png")  
+include_graphics("LectureData/04.groupdifferences/stats/Slide3.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/stats/Slide4.png")  
+include_graphics("LectureData/04.groupdifferences/stats/Slide4.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/stats/Slide5.png")  
+include_graphics("LectureData/04.groupdifferences/stats/Slide5.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/stats/Slide6.png")  
+include_graphics("LectureData/04.groupdifferences/stats/Slide6.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/stats/Slide7.png")  
+include_graphics("LectureData/04.groupdifferences/stats/Slide7.png")  
 ```
 
 # ANOVA
@@ -482,13 +387,13 @@ plot(fit, type = "PC", pch = 21, bg = pupfish$Group)
 legend("topright", levels(pupfish$Group), pch = 21, pt.bg = 1:4)
 ```
 ```{r echo = FALSE, include = TRUE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/pupfish.example.png") 
+include_graphics("LectureData/04.groupdifferences/pupfish.example.png") 
 ```
 
 # Design Matrices: Factors (cont.)
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/monty.png")  
+include_graphics("LectureData/04.groupdifferences/monty.png")  
 ```
 
 # Design Matrices: Factorial Models
@@ -574,7 +479,7 @@ legend("topright", levels(pupfish$Group), pch = 21, pt.bg = 1:4)
 One last comment about the factorial model design,
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/factorialX.png")  
+include_graphics("LectureData/04.groupdifferences/factorialX.png")  
 ```
 
 
@@ -677,7 +582,7 @@ There are two statistics for pairwise comparisons that might be of interest.  Re
 the vector between vector endpoints is also a vector with a direction and length (distance).  The following figure illustrates this.
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/vectors.png")  
+include_graphics("LectureData/04.groupdifferences/vectors.png")  
 ```
 
 The attributes, vector length (distance, $d$) and angle ($\theta$), can function as test statistics. These statistics have an expected value of 0 under a null hypothesis. (Vector correlation can also be a test statistic, but it has an expected value of 1 for parallel vectors, which is a bit awkward.)
@@ -728,7 +633,7 @@ summary(PWF, test.type = "dist") # "dist" for distance between vectors
 Note that in this example, we used `test.type = "dist"` because it makes sense to look at the differences among means in terms of how spread out they are in the data space.  Also notice the similarities and differences between the two tests:
 
 ```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/07.groupdifferences/pairwise1.png")  
+include_graphics("LectureData/04.groupdifferences/pairwise1.png")  
 ```
 
 # Pairwise Comparisons, Example (Cont.)
