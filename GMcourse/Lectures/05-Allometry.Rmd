@@ -462,7 +462,6 @@ include_graphics("LectureData/05.allometry/Heterochrony.png")
 ```
 
 # Allometry: Summary
-
 - Shape usually changes with size – allometry is a common pattern in biological data
 - We need to account for it when testing hypotheses about shape
 - Many biological hypotheses related directly to allometric variation
