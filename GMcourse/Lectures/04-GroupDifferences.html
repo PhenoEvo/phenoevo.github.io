@@ -597,9 +597,6 @@ color: #6954b0;
 <ul class="incremental">
 <li>The goal is to find a solution for which the estimated value of a
 data vector, given a vector of predictors, is expected to be true.</li>
-<li>The term, <strong>Least Squares</strong> (LS), references the fact
-that coefficients estimated from the model design, <span class="math inline">\(\mathbf{X}\)</span>, will minimize the sum squared
-error between observed data and expected values.</li>
 </ul>
 </div>
 <div id="glm-types" class="slide section level1">
@@ -625,15 +622,125 @@ Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + + \beta_nX_n +
 \end{aligned}
 \]</span> <span class="math display">\[
 \begin{aligned}
-Y = X\beta + E
+\mathbf{Y = X\beta + E}
 \end{aligned}
 \]</span> - They are <strong>all the same model!</strong><br />
 - Only difference: data in <span class="math inline">\(\mathbf{X}\)</span><br />
 - Works equally for univariate and multivariate <span class="math inline">\(\mathbf{Y}\)</span></p>
+<p><br />
+</p>
+<ul class="incremental">
+<li>Dependent variables <span class="math display">\[
+\mathbf{Y =
+\begin{bmatrix}
+Y_{11} &amp; Y_{12} &amp; \cdots &amp; Y_{1p} \\
+Y_{21} &amp; Y_{22} &amp; \cdots &amp; Y_{2p} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+Y_{n1} &amp; Y_{n2} &amp; \cdots &amp; Y_{np}
+\end{bmatrix}
+}
+\]</span></li>
+</ul>
+<ul class="incremental">
+<li>Independent (predictor) variables <span class="math display">\[
+\mathbf{X =
+\begin{bmatrix}
+1 &amp; X_{11} &amp;  \cdots &amp; X_{1k} \\
+1 &amp; \vdots &amp; \ddots &amp; \vdots \\
+1 &amp; X_{n1} &amp; \cdots &amp; X_{nk}
+\end{bmatrix}
+}
+\]</span></li>
+</ul>
+<ul class="incremental">
+<li>Solve for coefficients <span class="math display">\[
+\bf\unicode[Times]{x3B2} =
+\begin{bmatrix}
+\beta_{0} \\
+\vdots \\
+\beta_{p}
+\end{bmatrix}
+\]</span> found as <span class="math display">\[
+\bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) \]</span></li>
+</ul>
+</div>
+<div id="glm---estimation" class="slide section level1">
+<h1>GLM - estimation</h1>
+<p><span class="math display">\[ \bf\unicode[Times]{x3B2} =
+(X^TX)^{-1}(X^TY) \]</span></p>
+<ul>
+<li>This expresses <strong>ALL types of General Linear
+Models!</strong></li>
+<li>It is modified by including different types of data in X</li>
+<li>X may include categorical variables (factors), continuous predictors
+(covariates), combinations of the two, and interactions between
+them</li>
+</ul>
+<p><br />
+</p>
+<ul class="incremental">
+<li>Solving b this way minimizes the sum of squared residuals (error)
+and it is usually referred to as “<em>Least-Squares</em>” (LS)
+estimation</li>
+<li>In other words, coefficients estimated from the model design, <span class="math inline">\(\mathbf{X}\)</span>, will minimize the sum squared
+error between observed data and expected values</li>
+<li>As such, the error is an indication of how good the <em>fit of the
+model</em> is</li>
+</ul>
+</div>
+<div id="anova-groups-and-the-design-matrix" class="slide section level1">
+<h1>ANOVA, groups and the design matrix</h1>
+<ul>
+<li><strong>AN</strong>alysis <strong>O</strong>f
+<strong>VA</strong>riance: the procedure of evaluating any GLM by
+testing whether the inclusion of a term in a model causes a
+<strong>change in residual variance</strong></li>
+</ul>
+<div class="incremental">
+<ul>
+<li>More loosely (and generally) used to describe a GLM where X is a
+grouping factor</li>
+<li>Same model <span class="math display">\[ \bf{Y} = X
+\unicode[Times]{x3B2} \]</span> same estimators <span class="math display">\[ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY)
+\]</span></li>
+</ul>
+</div>
+<div class="incremental">
+<ul>
+<li><span class="math inline">\(\mathbf{X}\)</span> describes <em>group
+membership</em>, and this is recoded into g-1 <strong>dummy
+variables</strong></li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left">GROUP</th>
+<th align="left">X1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="left">0</td>
+</tr>
+<tr class="even">
+<td align="left">A</td>
+<td align="left">0</td>
+</tr>
+<tr class="odd">
+<td align="left">B</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="left">B</td>
+<td align="left">1</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="a-tale-of-two-linear-models" class="slide section level1">
 <h1>A Tale of Two Linear Models</h1>
-<h3 id="mikes-linear-model-axiom">Mike’s Linear Model Axiom</h3>
 <p><em>Other than to consider total dispersion in a data set, a linear
 model analysis always considers at least two models.</em></p>
 <p>Much of life is like this - the absolute definition of a state is

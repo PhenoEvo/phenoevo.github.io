@@ -92,7 +92,6 @@ include_graphics("LectureData/04.groupdifferences/GLM_structure.png")
 ```
 
 >- The goal is to find a solution for which the estimated value of a data vector, given a vector of predictors, is expected to be true.
->- The term, **Least Squares** (LS), references the fact that coefficients estimated from the model design, $\mathbf{X}$, will minimize the sum squared error between observed data and expected values.  
 
 # GLM types
 ```{r, echo = FALSE, fig.align='center', out.width="100%"}
@@ -115,7 +114,7 @@ Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + + \beta_nX_n + \epsilon
 $$
 $$
 \begin{aligned}
-Y = X\beta + E 
+\mathbf{Y = X\beta + E}
 \end{aligned}
 $$
 - They are **all the same model!**  
@@ -124,49 +123,74 @@ $$
 
 \
 
-- Dependent variables 
+>- Dependent variables 
 $$
-Y =
+\mathbf{Y =
 \begin{bmatrix}
 Y_{11} & Y_{12} & \cdots & Y_{1p} \\
 Y_{21} & Y_{22} & \cdots & Y_{2p} \\
 \vdots & \vdots & \ddots & \vdots \\
 Y_{n1} & Y_{n2} & \cdots & Y_{np}
 \end{bmatrix}
+}
 $$
 
-\
-
-- Independent (predictor) variables
+>- Independent (predictor) variables
 $$
-X =
+\mathbf{X =
 \begin{bmatrix}
 1 & X_{11} &  \cdots & X_{1k} \\
 1 & \vdots & \ddots & \vdots \\
 1 & X_{n1} & \cdots & X_{nk}
 \end{bmatrix}
+}
 $$
 
-\
-
-- Solve for coefficients 
+>- Solve for coefficients 
 $$
-\beta =
+\bf\unicode[Times]{x3B2} =
 \begin{bmatrix}
 \beta_{0} \\
 \vdots \\
 \beta_{p}
 \end{bmatrix}
 $$
-          found as $$ \beta = (X^TX)^{-1}(X^TY) $$
+>          found as $$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
+
+# GLM - estimation
+$$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
+
+- This expresses **ALL types of General Linear Models!** 
+- It is modified by including different types of data in X
+- X may include categorical variables (factors), continuous predictors (covariates), combinations of the two, and interactions between them
+
+\
+
+>- Solving b this way minimizes the sum of squared residuals (error) and it is usually referred to as “*Least-Squares*” (LS) estimation
+>- In other words, coefficients estimated from the model design, $\mathbf{X}$, will minimize the sum squared error between observed data and expected values 
+>- As such, the error is an indication of how good the *fit of the model* is
+
+# ANOVA, groups and the design matrix
+- **AN**alysis **O**f **VA**riance: the procedure of evaluating any GLM by testing whether the inclusion of a term in a model causes a **change in residual variance**
+
+. . . 
+
+- More loosely (and generally) used to describe a GLM where X is a grouping factor
+- Same model $$ \bf{Y} = X \unicode[Times]{x3B2} $$ same estimators $$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
+
+. . . 
+
+- $\mathbf{X}$ describes *group membership*, and this is recoded into g-1 **dummy variables**
+```{r, echo = FALSE}
+Xtab <- matrix(c("A", "A", "B", "B", 0, 0, 1, 1), nrow = 4, byrow = F)
+knitr::kable(Xtab, col.names = c("GROUP", "X1"),
+             table.attr = "style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);'")
+```
+
 
 
 
 # A Tale of Two Linear Models
-
-
-### Mike's Linear Model Axiom
-
 *Other than to consider total dispersion in a data set, a linear model analysis always considers at least two models.*
 
 Much of life is like this - the absolute definition of a state is difficult or meaningless, but the relative difference in states provides meaning to both.  (For example, if today is 3 degrees warmer than yesterday, we know something about the weather both today and yesterday, but finding an absolute meaning of temperature is not helpful.)  Whether a linear model is a good or poor model for how data are dispersed requires a comparison (especially to a null model).
