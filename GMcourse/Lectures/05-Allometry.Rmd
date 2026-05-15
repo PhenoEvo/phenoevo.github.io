@@ -470,7 +470,8 @@ include_graphics("LectureData/05.allometry/Heterochrony.png")
     - PredLine $\small{P_1}$ vs. Csize (Adams and Nistri 2010)
     - CAC, RSC, Csize (Mitteroecker et al. 2004)
 
-- **Comparison of ontogenies**: - MANCOVA
+- **Comparison of ontogenies**: 
+    - MANCOVA
     - Convergence & divergence (Adams and Nistri 2010)
     - Orientation (Piras et al. 2010)
 
