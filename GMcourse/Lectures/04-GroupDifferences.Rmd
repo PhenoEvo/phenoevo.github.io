@@ -82,12 +82,12 @@ include_graphics("LectureData/04.groupdifferences/GLM_names.png")
 ```
 
 # Thoughts on nomenclature
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="100%"}
 include_graphics("LectureData/04.groupdifferences/GLM_nomenclature.png")  
 ```
 
 # The General Linear Model
-```{r, echo = FALSE, out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
 include_graphics("LectureData/04.groupdifferences/GLM_structure.png")  
 ```
 
@@ -95,12 +95,12 @@ include_graphics("LectureData/04.groupdifferences/GLM_structure.png")
 >- The term, **Least Squares** (LS), references the fact that coefficients estimated from the model design, $\mathbf{X}$, will minimize the sum squared error between observed data and expected values.  
 
 # GLM types
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="100%"}
 include_graphics("LectureData/04.groupdifferences/GLM_types.png")  
 ```
 
 # More on nomenclature
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="100%"}
 include_graphics("LectureData/04.groupdifferences/GLM_nomenclature2.png")  
 ```
 
@@ -118,10 +118,47 @@ $$
 Y = X\beta + E 
 \end{aligned}
 $$
-- They are **all the same model!**
-- Only difference: data in $\mathbf{X}$
-- Works equally for univariate and multivariate $\mathbf{Y}$
+- They are **all the same model!**  
+- Only difference: data in $\mathbf{X}$  
+- Works equally for univariate and multivariate $\mathbf{Y}$  
 
+\
+
+- Dependent variables 
+$$
+Y =
+\begin{bmatrix}
+Y_{11} & Y_{12} & \cdots & Y_{1p} \\
+Y_{21} & Y_{22} & \cdots & Y_{2p} \\
+\vdots & \vdots & \ddots & \vdots \\
+Y_{n1} & Y_{n2} & \cdots & Y_{np}
+\end{bmatrix}
+$$
+
+\
+
+- Independent (predictor) variables
+$$
+X =
+\begin{bmatrix}
+1 & X_{11} &  \cdots & X_{1k} \\
+1 & \vdots & \ddots & \vdots \\
+1 & X_{n1} & \cdots & X_{nk}
+\end{bmatrix}
+$$
+
+\
+
+- Solve for coefficients 
+$$
+\beta =
+\begin{bmatrix}
+\beta_{0} \\
+\vdots \\
+\beta_{p}
+\end{bmatrix}
+$$
+          found as $$ \beta = (X^TX)^{-1}(X^TY) $$
 
 
 
