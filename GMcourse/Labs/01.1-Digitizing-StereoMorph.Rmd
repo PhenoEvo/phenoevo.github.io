@@ -25,8 +25,8 @@ library(geomorph)
 ## **Digitizing Landmarks**
 
 First, let´s see how one can digitize fixed landmarks. These correspond to well-defined anatomical points on your structure of interest.
-You will need a folder with the pictures you will digitize (Images, in our example)
-In this script, digitized data are stored in another folder, called Shapes
+You will need a folder with the pictures you will digitize (Images, in our example).  
+In this script, digitized data are stored in another folder, called Shapes.  
 To digitize, e.g., five fixed landmarks, run: 
 ```{r eval=FALSE}
 digitizeImages(image.file='Images', shapes.file='Shapes',
@@ -81,7 +81,7 @@ Once the curve is digitized, you can **subsample a desired number of semilandmar
 ```{r eval=TRUE}
 
 shapes <- readShapes("Shapes")
-shapesGM <- readland.shapes(shapes, nCurvePts = 10) # can change 10 to a different number
+shapesGM <- readland.shapes(shapes, nCurvePts = 40) # can change 10 to a different number
 
 # Perform GPA
 Y.gpa <- gpagen(shapesGM, print.progress = FALSE)

@@ -57,22 +57,12 @@ str(mydata)
 mydata[,,1]
 ```
 
-## **Read Landmark Data from Morphologika Files**
-
-Another file type that is sometimes encountered is a Morphologika file; developed for the Morphologika package. One can read these files using `geomorph` also, using the function `read.morphologika`:
-
-```{r eval=TRUE}
-mydata <- read.morphologika("Data/mophologikaexample.txt")
-str(mydata)
-dim(mydata$coords)
-mydata$coords[,,1]
-```
-
 ## **Read 3D image (PLY file)**
 
 Sometimes, we may wish to digitize directly from 3D images. These come in the form of ply files, and `geomorph` has the ability to read, and then digitize such images.
 
 ```{r eval=TRUE}
+library(rgl)
 new <- read.ply("Data/Mandible.ply")
 str(new)
 ```

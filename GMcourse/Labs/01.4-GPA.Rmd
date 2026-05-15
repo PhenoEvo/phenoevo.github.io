@@ -1,6 +1,6 @@
 ---
 title: "01.4: GPA: Generalized Procrustes Analysis"
-author: "Dean Adams, Michael Collyer & Antigoni Kaliontzopoulou"
+author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---
