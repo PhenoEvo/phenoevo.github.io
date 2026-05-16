@@ -187,6 +187,43 @@ knitr::kable(Xtab, col.names = c("GROUP", "X1"),
              table.attr = "style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);'")
 ```
 
+# ANOVA: the meaning of b
+- In ANOVA designs, the estimated parameters represent the mean of the first group and the difference of the means of other groups from it
+- Dummy variables work like switches: 
+0 turns the light off; 1 turns the light on
+
+. . . 
+
+- For instance, for group 3:
+
+$$ \hat y = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \beta_{3}x_{3}$$
+$$ \hat y = \beta_{0} + \beta_{1}0 + \beta_{2}1 + \beta_{3}0$$
+$$ \hat y = \beta_{0} + \beta_{2} $$
+
+- The mean (predicted value) for group 3 is the mean of group 1 ($\beta_0$) plus the adjustment for group 3 ($\beta_2$)
+
+# Data as points in multivariate space
+```{r, echo = FALSE, fig.align='center', out.width="100%"}
+include_graphics("LectureData/04.groupdifferences/LMgeometry0.png")  
+```
+
+# Data as points in multivariate space
+```{r, echo = FALSE, fig.align='center', out.width="100%"}
+include_graphics("LectureData/04.groupdifferences/LMgeometry1.png")  
+```
+
+# Data as points in multivariate space
+```{r, echo = FALSE, fig.align='center', out.width="100%"}
+include_graphics("LectureData/04.groupdifferences/LMgeometry2.png")  
+```
+
+# Data as points in multivariate space
+```{r, echo = FALSE, fig.align='center', out.width="100%"}
+include_graphics("LectureData/04.groupdifferences/LMgeometry3.png")  
+```
+
+
+
 
 
 
@@ -246,48 +283,6 @@ model.matrix(~ Group, data = df)
 ```
 
 
-# Design Matrices: Factors (cont.)
-
-#### Key points
-
-
-Let's revisit this description from before (next slide)
-
-
-# Vectors are Points in Space
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/points/Slide1.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/points/Slide2.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/points/Slide3.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/points/Slide4.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/points/Slide5.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/points/Slide6.png")  
-```
-
-# Vectors are Points in Space (Cont.)
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/points/Slide7.png")  
-```
 
 # Design Matrices: Factors
 
