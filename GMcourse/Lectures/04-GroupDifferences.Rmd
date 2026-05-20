@@ -114,7 +114,7 @@ Y = \beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + + \beta_nX_n + \epsilon
 $$
 $$
 \begin{aligned}
-\mathbf{Y = X\beta + E}
+\mathbf{Y = X\bf\unicode[Times]{x3B2} + E}
 \end{aligned}
 $$
 - They are **all the same model!**  
@@ -161,12 +161,12 @@ $$
 $$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
 
 - This expresses **ALL types of General Linear Models!** 
-- It is modified by including different types of data in X
-- X may include categorical variables (factors), continuous predictors (covariates), combinations of the two, and interactions between them
+- It is modified by including different types of data in $\mathbf{X}$
+- $\mathbf{X}$ may include categorical variables (factors), continuous predictors (covariates), combinations of the two, and interactions between them
 
 \
 
->- Solving b this way minimizes the sum of squared residuals (error) and it is usually referred to as “*Least-Squares*” (LS) estimation
+>- Solving $\bf\unicode[Times]{x3B2}$ this way minimizes the sum of squared residuals (error) and it is usually referred to as “*Least-Squares*” (LS) estimation
 >- In other words, coefficients estimated from the model design, $\mathbf{X}$, will minimize the sum squared error between observed data and expected values 
 >- As such, the error is an indication of how good the *fit of the model* is
 
@@ -178,16 +178,14 @@ $$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
 - More loosely (and generally) used to describe a GLM where X is a grouping factor
 - Same model $$ \bf{Y} = X \unicode[Times]{x3B2} $$ same estimators $$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
 
-. . . 
-
-- $\mathbf{X}$ describes *group membership*, and this is recoded into g-1 **dummy variables**
+>- $\mathbf{X}$ describes *group membership*, and this is recoded into g-1 **dummy variables**
 ```{r, echo = FALSE}
 Xtab <- matrix(c("A", "A", "B", "B", 0, 0, 1, 1), nrow = 4, byrow = F)
 knitr::kable(Xtab, col.names = c("GROUP", "X1"),
              table.attr = "style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);'")
 ```
 
-# ANOVA: the meaning of b
+# ANOVA: the meaning of $\beta$
 - In ANOVA designs, the estimated parameters represent the mean of the first group and the difference of the means of other groups from it
 
 . . . 
@@ -290,66 +288,78 @@ Bg
 by(y, df$Group, mean)
 ```
 
+. . . 
+
 #### Wait!  These values are different!
 * Remember that fitted values are found as $\mathbf{\hat{Y}} = \mathbf{X\hat{\beta}}$ !!! *
 
 # Geometric Interpretation of Model Effects
 
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/stats/Slide1.png")  
-```
-
-# Geometric Interpretation of Model Effects (cont.)
-
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide2.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide3.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide4.png")  
 ```
 
 # Geometric Interpretation of Model Effects (cont.)
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide5.png")  
 ```
 
-# Geometric Interpretation of Model Effects (cont.)
+# Is one model better than the other?
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide6.png")  
 ```
 
-# Geometric Interpretation of Model Effects (cont.)
+# Is one model better than the other? (cont.)
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide7.png")  
+```
+
+# Is one model better than the other? (cont.)
+
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
+include_graphics("LectureData/04.groupdifferences/stats/Slide8.png")  
+```
+
+# Is one model better than the other? (cont.)
+
+```{r, echo = FALSE, fig.align='center', out.width="80%"}
+include_graphics("LectureData/04.groupdifferences/stats/Slide9.png")  
 ```
 
 # ANOVA
 
-Analysis of variance is used for determining the *significance* of group differences (whether group means are a better estimate of shape than the grand mean).  For shape data, using randomization of residuals in a permutation procedure (RRPP) is the best way to go (Collyer et al. 2015; Adams & Collyer 2016, 2018)
+- Used for determining the *significance* of group differences (whether group means are a better estimate of shape than the grand mean).  
+- For shape data, using **randomization of residuals in a permutation procedure (RRPP)** is the best way to go (Collyer et al. 2015; Adams & Collyer 2016, 2018)
 
-The equation for RRPP:
+. . . 
+
+- The equation for RRPP:
 
 $$\mathbf{\mathcal{Y}} = \mathbf{\hat{Y}} + \mathbf{E}_{\left[s,\right]}^*$$
+. . . 
 
-In words, random pseudo-values are generated by holding the transformed fitted values of a (**reduced**) model constant and randomizing only the transformed residuals.  The subscript of the transformed residuals indicates that the rows of the matrix are shuffled, according to $s$, which is a randomized form of the sequence, $1,2,3,...,n$.
+- In other words, random pseudo-values are generated by holding the transformed fitted values of a (**reduced**) model constant and randomizing only the transformed residuals.  
+- The subscript of the transformed residuals indicates that the rows of the matrix are shuffled, according to $s$, which is a randomized form of the sequence, $1,2,3,...,n$.
 
 ###### Collyer et al. *Heredity.* (2015); Adams & Collyer. *Evolution.* (2016); Adams & Collyer. *Evolution.* (2018)
 
 # RRPP and Empirical Null Sampling Distributions
-
-1. Perform RRPP (randomize residuals many permutations).  
+1. Perform RRPP (randomize residuals many permutations)  
 2. Calculate $F$-value in every random permutation (observed case counts as one permutation)
 3. For $N$ permutations, $P = \frac{N(F_{random} \geq F_{obs})}{N}$
 4. Calculate *effect size* as a standard deviate of the observed value in a normalized distribution of random values (helps for comparing effects within and between models); i.e.,
@@ -358,44 +368,36 @@ $$z = \frac{
 } {
  \sigma_{\log\left(F\right)}
 }$$
-where $\mu_{\log\left(F\right)}$ and $\sigma_{\log\left(F\right)}$ are the expected value and standard deviation from the sampling distribution, respectively (Collyer et al. 2015; Adams and Collyer 2016, 2018).
+where $\mu_{\log\left(F\right)}$ and $\sigma_{\log\left(F\right)}$ are the expected value and standard deviation from the sampling distribution, respectively (Collyer et al. 2015; Adams and Collyer 2016, 2018)
 
 ###### Collyer et al. *Heredity.* (2015); Adams & Collyer. *Evolution.* (2016); Adams & Collyer. *Evolution.* (2018)
 
 # ANOVA (cont.)
-
 Returning to our previous example
 
 ```{r echo = TRUE, include = TRUE}
-
 fit <- procD.lm(y ~ Group, data = df, print.progress = FALSE)
 anova(fit)
-
 ```
 
-- Group $SS$ is the sum of squared distances between means.
-- Residual $SS$ is the sum of squared distances between observations and their means.
-- Total $SS$ is the sum of squared distances between observations and the **grand** mean.
-- The rest is a determination if the mean squared distances differ significantly.
+>- Group $SS$ is the sum of squared distances between means.
+>- Residual $SS$ is the sum of squared distances between observations and their means.
+>- Total $SS$ is the sum of squared distances between observations and the **grand** mean.
+>- The rest is a determination if the mean squared distances differ significantly.
 
 # ANOVA (cont.)
-
 #### Using a better example: body shape 
 
 ```{r echo = TRUE, include = TRUE}
-
-pupfish$Group <- interaction(Pupfish$Sex, Pupfish$Pop)
+pupfish$Group <- interaction(pupfish$Sex, Pupfish$Pop)
 fit <- procD.lm(coords ~ Group, data = pupfish, print.progress = FALSE)
 anova(fit)
-
 ```
 
 # ANOVA (cont.)
-
 #### Using a better example: body shape 
 
 ```{r echo = TRUE, include = TRUE, out.width="100%"}
-
 plot(fit, type = "PC", pch = 21, bg = pupfish$Group)
 legend("topright", levels(pupfish$Group), pch = 21, pt.bg = 1:4)
 ```
@@ -452,7 +454,6 @@ So why bother with a more complicated model design matrix?
 The two models before were sub-models of this full one
 
 ```{r echo = TRUE, include = TRUE}
-
 Xf
 ```
 
@@ -480,8 +481,8 @@ anova(fitPup)
 # A More Practical Example (from before, Cont.)
 
 ```{r echo = TRUE, include = TRUE}
-plot(fitPup, type = "PC", pch = 21, bg = pupfish$Group)
-legend("topright", levels(pupfish$Group), pch = 21, pt.bg = 1:4)
+plot(fitPup, type = "PC", pch = 21, bg = df$Group)
+legend("topright", levels(df$Group), pch = 21, pt.bg = 1:4)
 ```
 
 
