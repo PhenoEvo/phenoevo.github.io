@@ -401,10 +401,6 @@ anova(fit)
 plot(fit, type = "PC", pch = 21, bg = pupfish$Group)
 legend("topright", levels(pupfish$Group), pch = 21, pt.bg = 1:4)
 ```
-```{r echo = FALSE, include = TRUE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/pupfish.example.png") 
-```
-
 # Design Matrices: Factors (cont.)
 
 ```{r, echo = FALSE, out.width="100%"}
