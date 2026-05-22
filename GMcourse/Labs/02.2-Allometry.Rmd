@@ -1,6 +1,6 @@
 ---
-title: "03.4: Allometry"
-author: "Dean Adams, Michael Collyer & Antigoni Kaliontzopoulou"
+title: "Allometry"
+author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---
@@ -10,7 +10,6 @@ output: html_document
 Allometry, the covariation of shape with size, is a critically-important pattern to evaluate in morphometric analyses. Here we show several analyses available in `geomorph` for investigating shape-size relationships. For the case of allometry, many options are concatenated in the `plotAllometry` function in `geomorph`. However, for those based on linear models, one can arrive at similar analytics and plots using the `procD.lm` approach.
 
 ## **1: Simple allometry**
-
 Here we provide the case of a simple allometric pattern in a single group. We have seen these analyses before:
 
 ```{r eval=TRUE}
@@ -54,7 +53,6 @@ anova(fit.common, fit.unique, print.progress = FALSE)
 Because the unique slopes model was slightly better, it seems unwise to assume slopes are parallel and compare means.  However, the additional explained variation with unique slopes was also quite small.  Let's see what happens when we compare slopes.  We can compare slopes with pairwise, just like means. Let's make sure the common slopes model is the null model.
 
 ## **2a: Pairwise Comparisons**
-
 Based on the outcome of a homogeneity of slopes test, one may wish to perform different types of pairwise comparisons. These come in the form of: 1) comparisons of adjusted least-squares means (common slopes), 2) comparisons of slope angles (unique slopes), 3) comparisons of regression lengths (unique slopes), and 4) comparisons of group disparity. For the present example, #2 and #3 are most appropriate to investigate.
 
 ```{r eval=TRUE}
@@ -87,7 +85,6 @@ pch = 19, col = as.numeric(interaction(gdf$species, gdf$site)))
 
 
 ## **3: Size-Shape PCA**
-
 One can also generate a plot of size-shape space (sensu Mitteroecker et al. 2004):
 
 ```{r eval=TRUE}

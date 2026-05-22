@@ -1,6 +1,6 @@
 ---
 title: "ANOVA Models"
-author: "Dean Adams, Michael Collyer & Antigoni Kaliontzopoulou"
+author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---
@@ -9,11 +9,9 @@ output: html_document
 
 In `geomorph`, ANOVA models are performed using Procrustes ANOVA. Factorial models can also be performed. The primary function for this is `procD.lm`, which is a wrapper for the `lm.rrpp` function in the package `RRPP`. This latter function contains myriad options and is quite flexible for evaluating linear model designs. 
 
-As several examples, `RRPP` facilitates linear model analysis using type I, type II, or type III sums of squares, and has the ability to perform ordinary least squares (OLS) or generalized least squares (GLS) computations (the latter is useful when specimens are not independent and one has an estimated covariance matrix describing this non-independence).  Additionally, one may specify the error terms for different factors in the model, enabling simple mixed-model and random effects models to be performed, even on highly multivariate data. 
-
 Here we demonstrate some of that flexibility: the user is strongly encouraged to work through the various vignettes that accompany both `geomorph` and `RRPP` which provide additional hints on usage, and other valuable information. 
 
-Here are several examples for performing ANOVA-based models and pairwise comparisons in `geomorph` and `RRPP`. First, let's load some data: 
+Here are some examples for performing ANOVA-based models and pairwise comparisons in `geomorph` and `RRPP`. First, let's load some data: 
 
 ```{r eval=TRUE}
 library(geomorph)
@@ -23,7 +21,6 @@ plot(Y.gpa)
 ```
 
 ### **Single-Factor ANOVA (though multivariate data)**
-
 Here is an example of a single-factor ANOVA for shape data; comparing species: 
 
 ```{r eval=TRUE}
@@ -34,7 +31,8 @@ gdf <- geomorph.data.frame(Y.gpa,
 
 pleth.anova <- procD.lm(coords ~ species, data = gdf, print.progress = FALSE)
 summary(pleth.anova)
-PCA <- plotTangentSpace(Y.gpa$coords, groups = gdf$species) 
+PCA <- gm.prcomp(Y.gpa$coords)
+plot(PCA, pch = 21, bg = gdf$species)
 ```
 
 From this it seems that species differ, though our PCA plot reveals that there may be some additional structure in the data.
@@ -50,23 +48,18 @@ summary(pleth.manova, test = "Pillai")
 summary(pleth.manova, test = "Wilks")
 ```
 
-The `tol` argument could be set to 0 because the observations outnumber the shape variables.  This could be adjusted, or the number of PCs limited, if shape variables outnumber observations (to prevent problems with matrix inversion).  The help file for `manova.update` can help explain more.  This concern does not exists with ANOVA statistics.
+The `tol` argument could be set to 0 because the observations outnumber the shape variables.  This could be adjusted if shape variables outnumber observations (to prevent problems with matrix inversion).  The help file for `manova.update` can help explain more.  This concern does not exists with ANOVA statistics.
 
 ### **Factorial ANOVA/MANOVA**
-
 One can also perform factorial designs using the RRPP perspective: 
 
 ```{r eval=TRUE}
 pleth.anova2 <- procD.lm(coords ~ species*site, data = gdf, print.progress = FALSE)
 summary(pleth.anova2)
 ```
-
 This analysis reveals that there are differences among species and sites. **However**, the interaction term is highly significant and with a strong effect (note the $\small{Z-score}$). Thus, further analyses via pairwise comparisons will be important.
 
 ```{r eval=TRUE}
-pleth.anova2 <- procD.lm(coords ~ species*site, data = gdf, print.progress = FALSE)
-anova(pleth.anova2)
-
 # Before performing pairwise comparisons, it might be useful to see what the null model is
 reveal.model.designs(pleth.anova2)
 
@@ -75,13 +68,13 @@ summary(pleth.pw, confidence = 0.95, test.type = "dist")
 
 ```
 
-The pairwise test above is most appropriate.  It considers which means are different, after accounting for species and site effects.  We could ignore that and use a different null model.  It is always wise to consider the most appropriate null model.  Here is a poor choice, but done so to show how one can take control of the analysis.
+The pairwise test above is most appropriate.  It considers which means are different, after accounting for species and site effects. We could ignore that and use a different null model.  It is always wise to consider the most appropriate null model. 
+Following is a poor choice, run just to illustrate how one can control the analysis.
 
 ```{r eval=TRUE}
 pleth.null <- procD.lm(coords ~ 1, data = gdf, print.progress = FALSE)
 pleth.pw2 <- pairwise(pleth.anova2, fit.null = pleth.null, groups = gdf$gp)
 summary(pleth.pw2, confidence = 0.95, test.type = "dist")
-
 ```
 
 This pairwise test assumes just an overall mean is an appropriate null model, and species and site effects should not be considered.  *This is a really stupid null model!*  But just as forcing this null model is foolish, not considering the null model and using whatever is the default, is equally foolish.
@@ -94,8 +87,6 @@ gps <- as.factor(paste(plethodon$species, plethodon$site))
 par(mar=c(2, 2, 2, 2))
 plot(pleth.raw, pch=22, cex = 1.5, bg = gps) 
 #  Add things as desired using standard R plotting
-text(par()$usr[1], 0.1*par()$usr[3], labels = "PC1 - 45.64%", pos = 4, font = 2)
-text(0, 0.95*par()$usr[4], labels = "PC2 - 18.80%", pos = 4, font = 2)
 legend("topleft", pch=22, pt.bg = unique(gps), legend = levels(gps))
 
 M <- mshape(Y.gpa$coords)
@@ -114,7 +105,6 @@ plotRefToTarget(M, preds$alloJord, links = plethodon$links, mag=2)
 `Picknplot.shape` examples are available in the lab script.
 
 ### Specifying Error: Mixed Effects Models
-
 Sometimes, the terms in our model represent random effects; such as is found in a nested model. Here one must designate *WHICH* factor's SS represents the error term against which another factor is compared. This is done using the `error` argument in `anova`:
 
 ```{r eval=TRUE}
