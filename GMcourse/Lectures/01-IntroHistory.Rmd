@@ -204,7 +204,6 @@ include_graphics("LectureData/01.Intro/LizardMultiMorph.png")
     - Size, shape and allometry (size vs. shape): Jolicoeur, 1963; Burnaby, 1966; Mosimann, 1970
 
 # Geometric Morphometrics
-
 - 1980s-1990s: Theoretical advances and data types caused radical shift in morphometric methods
 - **Geometric Morphometric Methods (GMM) emerged**
 - Rigorous quantification of shape coupled with sound statistics and graphical visualization
@@ -217,7 +216,6 @@ include_graphics("LectureData/01.Intro/PlethHeadLand.png")
 ```
 
 # Measuring Shapes
-
 - **Morphometrics: the study of shape variation and its covariation**
 - How to quantify shape?  There are no *natural* units for shape
 
@@ -237,16 +235,17 @@ include_graphics("LectureData/01.Intro/PlethHeadLand.png")
   - Be appropriate to address the biological question of interest
 
 # Morphometric Data
-
 - Morphometric data may quantify:
 - The location of discrete anatomic features (**points**)
 - Distances between anatomic features (**lines**)
 - Outlines of a structure (**curves**)
-- The surface of a structure (**surfaces**)
->- The modern morphometric synthesis permits the combination of ALL these types of data
+- The surface of a structure (**surfaces**)   
+
+. . .
+
+- The modern morphometric synthesis permits the combination of ALL these types of data
 
 # Homology in Morphometrics
-
 - Data must quantify shape in a repeatable manner
 - Homology: correspondence across specimens
 - Evolutionary homology: structures derived from the same tissue of the most recent common ancestor
