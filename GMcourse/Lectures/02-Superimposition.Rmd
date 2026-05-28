@@ -94,7 +94,8 @@ include_graphics("LectureData/02.Superimposition/SuperIdea.png")
 . . . 
 
 **Centroid size**: the square root of the sum of the squared distances between each landmark and the centroid (center of mass of the object) of the landmark configuration:
-$$\small{CS}=\sqrt{\sum_{i,j}^{k,p}\left(\mathbf{Y}_{ij}-\mathbf{Y}_{ic}\right)^2}$$
+
+$$\text CS = \sqrt{\sum_{i,j}^{k,p} {\left(\mathbf{Y}_{ij}-\mathbf{Y}_{ic}\right)}^2}$$
 
 where $\small{p}$ is the number of landmarks and $\small{k}$ is the number of coordinate dimensions
 
