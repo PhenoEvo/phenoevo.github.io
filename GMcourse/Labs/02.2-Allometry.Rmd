@@ -1,6 +1,6 @@
 ---
-title: "03.4: Allometry"
-author: "Dean Adams, Michael Collyer & Antigoni Kaliontzopoulou"
+title: "02.2: Allometry"
+author: "Antigoni Kaliontzopoulou"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---

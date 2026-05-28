@@ -1,6 +1,6 @@
 ---
-title: "02.2: Visualizing Shape Differences and Principal Components Analysis"
-author: "Dean Adams, Michael Collyer & Antigoni Kaliontzopoulou"
+title: "02.3: Visualizing Shape Differences and Principal Components Analysis"
+author: "Antigoni Kaliontzopoulou"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---
@@ -72,8 +72,8 @@ While the mathematics of this can become rather involved, it is straightforward.
 
 ```{r eval=TRUE}
 M <- mshape(Y.gpa$coords)
-PCA <- plotTangentSpace(Y.gpa$coords)
-PC <- PCA$pc.scores[,1]
+PCA <- gm.prcomp(Y.gpa$coords)
+PC <- PCA$x[,1]
 preds <- shape.predictor(Y.gpa$coords, x= PC, Intercept = FALSE, 
                          pred1 = min(PC), pred2 = max(PC)) # PC 1 extremes, more technically
 plotRefToTarget(M, preds$pred1, links = plethodon$links)
@@ -124,13 +124,7 @@ plotRefToTarget(M, preds$alloJord, links = plethodon$links, mag=2)
 
 ## **3: PCA Plot (Tangent Space)**
 
-In `geomorph`, there are two ways to obtain a principal components plot of shape variation (i.e, a visualization of Tangent Space). Here is the first option, using `plotTangentSpace`:
-
-```{r eval=TRUE}
-plotTangentSpace(Y.gpa$coords, groups = interaction(plethodon$species, plethodon$site))
-```
-
-Alternatively, one could use the function `gm.prcomp`. This has additional flexibility as compared to the previous function, some of which we show here (later we will show phylogenetic PCA plots):
+The function `gm.prcomp` allows us to obtain a principal components plot of shape variation. This has additional flexibility as compared to the previous function, some of which we show here:
 
 ```{r eval=TRUE}
 pleth.raw <- gm.prcomp(Y.gpa$coords)
@@ -140,8 +134,6 @@ plot(pleth.raw)
 par(mar=c(2, 2, 2, 2))
 plot(pleth.raw, pch=22, cex = 1.5, bg = gps) 
 #  Add things as desired using standard R plotting
-text(par()$usr[1], 0.1*par()$usr[3], labels = "PC1 - 36.74%", pos = 4, font = 2)
-text(0, 0.95*par()$usr[4], labels = "PC2 - 31.02%", pos = 4, font = 2)
 legend("topleft", pch=22, pt.bg = unique(gps), legend = levels(gps))
  
 
