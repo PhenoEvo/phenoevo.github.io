@@ -1,11 +1,6 @@
 ---
-<<<<<<< HEAD
 title: "Allometry"
 author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer"
-=======
-title: "02.2: Allometry"
-author: "Antigoni Kaliontzopoulou"
->>>>>>> 815c9f1871822e57131d3fcc2068471827cba3f5
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---
@@ -44,7 +39,6 @@ plotAllometry(fit, size = gdf$Csize, logsz = TRUE, method = "CAC", pch = 19)
 ```
 
 ## **2: Group Allometries**
-
 Next, we add some biological realism, and consider the case of allometry patterns in multiple groups. This, of course, represents an ANCOVA design: analysis of covariance. It requires a more complex linear model, and affords additional possibilities in terms of analytical approaches, and visualizations.
 
 #### Note!  Before ever launching into an investigation of allometric differences, it is wise to ask if groups have a common allometry or unique allometrices.

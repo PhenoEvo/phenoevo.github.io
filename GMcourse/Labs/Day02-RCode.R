@@ -1,4 +1,4 @@
-# This R script contains the concatenatid code from the day 3 tutorials.
+# This R script contains the concatenatid code from the day 2 tutorials.
 # This is what you should work through during lab, using your own data.
 
 library(geomorph)
@@ -41,7 +41,7 @@ pleth.anova$GM$coefficients # effects
 
 ref <- mshape(Y.gpa$coords)
 
-par(mfcol = c(1, 2))
+par(mfcol = c(1, 2), mai = rep(0.2, 4))
 
 # P. jordani (just the intercept; i.e., 1, 0)
 plotRefToTarget(ref,  pleth.anova$GM$coefficients[,, 1], mag = 3)
@@ -55,7 +55,6 @@ par(mfcol = c(1,1))
 ### --------------------------------------------------------------------------------------------------
 
 # MANOVA statistics
-
 pleth.manova <- manova.update(pleth.anova, tol = 0)
 summary(pleth.manova)
 summary(pleth.manova, test = "Pillai")
@@ -75,7 +74,6 @@ pleth.pw <- pairwise(pleth.anova2, groups = gdf$gp)
 summary(pleth.pw, confidence = 0.95, test.type = "dist")
 
 # We could override the null model, if we wanted
-
 pleth.null <- procD.lm(coords ~ 1, data = gdf, print.progress = FALSE)
 pleth.pw2 <- pairwise(pleth.anova2, fit.null = pleth.null, groups = gdf$gp)
 summary(pleth.pw2, confidence = 0.95, test.type = "dist")
