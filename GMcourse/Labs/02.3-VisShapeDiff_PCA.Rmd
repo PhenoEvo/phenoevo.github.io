@@ -1,6 +1,11 @@
 ---
+<<<<<<< HEAD
 title: "Visualizing Shape Differences and Principal Components Analysis"
 author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer"
+=======
+title: "02.3: Visualizing Shape Differences and Principal Components Analysis"
+author: "Antigoni Kaliontzopoulou"
+>>>>>>> 815c9f1871822e57131d3fcc2068471827cba3f5
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---
@@ -74,7 +79,11 @@ While the mathematics of this can become rather involved, it is straightforward.
 M <- mshape(Y.gpa$coords)
 PCA <- gm.prcomp(Y.gpa$coords)
 PC <- PCA$x[,1]
+<<<<<<< HEAD
 preds <- shape.predictor(Y.gpa$coords, x = PC, Intercept = FALSE, 
+=======
+preds <- shape.predictor(Y.gpa$coords, x= PC, Intercept = FALSE, 
+>>>>>>> 815c9f1871822e57131d3fcc2068471827cba3f5
                          pred1 = min(PC), pred2 = max(PC)) # PC 1 extremes, more technically
 # Note that these are actually already included in the PCA object in the list "shapes"
 plotRefToTarget(M, preds$pred1, links = plethodon$links)
@@ -125,7 +134,11 @@ plotRefToTarget(M, preds$alloJord, links = plethodon$links, mag=2)
 
 ## **3: PCA Plot **
 
+<<<<<<< HEAD
 In `geomorph`, the function `gm.prcomp` provides great flexibility for different types of PCAs. Here we only showcase the basic PCA capacities.
+=======
+The function `gm.prcomp` allows us to obtain a principal components plot of shape variation. This has additional flexibility as compared to the previous function, some of which we show here:
+>>>>>>> 815c9f1871822e57131d3fcc2068471827cba3f5
 
 ```{r eval=TRUE}
 pleth.raw <- gm.prcomp(Y.gpa$coords)

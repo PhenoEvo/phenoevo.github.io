@@ -57,16 +57,6 @@ str(mydata)
 mydata[,,1]
 ```
 
-## **Read 3D image (PLY file)**
-
-Sometimes, we may wish to digitize directly from 3D images. These come in the form of ply files, and `geomorph` has the ability to read, and then digitize such images.
-
-```{r eval=TRUE}
-library(rgl)
-new <- read.ply("Data/Mandible.ply")
-str(new)
-```
-
 ## **Read in text file (for landmarks or other variables)**
 
 Finally, one may have additional data, covariates, or other specimen information that one wishes to read into R for downstream analyses. As we are working in the R environment, one is free to do so using a variety of `read` functions. Below we provide an example for a data matrix, and a phylogeny:

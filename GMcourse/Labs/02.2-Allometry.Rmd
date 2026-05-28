@@ -1,6 +1,11 @@
 ---
+<<<<<<< HEAD
 title: "Allometry"
 author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer"
+=======
+title: "02.2: Allometry"
+author: "Antigoni Kaliontzopoulou"
+>>>>>>> 815c9f1871822e57131d3fcc2068471827cba3f5
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---
