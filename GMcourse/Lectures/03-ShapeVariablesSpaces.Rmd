@@ -223,7 +223,7 @@ plot(GPA.d,Kendall.d)
     - Difference due to curvature of shape space
 
 >- **Use Kendall´s Tangent Space Coordinates** to represent shape
->- These are found from GPA+Orthogonal Projection
+>- These are found from GPA + Orthogonal Projection
 
 >- NOTE: Most current papers use tangent space coordinates, aka Procrustes residuals combined with resampling tests (to accomodate singular dimensions) 
 >- TPS then, is frequently used to **visualize shape differences**
