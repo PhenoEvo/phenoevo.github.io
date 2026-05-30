@@ -128,8 +128,6 @@ Here is isometry...
 include_graphics("LectureData/05.allometry/IsometryPlot.png")  
 ```
 
-\
-
 >- But how do we assess such patterns? 
 
 >- We use linear models!
@@ -157,9 +155,9 @@ Model Residual Error    ($\small{SSE}$) | $\small\mathbf{S}_R=\hat{\mathbf{E}}_R
 # Assessing Significance: RRPP
 1: Fit $\small\mathbf{X}_{R}$ for each $\small\mathbf{X}_{F}$; Estimate $\small\hat{\mathbf{Y}}_{R}$ and $\small\mathbf{E}_{R}$
 
-2: Permute, $\small\mathbf{E}_{R}$: obtain pseudo-values as: $\small\mathbf{\mathcal{Y}} = \mathbf{\hat{Y}}_{R} + \mathbf{E}_{R}$
+2: Permute, $\small\mathbf{E}_{R}$: obtain pseudo-values as: $\small\mathscr{Y} = \mathbf{\hat{Y}}_{R} + \mathbf{E}_{R}$
 
-3: Fit $\small\mathbf{X}_{F}$ using $\small\mathbf{\mathcal{Y}}$: obtain coefficients and summary statistics
+3: Fit $\small\mathbf{X}_{F}$ using $\small\mathscr{Y}$: obtain coefficients and summary statistics
 
 4: Calculate $\small{F}$-value in every random permutation (observed case counts as one permutation)
 
