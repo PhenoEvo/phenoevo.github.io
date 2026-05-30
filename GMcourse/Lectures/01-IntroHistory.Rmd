@@ -131,7 +131,7 @@ and the one method tends to follow the other in strict scientific order and hist
 - Species taxonomy, classification, and ecological specialization were all addressed using anatomical properties
 - However, morphology was typically described qualitatively, leading to limitations
 - Much of the richness of morphological variation not captured
-- Limits comparisons to 2 objects (same or different)
+- Limits comparisons to 2 objects (same or different)  
 For > 2 objects, only rank-orderings could be done (A >B >C)
 - Rank-ordering implies differences on a continuous scale
 - Thus, there was a need to quantitatively compare morphology
@@ -149,7 +149,6 @@ include_graphics("LectureData/01.Intro/Durer.png")
 ```
 
 # Transformation Grids in Biology 
-
 - Early biological ideas 
     
 ```{r, echo = FALSE, out.width="80%"}
@@ -159,7 +158,6 @@ include_graphics("LectureData/01.Intro/DiodonMola.png")
 ###### Early versions were qualitative. This week we learn the thin-plate spline which enables accurate shape transformations
 
 # The Biometric Tradition
-
 - Use of quantitative data began in the late 1800s: variables were measured (e.g., wing length) and group means compared
 - Morphometric advances concurrent with statistical advances
 - **LATE 1800s – EARLY 1900s**
@@ -169,7 +167,6 @@ include_graphics("LectureData/01.Intro/DiodonMola.png")
 - Early 1900s: BIG biological debate: Biometric vs. Mendelian (continuous vs. discontinuous biological variation)
 
 # Development of Statistics
-
 - Statistics developed (as a field) with evolutionary biology
 - ANOVA / Variance partitioning (Fisher: for quantitative genetics and more generally)
 - Discriminant Function Analysis (DFA/CVA), MANOVA, 
@@ -178,6 +175,8 @@ include_graphics("LectureData/01.Intro/DiodonMola.png")
 - Multivariate t-test (Hotelling)
 - Factor Analysis (Spearman)
 - Path Analysis (Wright)
+
+\
 
 . . . 
 
@@ -188,7 +187,6 @@ include_graphics("LectureData/01.Intro/DiodonMola.png")
 - *THIS* paved the way for morphometrics
 
 # Multivariate Morphometrics
-
 - Multivariate analysis of morphological measurements 
 - Within- and between-group variation described and compared 
 - Commonly used methods: principal components, canonical variates, discriminant function (see Blackith and Reyment, 1971)
