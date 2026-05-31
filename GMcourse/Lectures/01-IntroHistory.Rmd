@@ -317,11 +317,10 @@ include_graphics("LectureData/01.Intro/Truss.png")
 - The truss was an attempt to record relative positions
 - This information is inherent in the common endpoints of linear distances
 - Change from linear measurements to the locations of points themselves
-- Use **landmark coordinates** as the raw data
+- Use **landmark coordinates** as the raw data  
 This advance was aided by the simultaneous development of mathematical shape theory
 
 # Data Types: Landmark Coordinates
-
 - Use x, y (or x, y, z) coordinates of anatomic locations to quantify anatomical variation
 - Eliminate non-shape variation (size and others, see further on)
 - Multivariate data analysis
@@ -339,7 +338,6 @@ include_graphics("LectureData/01.Intro/LandmarkTypes.png")
 ```
 
 # Landmarks: Considerations
-
 **Advantages**
 
 - Easy to assess homology, so biological interpretation is more robust
@@ -355,10 +353,9 @@ include_graphics("LectureData/01.Intro/LandmarkTypes.png")
 
 \
 
-##### These issues are alleviated through Geometric Morphometric methods and its extensions to other data types, see further on
+###### These issues are alleviated through Geometric Morphometric methods and its extensions to other data types, see further on
 
 # Data Types: Curves
-
 - Some structures have few, or no, landmarks
 - One may be interested in outlines, or other curves, to quantify shape
 - Types of curves
@@ -370,7 +367,6 @@ include_graphics("LectureData/01.Intro/Curves.png")
 ```
 
 # Curves: Considerations
-
 **Advantages**
 
 - Useful when there are few, or no, landmarks
@@ -388,13 +384,12 @@ include_graphics("LectureData/01.Intro/Curves.png")
 ##### But see next! – The Procrustes paradigm allows the combination of points, curves and surfaces
 
 # Semilandmarks
-
 - They resolve the problems encountered when working with curves
 - Can be quantified on curves (2D) or surfaces (3D)
 - They are treated as “degenerate” landmarks, the position of which is limited to slide on a curve (or surface) during analysis
 - Only variation perpendicular to the curve is relevant
 
-```{r, echo = FALSE, out.width="80%"}
+```{r, echo = FALSE, out.width="75%", position = "center"}
 include_graphics("LectureData/01.Intro/Semilandmarks.png")  
 ```
 
@@ -407,7 +402,6 @@ include_graphics("LectureData/01.Intro/Semilandmarks.png")
 - It is possible to combine different morphological features (points, curves, surfaces) in a single analysis of form
 
 # The Procrustes Paradigm
-
 - Combining landmarks and semilandmarks there is a general solution for quantifying biological shape variation
 - We obtain quantitative information that represents:
     - Discrete anatomical points
