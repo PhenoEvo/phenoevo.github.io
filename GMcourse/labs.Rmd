@@ -20,6 +20,6 @@
 - [3.2: GPA with Semilandmarks](https://phenoevo.github.io/GMcourse/Labs/02.1-GPA-Semilandmarks.html)
     - [Day 3 R-script](https://phenoevo.github.io/GMcourse/Labs/Day04-RCode.R)
 
-### Example data for Workshop (can be cloned, pulled, or files downloaded)
-[Link to Data Repository](https://phenoevo.github.io/GMcourse/Labs/Practice_data)
+### Example data for Workshop (download and extract zip file)
+[Link to Data Repository](https://phenoevo.github.io/GMcourse/Labs/Practice_data/Practice_data.zip)
 
