@@ -21,5 +21,5 @@
     - [Day 3 R-script](https://phenoevo.github.io/GMcourse/Labs/Day04-RCode.R)
 
 ### Example data for Workshop (can be cloned, pulled, or files downloaded)
-[Link to Data Repository](https://github.com/deanadams/GM-WorkshopData)
+[Link to Data Repository](https://phenoevo.github.io/GMcourse/Labs/Practice_data)
 
