@@ -13,36 +13,29 @@ digitizeImages(image.file='Images', shapes.file='Shapes',
 # Scaling: See Tutorial for instructions
 
 # Read Data
-
 shapes <- readShapes("Shapes") # Steromorph function.  Turns image txt files into a list
 shapesGM <- readland.shapes(shapes) # geomorph conversion function
 
 # GPA (more below)
-
 Y.gpa <- gpagen(shapesGM)
 plot(Y.gpa)
 
 # Digitizing a curve (add to existing LMs)
-
 digitizeImages(image.file='Images', shapes.file='Shapes',
                landmarks.ref=paste("LM", c(1:5), sep=""),
                curves.ref = "example.curves.txt")
 
 # Read Data
-
 shapes <- readShapes("Shapes") # Steromorph function.  Turns image txt files into a list
 shapesGM <- readland.shapes(shapes, nCurvePts = 10) # geomorph conversion function
 
 # GPA
-
 Y.gpa <- gpagen(shapesGM)
 plot(Y.gpa)
 
 #### 2 Read Data
-
 # Working with digitized specimens (StereoMorph)
 # These 30 specimens have 11 fixed landmarks and 6 curves
-
 shapes <- readShapes("example.digitized")
 
 # curves include eye, head, tail1, tail end, tail2, anal fin, 
@@ -85,6 +78,7 @@ str(mydata)
 mydata[,,1]
 
 # Read PLY
+options(rgl.useNULL = TRUE)
 library(rgl)
 new <- read.ply("Data/Mandible.ply")
 str(new)
@@ -100,7 +94,6 @@ mytree <- read.tree("Data/plethtree.tre")
 plot(mytree)
 
 ##### 3: Data Pre-Processing
-
 # Check for Outliers
 data(plethodon)
 newland <- plethodon$land
@@ -110,26 +103,6 @@ Y <- gpagen(newland, print.progress = FALSE)
 
 plotOutliers(Y$coords, inspect.outliers = T)
 
-# Fixed Angle
-jaw.fixed <- fixed.angle(Y$coords,
-                         art.pt=1, angle.pts.1 = 5, 
-                         angle.pts.2 = 6, rot.pts = c(2,3,4,5))
-
-gpa.fixed <- gpagen(jaw.fixed, print.progress = FALSE)
-plotAllSpecimens(gpa.fixed$coords, links = plethodon$links)
-
-# Estimate Missing Landmarks
-#### build some missing data (EXAMPLE ONLY)
-data(plethodon)
-plethland <- plethodon$land
-plethland[3,,2] <- plethland[8,,2] <- NA  #create missing landmarks
-plethland[3,,5] <- plethland[8,,5] <- plethland[9,,5]<-NA  
-plethland[3,,10] <- NA  
-
-# Estimate via TPS or Regression
-estimate.missing(plethland,method="TPS")
-estimate.missing(plethland,method="Reg")
-
 ##### 4: Generalized Procrustes Analysis: GPA
 data(plethodon)
 pleth.gpa <- gpagen(plethodon$land, print.progress = F)
@@ -137,3 +110,5 @@ summary(pleth.gpa)
 
 plot(pleth.gpa)
 plotAllSpecimens(pleth.gpa$coords, links = plethodon$links)
+
+
