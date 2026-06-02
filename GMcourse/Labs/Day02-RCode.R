@@ -183,6 +183,8 @@ fit <- procD.lm(coords ~ treatment/family, data = gdf,
 anova(fit) # treatment effect not adjusted
 anova(fit, error = c("treatment:family", "Residuals")) # treatment effect updated (adjusted)
 
+
+
 ##### 3: Allometry ===================================================================================
 
 # Simple Allometry
