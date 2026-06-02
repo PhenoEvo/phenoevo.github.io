@@ -1,6 +1,6 @@
 ---
-title: "02.1: GPA with Semilandmarks"
-author: "Dean Adams, Michael Collyer & Antigoni Kaliontzopoulou"
+title: "03.2: GPA with Semilandmarks"
+author: "Antigoni Kaliontzopoulou, Dean Adams & Michael Collyer"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output: html_document
 ---

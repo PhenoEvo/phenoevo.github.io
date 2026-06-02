@@ -27,7 +27,20 @@ scallop.sym <- bilat.symmetry(scallops$coorddata,
 summary(scallop.sym)
 plot(scallop.sym)
 
-##### 2: GPA with semilandmarks ####
+##### 2: Articulated structures ##### 
+# Fixed Angle
+data(plethodon)
+Y <- gpagen(plethodon$land) 
+plot(Y, links = plethodon$links)
+
+jaw.fixed <- fixed.angle(Y$coords,
+                         art.pt=1, angle.pts.1 = 5, 
+                         angle.pts.2 = 6, rot.pts = c(2,3,4,5))
+
+gpa.fixed <- gpagen(jaw.fixed, print.progress = FALSE)
+plotAllSpecimens(gpa.fixed$coords, links = plethodon$links)
+
+##### 3: GPA with semilandmarks ####
 # Fixed points only
 data(plethodon)
 pleth.gpa <- gpagen(plethodon$land, print.progress = F)
@@ -52,7 +65,6 @@ gpa.scallop <- gpagen(A=scallops$coorddata, curves=scallops$curvslide, surfaces=
 plot(gpa.scallop)
 
 # Points and curves via readland.shapes
-
 library(StereoMorph)
 shapes <- readShapes("example.digitized")
 shapesGM <- readland.shapes(shapes, 
@@ -62,20 +74,7 @@ shapesGM$curves
 gpa.pupfish <- gpagen(shapesGM)
 plot(gpa.pupfish)
 
-##### 3: Articulated structures ##### 
-# Fixed Angle
-data(plethodon)
-Y <- gpagen(plethodon$land) 
-plot(Y, links = plethodon$links)
-
-jaw.fixed <- fixed.angle(Y$coords,
-                         art.pt=1, angle.pts.1 = 5, 
-                         angle.pts.2 = 6, rot.pts = c(2,3,4,5))
-
-gpa.fixed <- gpagen(jaw.fixed, print.progress = FALSE)
-plotAllSpecimens(gpa.fixed$coords, links = plethodon$links)
-
-# Estimate Missing Landmarks
+##### 4: Estimate Missing Landmarks ####
 #### build some missing data (EXAMPLE ONLY)
 data(plethodon)
 plethland <- plethodon$land
