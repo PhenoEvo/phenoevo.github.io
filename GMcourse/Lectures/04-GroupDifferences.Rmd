@@ -72,30 +72,29 @@ opts_chunk$set(echo = TRUE)
 - Design matrices for groups
 - Testing for group differences
 - One-way MANOVA
-- Post-hoc comparisons
-- Factorial MANOVA
-- Types of Sums of Squares
 - Randomized residual permutation procedure (RRPP)
+- Factorial MANOVA
+- Post-hoc comparisons
 
 # Thoughts on model names
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/04.groupdifferences/GLM_names.png")  
 ```
 
 # Thoughts on nomenclature
-```{r, echo = FALSE, fig.align='center', out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="75%"}
 include_graphics("LectureData/04.groupdifferences/GLM_nomenclature.png")  
 ```
 
 # The General Linear Model
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="75%"}
 include_graphics("LectureData/04.groupdifferences/GLM_structure.png")  
 ```
 
 >- The goal is to find a solution for which the estimated value of a data vector, given a vector of predictors, is expected to be true.
 
 # GLM types
-```{r, echo = FALSE, fig.align='center', out.width="100%"}
+```{r, echo = FALSE, fig.align='center', out.width="70%"}
 include_graphics("LectureData/04.groupdifferences/GLM_types.png")  
 ```
 
@@ -123,9 +122,8 @@ $$
 - Only difference: data in $\mathbf{X}$  
 - Works equally for univariate and multivariate $\mathbf{Y}$  
 
-\
-
->- Dependent variables 
+# The GLM matrices (Cont.)
+- Dependent variables 
 $$
 \mathbf{Y =
 \begin{bmatrix}
@@ -147,7 +145,6 @@ $$
 \end{bmatrix}
 }
 $$
-
 >- Solve for coefficients 
 $$
 \bf\unicode[Times]{x3B2} =
@@ -157,7 +154,7 @@ $$
 \beta_{p}
 \end{bmatrix}
 $$
->          found as $$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
+found as $$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
 
 # GLM - estimation
 $$ \bf\unicode[Times]{x3B2} = (X^TX)^{-1}(X^TY) $$
@@ -189,36 +186,23 @@ knitr::kable(Xtab, col.names = c("GROUP", "X1"),
              table.attr = "style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);'")
 ```
 
-# ANOVA: the meaning of $\bf\unicode[Times]{x3B2}$
-- In ANOVA designs, the estimated parameters represent the mean of the first group and the difference of the means of other groups from it
-
-. . . 
-
-- For instance, for group 3:
-
-$$\widehat{y} = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \beta_{3}x_{3}$$
-$$\widehat{y} = \beta_{0} + \beta_{1}0 + \beta_{2}1 + \beta_{3}0$$
-$$\widehat{y} = \beta_{0} + \beta_{2}$$
-
-- The mean (predicted value) for group 3 is the mean of group 1 ($\beta_0$) plus the adjustment for group 3 ($\beta_2$)
-
 # Data as points in multivariate space
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="75%"}
 include_graphics("LectureData/04.groupdifferences/LMgeometry0.png")  
 ```
 
 # Data as points in multivariate space
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="75%"}
 include_graphics("LectureData/04.groupdifferences/LMgeometry1.png")  
 ```
 
 # Data as points in multivariate space
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="75%"}
 include_graphics("LectureData/04.groupdifferences/LMgeometry2.png")  
 ```
 
 # Data as points in multivariate space
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="75%"}
 include_graphics("LectureData/04.groupdifferences/LMgeometry3.png")  
 ```
 
@@ -232,9 +216,21 @@ include_graphics("LectureData/04.groupdifferences/LMgeometry3.png")
 include_graphics("LectureData/04.groupdifferences/Design_matrix.png")  
 ```
 
-# Group differences: an example
+# ANOVA: the meaning of $\bf\unicode[Times]{x3B2}$
+- In ANOVA designs, the estimated parameters represent the mean of the first group and the difference of the means of other groups from it
 
-```{r, echo = FALSE, out.width="100%"}
+. . . 
+
+- For instance, for group 3:
+
+$$\widehat{y} = \beta_{0} + \beta_{1}x_{1} + \beta_{2}x_{2} + \beta_{3}x_{3}$$
+$$\widehat{y} = \beta_{0} + \beta_{1}0 + \beta_{2}1 + \beta_{3}0$$
+$$\widehat{y} = \beta_{0} + \beta_{2}$$
+
+- The mean (predicted value) for group 3 is the mean of group 1 ($\beta_0$) plus the adjustment for group 3 ($\beta_2$)
+
+# Group differences: an example
+```{r, echo = FALSE, out.width="90%"}
 include_graphics("LectureData/04.groupdifferences/pupfish.example.png")  
 ```
 
@@ -257,7 +253,7 @@ df <- data.frame(df[select, ])
 ```
 
 # Design Matrices: Factors
-Factors (categorical variables) require multiple variables for the various levels of the factor.  
+Factors (categorical variables) require multiple variables for the various levels of the factor.
 
 ```{r echo = TRUE, include = TRUE}
 df$Group
@@ -265,7 +261,7 @@ model.matrix(~ Group, data = df)
 ```
 
 # Design Matrices: Factors (cont.)
-Factors (categorical variables) require multiple variables for the various levels of the factor.  
+Factors (categorical variables) require multiple variables for the various levels of the factor.
 
 ```{r echo = TRUE, include = TRUE}
 model.matrix(~ Group, data = df)
@@ -297,56 +293,32 @@ by(y, df$Group, mean)
 #### Wait!  These values are different!
 *Remember that fitted values are found as $\mathbf{\hat{Y}} = \mathbf{X\hat{\beta}}$ !!!*
 
-# Geometric Interpretation of Model Effects
-
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
-include_graphics("LectureData/04.groupdifferences/stats/Slide2.png")  
-```
-
-# Geometric Interpretation of Model Effects (cont.)
-
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
-include_graphics("LectureData/04.groupdifferences/stats/Slide3.png")  
-```
-
-# Geometric Interpretation of Model Effects (cont.)
-
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
-include_graphics("LectureData/04.groupdifferences/stats/Slide4.png")  
-```
-
-# Geometric Interpretation of Model Effects (cont.)
-
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
-include_graphics("LectureData/04.groupdifferences/stats/Slide5.png")  
+# Geometric Interpretation of Model Effects (summary)
+```{r, echo = FALSE, fig.align='center', out.width="70%"}
+include_graphics("LectureData/04.groupdifferences/stats/Overview.png")  
 ```
 
 # Is one model better than the other?
-
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="70%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide6.png")  
 ```
 
 # Is one model better than the other? (cont.)
-
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="70%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide7.png")  
 ```
 
 # Is one model better than the other? (cont.)
-
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="70%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide8.png")  
 ```
 
 # Is one model better than the other? (cont.)
-
-```{r, echo = FALSE, fig.align='center', out.width="80%"}
+```{r, echo = FALSE, fig.align='center', out.width="70%"}
 include_graphics("LectureData/04.groupdifferences/stats/Slide9.png")  
 ```
 
 # ANOVA
-
 - Used for determining the *significance* of group differences (whether group means are a better estimate of shape than the grand mean).  
 - For shape data, using **randomization of residuals in a permutation procedure (RRPP)** is the best way to go (Collyer et al. 2015; Adams & Collyer 2016, 2018)
 
@@ -390,7 +362,6 @@ anova(fit)
 
 # ANOVA (cont.)
 #### Using a better example: body shape 
-
 ```{r echo = TRUE, include = TRUE}
 pupfish$Group <- interaction(pupfish$Sex, Pupfish$Pop)
 fit <- procD.lm(coords ~ Group, data = pupfish, print.progress = FALSE)
@@ -399,8 +370,7 @@ anova(fit)
 
 # ANOVA (cont.)
 #### Using a better example: body shape 
-
-```{r echo = TRUE, include = TRUE, out.width="100%"}
+```{r echo = TRUE, include = TRUE, , fig.align='center', out.width="60%"}
 plot(fit, type = "PC", pch = 21, bg = pupfish$Group)
 legend("topright", levels(pupfish$Group), pch = 21, pt.bg = 1:4)
 ```
@@ -440,7 +410,6 @@ model.matrix(~ Sex, data = df)
 model.matrix(~ Sex + Pop, data = df)
 ```
 
-
 # Design Matrices: Factorial Models (Cont.)
 The two models before were sub-models of this full one
 
@@ -459,114 +428,16 @@ anova(fitg)
 anova(fitf)
 ```
 
-
 # A More Practical Example (from before)
-
 ```{r echo = TRUE, include = TRUE}
 fitPup <- procD.lm(coords ~ Sex * Pop, data = pupfish, iter = 999, SS.type = "I", print.progress = FALSE)
 anova(fitPup)
 ```
 
-# A More Practical Example (from before, Cont.)
-
-```{r echo = TRUE, include = TRUE}
-plot(fitPup, type = "PC", pch = 21, bg = df$Group)
-legend("topright", levels(df$Group), pch = 21, pt.bg = 1:4)
-```
-
-#### Conclusion (with visual help): The interaction between $Sex$ and $Population$ was significant, which indicated sexual dimorphism varied between populations.  There is greater sexual dimorphism in the Marsh population compared to the Sinkhole population.
-
-# Design Matrices: Factorial Models (Cont.)
-
-One last comment about the factorial model design,
-
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/factorialX.png")  
-```
-
-
-# Multiple Model Effects
-
-It  might be apparent with the previous example, or any other example with which one might familiar, that there is often more than a null model and a full model.  There might be different **effects** that could be considered for different sets of parameters.  In the pupfish example, we might ask whether $Sex$ or $Population$ contribute more to the dispersion in means.  We might also wonder if the $Sex$ effect varies between populations.
-
-Not to worry!  The model comparison approach can be done in sequence for different model effects.  There are only a few little twists with which to be concerned.
-
-#### Preliminaries:
-1. Let **null** refer to the model with only an intercept and whose purpose is to estimate an overall mean.
-2. Let **reduced** refer to a model with limited parameters, which serves as a basis for comparison.
-3. Let **full** refer to a model with all parameters of the reduced model, plus parameters for an effect of interest.
-
-In the initial pupfish example, the null and reduced models were the same; the full model had parameters to estimate four group means.  We are going to use the same model now to consider partial effects associated with the dispersion of the four means.
-
-
-# Multiple Model Effects (Type I SS)
-
-In the pupfish example, we could have the following set of model comparisons to estimate different effects
-
-Effect | Reduced | Full | Purpose
-:----- | :------- | :------- | :-------------
-Sex | Null | Null + Sex | Determine if Sex mean difference is "significant" compared to an overall mean
-Pop | Null + Sex | Null + Sex + Pop | Determine if population differences are significant, after accounting for general difference between males and females
-Sex:Pop | Null + Sex + Pop | Null + Sex + Pop + Sex:Pop | Determine if sexual dimorphism varies between populations, after accounting for general difference in sex and population.
-Full model | Null | Null + Sex + Pop + Sex:Pop | Ascertain if the model is significant (if not, the other parts should not be considered significant either)
-
-Estimating $SS$ between models for the first three model comparisons is called **Sequential (Type I) $SS$** estimation.  We start with a null model and build up to the fullest model.
-
-# Multiple Model Effects (Type II SS)
-
-In the pupfish example, we could have the following set of model comparisons to estimate different effects
-
-Effect | Reduced | Full | Purpose
-:----- | :------- | :------- | :-------------
-Sex | Null + Pop | Null + Pop + Sex | Determine if Sex mean difference is "significant", after accounting for population mean difference
-Pop | Null + Sex | Null + Sex + Pop | Determine if population differences are significant, after accounting for general difference between males and females
-Sex:Pop | Null + Sex + Pop | Null + Sex + Pop + Sex:Pop | Determine if sexual dimorphism varies between populations, after accounting for general difference in sex and population.
-Full model | Null | Null + Sex + Pop + Sex:Pop | Ascertain if the model is signficant (if not, the other parts should not be considered significant either)
-
-Estimating $SS$ between models for the first three model comparisons is called **Conditional (Type II) $SS$** estimation.  We analyze effects with respect to other effects, but do not include interactions with targeted effects.  For example, with three factors, A, B, and C.  The effect A would have a reduced model of B, C, and B:C.  The full model would add A to these.  The effect A:B, would have a reduced model of A, B, C, and B:C, and the full model would add A:B to these. 
-
-# Multiple Model Effects (Type III SS)
-
-In the pupfish example, we could have the following set of model comparisons to estimate different effects
-
-Effect | Reduced | Full | Purpose
-:----- | :------- | :------- | :-------------
-Sex | Null + Pop + Pop:Sex| Null + Pop + Sex + Pop:Sex| Determine if Sex mean difference is "significant", after accounting for all other effects
-Pop | Null + Sex + Pop:Sex| Null + Sex + Pop + Pop:Sex| Determine if population differences are significant, after accounting for all other effects.
-Sex:Pop | Null + Sex + Pop | Null + Sex + Pop + Sex:Pop | Determine if sexual dimorphism varies between populations, after accounting for general difference in sex and population.
-Full model | Null | Null + Sex + Pop + Sex:Pop | Ascertain if the model is signficant (if not, the other parts should not be considered significant either)
-
-Estimating $SS$ between models for the first three model comparisons is called **Marginal (Type III) $SS$** estimation.  Whereas Type I $SS$ evaluates the importance of effects through inclusion, Type III $SS$ evaluates the importance of effects through exclusion.
-
-# Example: Types of SS
-
-```{r echo = TRUE, include = TRUE}
-fit1 <- procD.lm(coords ~ Pop * Sex, data = pupfish, iter = 999, SS.type = "I", print.progress = FALSE)
-fit2 <- procD.lm(coords ~ Pop * Sex, data = pupfish, iter = 999, SS.type = "II", print.progress = FALSE)
-fit3 <- procD.lm(coords ~ Pop * Sex, data = pupfish, iter = 999, SS.type = "III", print.progress = FALSE)
-
-anova(fit1)
-anova(fit2)
-anova(fit3)
-```
-
-# Multiple Model Effects (comments)
-
-- $F$-values for multiple model effects use the residual $MS$ for the fullest model, under most circumstances.  (There are cases where this is not true, if we have random effects.  This is a topic for a different workshop, but *geomorph* functions can handle this.)
-- Only Sequential addition of model terms ensures that the summation of various $SS$ for effects is the same as the whole model $SS$.
-- With Type I $SS$ one has to consider the order of variables; this is not the case with Types II and III $SS$.
-- Model design might determine which method to use.  Types II and III $SS$ are sometimes recommended for imbalanced designs or many two-way interactions.
-- In general, significant effects will be significant, regardless of method, but if there is multi-collinearity among independent variables, Type II $SS$ can reveal it (Type I $SS$ might suggest the first effect added is meaningful compared to others).
-
-
 # Digging deeper: Pairwise Comparisons (more on interactions)
-
-Let's return to the pupfish body shape example.
-
-An astute observer might start to wonder which pupfish means are different form each other?  
+OK, so both sex and population have a significant effect. But which pupfish means are different from each other?  
 
 One thing of which to be aware, models with interactions provide so much more opportunity than simpler single-factor models.  Recall that these models produce the same means:
-
 
 ```{r echo = TRUE, include = TRUE}
 
@@ -579,50 +450,27 @@ fitf
 Let's see, however, how pairwise hypothesis tests differ between them.
 
 # Pairwise Comparisons
-
-There are two statistics for pairwise comparisons that might be of interest.  Recall that any estimated value is a vector.  A vector has two attributes: length and direction.  With two or more vectors, these attributes are related.  Anyone who has studied trigonometry can attest that two vectors originating from the same point (origin) describe a triangle.  The vectors are orientated with an angle between them, and 
-the vector between vector endpoints is also a vector with a direction and length (distance).  The following figure illustrates this.
-
-```{r, echo = FALSE, out.width="100%"}
-include_graphics("LectureData/04.groupdifferences/vectors.png")  
-```
-
-The attributes, vector length (distance, $d$) and angle ($\theta$), can function as test statistics. These statistics have an expected value of 0 under a null hypothesis. (Vector correlation can also be a test statistic, but it has an expected value of 1 for parallel vectors, which is a bit awkward.)
-
-# Pairwise Comparisons (Cont.)
-
-Here is the beautiful thing!  I mean this is really, really awesome!
-
-When performing RRPP, we have thousands of random outcomes of coefficients (vectors).  These might represent different slopes or ways to estimate vectors between means.  Therefore, we inherently have distributions of these geometric statistics.  **There is no need for a post-hoc, manufactured test!  We can simply generate** *in situ* **distributions from the resampling experiment!**
-
+One can define pairwise comparisons, which are derived from the empirical distribution of estimate vectors created during the RRPP procedure. 
 ```{r echo = TRUE, include = TRUE}
-
 PWG <- pairwise(fitg, groups = pupfish$Group)
 PWF <- pairwise(fitf, groups = pupfish$Group)
-
-PWG
-PWF
 ```
 
 For any pairwise test, there is a null model.  Let's see the null models for these pairwise tests:
 
 ```{r echo = TRUE, include = TRUE}
-
 reveal.model.designs(fitg)
 reveal.model.designs(fitf)
 ```
 
 # Pairwise Comparisons, Example 
-
 Now we have choices!  For example,
 
 ```{r echo = TRUE, include = TRUE}
-
 summary(PWG, test.type = "dist") # "dist" for distance between vectors
 ```
 
 # Pairwise Comparisons, Example (Cont.)
-
 Now we have choices!  For example,
 
 ```{r echo = TRUE, include = TRUE}
@@ -631,18 +479,16 @@ summary(PWF, test.type = "dist") # "dist" for distance between vectors
 ```
 
 # Pairwise Comparisons, Example (Cont.)
-
 Note that in this example, we used `test.type = "dist"` because it makes sense to look at the differences among means in terms of how spread out they are in the data space.  Also notice the similarities and differences between the two tests:
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE,fig.align='center', out.width="100%"}
 include_graphics("LectureData/04.groupdifferences/pairwise1.png")  
 ```
 
 # Pairwise Comparisons, Example (Cont.)
-
 The latter test makes sense, if we look again at the PC plot 
 
-```{r echo = TRUE, include = TRUE}
+```{r echo = TRUE, include = TRUE, fig.align='center', out.width="70%"}
 plot(fitf, type = "PC", pch = 21, bg = pupfish$Group)
 legend("topright", levels(pupfish$Group), pch = 21, pt.bg = 1:4)
 ```
@@ -650,19 +496,8 @@ legend("topright", levels(pupfish$Group), pch = 21, pt.bg = 1:4)
 The first test tells use means are different.  The second test tells use that despite population differences in shape and despite sexual dimorphism, in general, the sexual dimorphism in the Marsh population is greater than the sexual dimorphism in the sinkhole population.
 
 # Pairwise Comparisons, Example (Cont.)
-
 What about comparing slopes among groups that might have different patterns of covariation?  
 
 ##### We will explore that in the allometry lecture
 ##### We will also explore ANCOVA designs as lab examples
 
-# Summary
-
-- Group shape differences via linear models
-- ANOVA means comparing two models in a systematic way
-  + SS types: I, II, III
-- RRPP makes ANOVA possible
-- RRPP also means pairwise statistics are inherently generated
-- Pairwise statistics are geometric attributes
-
-- More on pairwise approaches in *Trajectory Analysis* and *Allometry*
