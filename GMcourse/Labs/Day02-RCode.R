@@ -21,7 +21,7 @@ ref <- mshape(Y.gpa$coords)
 par(mfrow=c(2,2))
 plotRefToTarget(ref,Y.gpa$coords[,,39], links=plethodon$links)
 mtext("TPS")
-plotRefToTarget(ref,Y.gpa$coords[,,39],mag=2.5, links=plethodon$links)
+plotRefToTarget(ref,Y.gpa$coords[,,39], mag=2.5, links=plethodon$links)
 mtext("TPS: 2.5X magnification")
 
 plotRefToTarget(ref,Y.gpa$coords[,,39], links=plethodon$links,method="vector",mag=3)
@@ -60,7 +60,8 @@ str(pleth.raw$shapes$shapes.comp1)
 pleth.pca.plot <- plot(pleth.raw)
 picknplot.shape(pleth.pca.plot) 
 
-picknplot.shape(plot(pleth.pca), method = "points", mag = 3, links=plethodon$links)
+picknplot.shape(plot(pleth.raw), method = "points", 
+                mag = 3, links=plethodon$links)
 
 
 ##### 2: ANOVA and pairwise comparisons ==============================================================
