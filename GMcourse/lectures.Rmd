@@ -8,7 +8,8 @@
 
 [03 - Shape Spaces, Shape Variables, & PCA](https://phenoevo.github.io/GMcourse/Lectures/03-ShapeVariablesSpaces.html)
 
-[04 - Group Differences](https://phenoevo.github.io/GMcourse/Lectures/04-GroupDifferences.html)
+[04 - Group Differences](https://phenoevo.github.io/GMcourse/Lectures/04-GroupDifferences.html)  
+  [04b - Group Differences additions](https://phenoevo.github.io/GMcourse/Lectures/04b-GroupDifferences_additions.html)
 
 [05 - Allometry](https://phenoevo.github.io/GMcourse/Lectures/05-Allometry.html)
 
