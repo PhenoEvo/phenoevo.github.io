@@ -77,7 +77,7 @@ $$\small\mathbf{Z}=\frac{1}{CS}\mathbf{(Y-\overline{Y})H}$$
 - Landmarks provide rigorous quantification of shape
 - Some objects have few landmarks, but have defined boundaries (curves) or surfaces
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/semiland-motiv.png")  
 ```
 
@@ -87,7 +87,7 @@ include_graphics("LectureData/07.semilandmarks/semiland-motiv.png")
 - Some objects contain multiple ‘types’ of morphometric data
 - Types typically analyzed separately
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/Face.png")  
 ```
 
@@ -97,14 +97,14 @@ include_graphics("LectureData/07.semilandmarks/Face.png")
 - Define landmark homology mathematically (e.g., equal spacing)
 - Often produce suggestive (but incorrect) results 
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/RectangEx.png")  
 ```
 
 . . . 
 
 - Implied shape differences:
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/RectangTPS.png")  
 ```
 
@@ -113,14 +113,14 @@ include_graphics("LectureData/07.semilandmarks/RectangTPS.png")
 # Mathematically-Defined Points: Problems (Cont.)
 - Another example
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="60%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/BarEx.png")  
 ```
 
 . . . 
 
 - Implied shape differences:
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="60%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/BarTPS.png")  
 ```
 
@@ -155,7 +155,7 @@ include_graphics("LectureData/07.semilandmarks/BarTPS.png")
     - How far to slide?
     
 # What Direction to Slide?
-```{r, echo = FALSE, out.width="50%"}
+```{r, echo = FALSE, out.width="50%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/DirToSlide.png")  
 ```
 
@@ -175,7 +175,7 @@ include_graphics("LectureData/07.semilandmarks/DirToSlide.png")
 # Semilandmarks: Differing Approaches
 - Visual differences between $\small{BE}$ and $\small{D}_{Proc}$ sliding:
 
-```{r, echo = FALSE, out.width="70%"}
+```{r, echo = FALSE, out.width="70%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/SlidingCorpusEx.png")  
 ```
 
@@ -199,19 +199,19 @@ include_graphics("LectureData/07.semilandmarks/DirToSlide.png")
 ###### Bookstein et al. (1999). Anatomical Record.
 
 # Semilandmark Example: The Data
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="75%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/Book99Example.png")  
 ```
 
 # Semilandmark Example: The Data
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="75%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/Book99Data.png")  
 ```
 
 # Semilandmark Example: Results
 - Large differences in external profiles, but NO difference of internal profiles
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/Book99Results.png")  
 ```
 
@@ -241,7 +241,7 @@ Slide using $\small{BE}$ or $\small{D}_{Proc}$ as before
     - Match these to surface points of next specimen (using TPS)
     - Repeat
 
-```{r, echo = FALSE, out.width="50%"}
+```{r, echo = FALSE, out.width="25%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/DigitSurface.png")  
 ```
 
@@ -256,72 +256,49 @@ include_graphics("LectureData/07.semilandmarks/DigitSurface.png")
 - Define tangent directions and generate **U**
 - **GPA + Sliding**
 
-```{r, echo = FALSE, out.width="50%"}
+```{r, echo = FALSE, out.width="40%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/Scallop.png")  
 ```
 
-# Complications: Shape Variables and Dimensionality
-- Sliding procedure results in redundant shape dimensions
-    - Minimum: ~1 df lost per 2D/3D curve semilandmark; and ~2 df lost per 3D surface semilandmark (e.g., ~ $\small{2p-4-m}$ shape variables in 2D for $\small{m}$ = # semilandmarks)
-    - However, usually many more dimensions lost, because adjacent semilandmarks encode redundant shape information
-
-- Causes *MAJOR* issues for statistical hypothesis testing using Procrustes residuals
-
-. . . 
-
-- Solutions: 
-    - 1: PCA to ‘spin out’ redundant dimensions (remove dimensions with 0.0% variance)
-    - 2: Use generalized inverses in computations
-    - 3: **Use resampling procedures (RRPP) for significance testing** 
-    
-###### Note: #3 also required when # shape variables exceeds # specimens
-
 # Semilandmarks: Snake Example
-
 - Examined head shape in snakes (83 species)
 - Focused on aquatic species in different families
 - Is there evidence of head shape convergence? 
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/SnakeExample.png")  
 ```
 
 # Semilandmarks: *Homo* Example
-
 - Examined 'Zuttiyeh’ fossil morphology as compared to other early hominids
 
-
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/HomoExample.png")  
 ```
 
 # Semilandmarks: Scallop Example
-
 - Scallop species display differing life habits
 - What patterns are observed at the macroevolutionary level?
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/ScallopData.png")  
 ```
 
 # Semilandmarks: Scallop Example (Cont.)
-
 - Recessors display unique morphology and directional evolution
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/ScallopResults1.png")  
 ```
 
 # Semilandmarks: Scallop Example (Cont.)
-
 - Gliders occupy morphological convergence
 
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="100%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/ScallopResults2.png")  
 ```
 
 # The Procrustes Paradigm
-
 - With landmarks and semilandmarks we arrive at a general solution for quantifying morphology
 - Quantitative information representing:
     - Discrete anatomical points
@@ -329,7 +306,7 @@ include_graphics("LectureData/07.semilandmarks/ScallopResults2.png")
     - Surfaces of structures
 - **Can all be combined in a single analysis of shape variation**
 
-```{r, echo = FALSE, out.width="50%"}
+```{r, echo = FALSE, out.width="50%", fig.align='center'}
 include_graphics("LectureData/07.semilandmarks/ProcParadigm.png")  
 ```
 
