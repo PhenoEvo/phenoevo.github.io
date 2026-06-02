@@ -79,14 +79,13 @@ opts_chunk$set(echo = TRUE)
 
 
 # Why Allometry?
-
 - Allometry occurs due to several reasons:
     - Physical (e.g. surface area/volume ratio)
     - Physiological
     - Biomechanical/functional
     - Selection (e.g. sexual selection and male ornaments)
 
-```{r, echo = FALSE, out.width="80%"}
+```{r, echo = FALSE, out.width="70%", fig.align='center'}
 include_graphics("LectureData/05.allometry/AllomIntro.png")  
 ```
 
@@ -99,7 +98,7 @@ include_graphics("LectureData/05.allometry/AllomIntro.png")
 
 $\small{log(Y)}=log(\beta)+\alpha{log(x)}$
     
-```{r, echo = FALSE, out.width="50%"}
+```{r, echo = FALSE, out.width="45%", fig.align='center'}
 include_graphics("LectureData/05.allometry/PosNegAllom.png")  
 ```
 
@@ -113,7 +112,7 @@ include_graphics("LectureData/05.allometry/PosNegAllom.png")
     - **Static allometry** : within a single life stage (e.g. ornaments and sexual selection)
     - **Evolutionary allometry**: across species (e.g. adaptive shape changes) 
 
-```{r, echo = FALSE, out.width="80%"}
+```{r, echo = FALSE, out.width="75%", fig.align='center'}
 include_graphics("LectureData/05.allometry/AllometryTypes.png")  
 ```
 
@@ -124,7 +123,7 @@ include_graphics("LectureData/05.allometry/AllometryTypes.png")
 
 Here is isometry...
 
-```{r, echo = FALSE, out.width="40%"}
+```{r, echo = FALSE, out.width="30%", fig.align='center'}
 include_graphics("LectureData/05.allometry/IsometryPlot.png")  
 ```
 
@@ -133,7 +132,7 @@ include_graphics("LectureData/05.allometry/IsometryPlot.png")
 >- We use linear models!
 
 # Multivariate Linear Regression
-To characterize allometric patterns, we fit a model of `shape~size` as:
+To characterize allometric patterns, we fit a model of `shape ~ size` as:
 
 $$\large\mathbf{Y}=\mathbf{X}\mathbf{\beta } +\mathbf{E}$$
 
@@ -180,7 +179,7 @@ Does body shape covary with size in *Pecos* pupfish?
 include_graphics("LectureData/05.allometry/Pupfish Motivation.png")  
 ``` 
 
-This is a hypothesis of *Allometry* (shape~size covariation)
+This is a hypothesis of *Allometry* (shape ~ size covariation)
 
 ```{r eval=TRUE, echo=TRUE, out.width="40%"}
 data(Pupfish)
@@ -237,7 +236,7 @@ anova(fit)
 ``` 
 
 # Allometry Example: *Podarcis* (Cont.)
-```{r, echo = FALSE, out.width="80%"}
+```{r, echo = FALSE, out.width="70%"}
 res <- plot(gm.prcomp(Y.gpa$coords), pch = 21, bg = type)
 ```
 
@@ -251,8 +250,6 @@ plotAllometry(fit, size = gdf$CS, logsz = FALSE, method = "PredLine", pch=21, bg
 mtext("Predicted Lines")
 par(mfrow=c(1,1)) 
 ```
-
-
 
 # Post-Hoc Tests
 - Use randomization methods to test custom hypotheses
@@ -285,8 +282,7 @@ $$\small\alpha=(\mathbf{Y}_{cent}^T\mathbf{CS})/\mathbf{(CS^TCS)}$$
 $$\small{CAC}=\mathbf{Y}_{cent}\alpha$$             where $$\small\alpha=\alpha\sqrt{}(\alpha^T\alpha)$$
 
 # Size-Shape Space: Example
-
-```{r, echo = FALSE, out.width="100%"}
+```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/05.allometry/Mitteroecker-04.png")  
 ```
 
@@ -337,26 +333,22 @@ include_graphics("LectureData/05.allometry/HydromantesEx.png")
 ```
 
 # Evolutionary Convergence: Example (Cont.)
-
 ```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/05.allometry/HydroRes1.png")  
 ```
 
 # Evolutionary Convergence: Example (Cont.)
-
 ```{r, echo = FALSE, out.width="80%"}
 include_graphics("LectureData/05.allometry/HydroRes2.png")  
 ```
 
 # Comparing allometric trajectories: geomorph example
-
 - **Question**: Do your groups have parallel allometries?
 - **Question**: Do your groups have unique allometries?
 - **Question**: Which groups have different allometries, and how do they differ?
 
 #### Example: pupfish data
-
-```{r, include=TRUE}
+```{r, include=TRUE, out.width="80%", fig.align='center'}
 data(pupfish)
 plotAllSpecimens(pupfish$coords)
 
