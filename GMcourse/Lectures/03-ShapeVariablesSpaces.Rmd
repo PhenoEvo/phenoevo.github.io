@@ -1,7 +1,7 @@
 ---
 title: |
         Shape Variables and Shape Spaces
-        <br><img src="LectureData/03.shape.vars/Diodon2Mola.png" style="width:500px; margin: 20px auto 20px auto;"><br>
+        <br><img src="LectureData/03.shape.vars/Diodon2Mola.png" style="width:400px; margin: 10px auto -60px auto;"><br>
 
 author: "Antigoni Kaliontzopoulou, Universitat de Barcelona"
 output: slidy_presentation
@@ -65,8 +65,7 @@ opts_chunk$set(echo = TRUE)
     - Obtain variables we can use for analyses
     - Review the relative position of individuals in shape space
     - Visualize shape variation
-
-```{r echo=FALSE, eval=TRUE, fig.align='center', out.height="40%"}
+```{r echo=FALSE, eval=TRUE, fig.align='center', out.height="30%"}
 lizards <- readland.nts('LectureData/03.shape.vars/lizards_LAT.nts')
 links <- read.csv('LectureData/03.shape.vars/links.txt', header=FALSE, sep = " ")
 liz.lab <- read.csv('LectureData/03.shape.vars/liz_groups.csv',header=TRUE, sep="\t")
@@ -159,30 +158,28 @@ plot(pc.tri[,1:2], asp=1, pch=21, bg="red")
 - D'Arcy Thompson, in "On Growth and Form" (1917) visualized shape differences using transformation grids  
 - Simple mathematical models to represent complex morphological changes 
 
-```{r, echo = FALSE, out.width="80%"}
+```{r, echo = FALSE, out.width="50%", fig.align='center'}
 include_graphics("LectureData/03.shape.vars/ThompsonBook.png")  
 ```
 
 >- Today we use the *Thin-Plate Spline* to generate such visualizations
 
 # Shape Deformations: the Thin-Plate Spline
-
 - Based on D'Arcy Thompson's, Bookstein (1989) proposed using the thin-plate spline for providing a mathematically accurate representation of shape change (math was borrowed from engineering methods from 1980s)
 - Deformation of a *reference* to a *target* specimen
 - The coefficients of the fitted TPS model describe shape changes
 
-```{r, echo = FALSE, out.width="80%"}
+```{r, echo = FALSE, out.width="70%", fig.align='center'}
 include_graphics("LectureData/03.shape.vars/GorillaHuman.png")  
 ```
 
 >- The TPS is an alternative way of projecting aligned shape coordinates to tangent space (different math, but same result)
 
 # The Thin-Plate Spline
-
 - TPS is a smooth interpolation function (i.e., a doubly-differentiated equation)
 - It models the differences in landmark locations between the reference and target specimen for each coordinate dimension separately (x,y)
 
-```{r, echo = FALSE, out.width="70%"}
+```{r, echo = FALSE, out.width="60%", fig.align='center'}
 include_graphics("LectureData/03.shape.vars/TPSConcept.png")  
 ```
 
@@ -190,7 +187,6 @@ include_graphics("LectureData/03.shape.vars/TPSConcept.png")
 >- These are known as the *partial warp scores* and the *uniform component* (details ommited, but these are different types of potential shape transformations)
 
 # Which Shape Variables to Use?
-
 - We then have 3 shape variable options: 
     - GPA-aligned coordinates
     - Kendall's Tangent Space coordinates (GPA + orthogonal projection)
@@ -200,7 +196,7 @@ include_graphics("LectureData/03.shape.vars/TPSConcept.png")
 . . . 
 
 <div style="text-align: center;">
-```{r echo=FALSE, eval=TRUE,out.width="40%"}
+```{r echo=FALSE, eval=TRUE, out.width="20%"}
 Y.gpa2 <- gpagen(lizards, Proj = FALSE, print.progress = FALSE)
 Kendall.d <- dist(two.d.array(Y.gpa$coords))
 GPA.d <- dist(two.d.array(Y.gpa2$coords))
@@ -216,7 +212,6 @@ plot(GPA.d,Kendall.d)
 >- **AND** correlation between PWS+U vs. Tangent space is **ALWAYS** 1.0 (see Rohlf 1999)
 
 # Shape Variables: Conclusions
-
 - Kendall's Tangent coordinates & TPS shape variables yield identical results
     - They are simply rotations of one another
 - GPA-aligned coordinates (unprojected) are close, but not exact 
@@ -229,7 +224,6 @@ plot(GPA.d,Kendall.d)
 >- TPS then, is frequently used to **visualize shape differences**
 
 # Exploring Shape Variation
-
 - GM data are points in high-dimensional shape space
     - (e.g. for $\small{p=20}$ & $\small{k=3}$, shape space comprises 53 dimensions)
 - Our human brains are limited to perception in up to 3 dimensions
@@ -238,7 +232,6 @@ plot(GPA.d,Kendall.d)
 >- Principal Components Analysis (PCA) is one such tool
 
 # Principal Components Analysis (PCA)
-
 - PCA combines orthogonal rotation and projection to arrive at a summary plot of the data space 
 - The objective: to summarize most of the variation in as few dimensions as possible
 - It consists of a rigid rotation of the data based on directions of variation, followed by projection to those new summary axes
@@ -247,10 +240,9 @@ plot(GPA.d,Kendall.d)
 - Subsequent axes are orthogonal to PC1
 
 # PCA: Conceptual Visualization
-
 - This is what PCA does:
 
-```{r echo=FALSE, out.width="80%" }
+```{r echo=FALSE, out.width="60%"}
 bumpus <- read.csv("LectureData/03.shape.vars/bumpus.csv",header=T)
 Y.2 <- cbind(bumpus$TL,bumpus$AE)
 par(mfcol = c(1, 2))
@@ -258,10 +250,9 @@ plot(Y.2, pch=21, bg="red", xlab="Total Length", ylab="Alar Extent")
 ```
 
 # PCA: Conceptual Visualization
-
 - This is what PCA does:
 
-```{r echo=FALSE, out.width="80%" }
+```{r echo=FALSE, out.width="60%" }
 Y.pc <- prcomp(Y.2)$x
 par(mfcol = c(1, 2))
 plot(Y.2, pch=21, bg="red", xlab="Total Length", ylab="Alar Extent")
@@ -270,44 +261,7 @@ plot(Y.pc, asp=1,pch=21, bg="red", xlab="PC1", ylab="PC2")
 
 - PCA has performed a rigid rotation of the original data, so that variation is aligned with the new (PC) axes
 
-# PCA: Standard Computations
-
-Principal component analysis (PCA) is two things: (1) a singular-value decomposition (SVD) of a symmetric matrix and (2) projection of mean-centered or standardized data onto eigenvectors from SVD. 
-
-Using mean-centered data: $\small\mathbf{Y}_c$ we calculate:
-
-$$\small\hat{\mathbf{\Sigma}}=\frac{\mathbf{Y}^{T}_c\mathbf{Y}_c}{n-1}$$
-
-We then decompose the covariance matrix via eigen-analysis (SVD):
-
-$$\small\hat{\mathbf{\Sigma}}=\mathbf{U} \mathbf{\Lambda} \mathbf{U}^T$$
-
-This step identifies a set of orthogonal axes describing directions of variation. These are the columns of $\small\mathbf{U}$. Next we project the data onto these axes as: 
-
-$$\small\mathbf{P} = \mathbf{Y}_c\mathbf{U}$$
-
-Here, $\small\mathbf{P}$ represent the set of projection scores (principal component scores) on each of the PC axes. These are used in the subsequent plot.
-
-Finally, the percent variation explained by any principal component (column of $\mathbf{U}$) is 
-$$\frac{\lambda_i}{tr\mathbf{\Lambda}}$$
-
-# PCA: Alternative Computations
-
-Note that one can alternatively perform singular-value decomposition (SVD) directly on $\small\mathbf{Y}_c$: 
-
-$$\small{\mathbf{Y}_c}=\mathbf{V} \mathbf{D} \mathbf{U}^T$$
-
-Here, $\small\mathbf{D^2}$ expresses the percent-variation explained by each PC-axis, which are found as the right-singular vectors in $\small\mathbf{U}$.
-
-PC scores are found as: 
-
-$$\small\mathbf{P} = \mathbf{VD}$$
-
-###### NOTE: eigenanalysis of the *inner product* $\small\mathbf{Y}^{T}_c\mathbf{Y}_c$ yields $\small\mathbf{U}$, while eigenanalysis of the *outer product* $\small\mathbf{Y}_c\mathbf{Y}^{T}_c$ yields $\small\mathbf{V}$
-
-
 # Visualizing Shape Differences
-
 - TPS allows us to visualize what exactly changes in shape
 - As an interpolation function, TPS allows us to precisely map all points of one shape to those of another shape, and visualize how they differ
 
@@ -321,7 +275,7 @@ $$\small\mathbf{P} = \mathbf{VD}$$
 
 - One can also magnify shape differences to aid biological interpretation 
 
-```{r, echo = FALSE, out.width="40%"}
+```{r, echo = FALSE, out.width="30%", fig.align='center'}
 include_graphics("LectureData/03.shape.vars/3XTPS.png")  
 ```
 

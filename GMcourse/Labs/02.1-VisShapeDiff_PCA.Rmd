@@ -55,11 +55,6 @@ mtext("Vector Displacements")
 plotRefToTarget(ref,Y.gpa$coords[,,39], links=plethodon$links,gridPars=gridPar(pt.bg="red", link.col="green", pt.size = 1), method="vector", mag=3)
 mtext("Vector Displacements: Other Options")
 
-plotRefToTarget(ref,Y.gpa$coords[,,39], mag=2, outline=plethodon$outline)  
-mtext("Outline Deformation")
-plotRefToTarget(ref,Y.gpa$coords[,,39], method="points", outline=plethodon$outline)
-mtext("Outline Deformations Ref (gray) & and Tar (black)")
-
 ```
 
 ## **2: Advanced Shape Plotting: Shape Prediction**
@@ -81,44 +76,6 @@ plotRefToTarget(M, preds$pred1, links = plethodon$links)
 mtext("PC1 - Min.")
 plotRefToTarget(M, preds$pred2, links = plethodon$links)
 mtext("PC1 - Max.")
-
-```
-
-### Shape Predictions Along a Regression
-
-Many times, we fit a linear model in the form of regression (e.g., allometry). Here is how we visualize shape changes along the extremes of that regression using `shape.predictor`:
-
-```{r eval=TRUE}
-gdf <- geomorph.data.frame(Y.gpa)
-plethAllometry <- procD.lm(coords ~ log(Csize), data=gdf, print.progress = FALSE)
-allom.plot <- plot(plethAllometry, 
-                   type = "regression", 
-                   predictor = log(gdf$Csize),
-                   reg.type ="PredLine") # make sure to have a predictor 
-
-preds <- shape.predictor(plethAllometry$GM$fitted, x= allom.plot$RegScore, Intercept = FALSE, 
-                         predmin = min(allom.plot$RegScore), 
-                         predmax = max(allom.plot$RegScore)) 
-plotRefToTarget(M, preds$predmin, mag=3, links = plethodon$links)
-plotRefToTarget(M, preds$predmax, mag=3, links = plethodon$links)
-```
-
-### Shape Predictions of Group Differences
-
-Another very common statistical design is one of evaluating group differences in shape (i.e., ANOVA). Here we wish to visualize shape differences among groups. Below is an example:
-
-```{r eval=TRUE}
-gdf <- geomorph.data.frame(Y.gpa, species = plethodon$species, site = plethodon$site)
-pleth.anova <- procD.lm(coords ~ species*site, data=gdf, print.progress = FALSE)
-X <- pleth.anova$X
-X # includes intercept; remove for better functioning 
-X <- X[,-1]
-symJord <- c(0,1,0) # design for P. Jordani in sympatry
-alloJord <- c(0,0,0) # design for P. Jordani in allopatry
-preds <- shape.predictor(arrayspecs(pleth.anova$fitted, 12, 2), x = X, Intercept = TRUE, 
-                         symJord=symJord, alloJord=alloJord)
-plotRefToTarget(M, preds$symJord, links = plethodon$links, mag=2)
-plotRefToTarget(M, preds$alloJord, links = plethodon$links, mag=2)
 
 ```
 
@@ -156,15 +113,4 @@ This real-time visualization is especially useful for viewing regions of morphos
 # picknplot.shape(plot(pleth.pca), method = "points", mag = 3, links=plethodon$links)
 ```
 
-## **5: 3D warping**
-
-`Geomorph` also has the ability to generate shape deformations of 3D objects. Again this is interactive code, so it is repeated, but not run, below:
-
-```{r eval=TRUE}
-#scallops <- readland.tps("Data/scallops for viz.tps", specID = "ID")
-#ref <- mshape(scallops)
-#refmesh <- warpRefMesh(read.ply("Data/glyp02L.ply"), 
-#                       scallops[,,1], ref, color=NULL, centered=T)
-#plotTangentSpace(scallops, axis1 = 1, axis2 = 2, warpgrids=T, mesh= refmesh)
-```
 

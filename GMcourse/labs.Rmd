@@ -10,9 +10,9 @@
     - [Day 1 R-script](https://phenoevo.github.io/GMcourse/Labs/Day01-RCode.R)
 
 ### Day 2
-- [2.1: ANOVA and Pairwise Comparisons](https://phenoevo.github.io/GMcourse/Labs/02.1-ANOVA_PW.html)
-- [2.2: Allometry](https://phenoevo.github.io/GMcourse/Labs/02.2-Allometry.html)
-- [2.3: Visualizing Shape Differences and PCA](https://phenoevo.github.io/GMcourse/Labs/02.3-VisShapeDiff_PCA.html)
+- [2.1: Visualizing Shape Differences and PCA](https://phenoevo.github.io/GMcourse/Labs/02.1-VisShapeDiff_PCA.html)
+- [2.2: ANOVA and Pairwise Comparisons](https://phenoevo.github.io/GMcourse/Labs/02.2-ANOVA_PW.html)
+- [2.3: Allometry](https://phenoevo.github.io/GMcourse/Labs/02.3-Allometry.html)
     - [Day 2 R-script](https://phenoevo.github.io/GMcourse/Labs/Day02-RCode.R)
 
 ### Day 3 
