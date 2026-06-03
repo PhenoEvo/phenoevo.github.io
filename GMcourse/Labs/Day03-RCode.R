@@ -41,16 +41,12 @@ gpa.fixed <- gpagen(jaw.fixed, print.progress = FALSE)
 plotAllSpecimens(gpa.fixed$coords, links = plethodon$links)
 
 ##### 3: GPA with semilandmarks ####
-# Fixed points only
-data(plethodon)
-pleth.gpa <- gpagen(plethodon$land, print.progress = F)
-summary(pleth.gpa)
-
-plot(pleth.gpa)
-plotAllSpecimens(pleth.gpa$coords, links = plethodon$links)
-
 # Points and Curve points
 data(hummingbirds)
+gpa <- gpagen(hummingbirds$land)
+plot(gpa)
+
+
 hummingbirds$curvepts   
 gpa.BE <- gpagen(hummingbirds$land, curves=hummingbirds$curvepts, ProcD=FALSE, print.progress = F)
 plot(gpa.BE)
