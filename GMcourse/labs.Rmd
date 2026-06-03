@@ -18,7 +18,7 @@
 ### Day 3 
 - [3.1: Asymmetry](https://phenoevo.github.io/GMcourse/Labs/03.1-Asymmetry.html)
 - [3.2: GPA with Semilandmarks](https://phenoevo.github.io/GMcourse/Labs/03.2-GPA-Semilandmarks.html)
-    - [Day 3 R-script](https://phenoevo.github.io/GMcourse/Labs/Day04-RCode.R)
+    - [Day 3 R-script](https://phenoevo.github.io/GMcourse/Labs/Day03-RCode.R)
 
 ### Example data for Workshop (download and extract zip file)
 [Link to Data Repository](https://phenoevo.github.io/GMcourse/Labs/Practice_data/Practice_data.zip)
