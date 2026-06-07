@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Reference list</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="schedule.html">Schedule</a>
+</li>
+<li>
+  <a href="lectures.html">Theory lectures</a>
+</li>
+<li>
+  <a href="labs.html">Practical sessions</a>
+</li>
+<li>
+  <a href="references.html">References</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Reference list</h1>
+
+</div>
+
+
+<style>
+/* This changes the headers */
+h1, h2, h3 {
+  font-family: Lucida Console, sans-serif;
+  color: #6954b0;
+}
+</style>
+<div id="software-packages" class="section level4">
+<h4>Software Packages</h4>
+<p>Baken E., Collyer M., Kaliontzopoulou A., Adams D. 2021. gmShiny and
+geomorph v4.0: new graphical interface and enhanced analytics for a
+comprehensive morphometric experience. <em>Methods in Ecology and
+Evolutionary Biology</em> 12(12).</p>
+<p>Collyer, M.L, and D.C. Adams. 2018. RRPP: An R package for fitting
+linear models to high-dimensional data using residual randomization.
+<em>Methods in Ecology and Evolution</em> 9:1772-1779.</p>
+<p>Adams, D.C., and E. Otarola-Castillo. 2013. geomorph: an R package
+for the collection and analysis of geometric morphometric shape data.
+<em>Methods in Ecology and Evolution</em> 4:393-399.</p>
+<p><br />
+</p>
+</div>
+<div id="general-overview-of-geometric-morphometrics"
+class="section level4">
+<h4>General Overview of Geometric Morphometrics</h4>
+<p>Adams, D.C., F. J. Rohlf, and D.E. Slice. 2013. A field comes of age:
+Geometric morphometrics in the 21<sup>st</sup> century. <em>Hystrix</em>
+24:7-14.</p>
+<p><br />
+</p>
+</div>
+<div id="general-analytical-theory-of-methods" class="section level4">
+<h4>General Analytical Theory of Methods</h4>
+<p>Collyer, M.L., D.J. Sekora, and D.C. Adams. 2015. A method for
+analysis of phenotypic change for phenotypes described by
+high-dimensional data. <em>Heredity</em> 115: 357-365.</p>
+<p>Collyer, M. L., and D.C. Adams. 2013. Phenotypic trajectory analysis:
+Comparison of shape change patterns in evolution and ecology.
+<em>Hystrix</em> 24:75-83.</p>
+<p>Adams, D.C., and M.L. Collyer. 2009. A general framework for the
+analysis of phenotypic trajectories in evolutionary studies.
+<em>Evolution</em> 63:1143-1154.</p>
+<p>Adams, D. C., and M.L. Collyer. 2007. Analysis of character
+divergence along environmental gradients and other covariates.
+<em>Evolution</em> 61:510-515.</p>
+<p>Collyer, M. L., and D. C. Adams. 2007. Analysis of two-state
+multivariate phenotypic change in ecological studies. <em>Ecology</em>
+88:683-692.</p>
+<p>Adams, D. C. 1999. Methods for shape analysis of landmark data from
+articulated structures. <em>Evolutionary Ecology Research</em>
+1:959-970.</p>
+<p><br />
+</p>
+</div>
+<div id="further-theoretical-reading" class="section level4">
+<h4>Further Theoretical Reading</h4>
+<p>Anderson, M. J. and C. J. F. t. Braak. 2003. Permutation tests for
+multi-factorial analysis of variance. <em>Journal of Statistical
+Computation and Simulation</em>. 73:85-113.</p>
+<p>Anderson, M. J. (2001a). A new method for non-parametric multivariate
+analysis of variance. <em>Austral Ecology</em>. 26, 32–46.</p>
+<p>Anderson, M. J. (2001b). Permutation tests for univariate or
+multivariate analysis of variance and regression. <em>Canadian Journal
+of Fisheries and Aquatic Sciences, 58</em>. 626–639.</p>
+<p>Anderson, M. J., and D. C. Walsh. 2012. PERMANOVA, ANOSIM, and the
+Mantel test in the face of heterogeneous dispersions: what null
+hypothesis are you testing?. <em>Ecological monographs.</em>
+83:557-574.</p>
+<p>Gower J.C. 1966. Some distance properties of latent root and vector
+methods used in multivariate analysis. <em>Biometrika</em>.
+53:325–338.</p>
+<p>McArdle, B. H., and M. J. Anderson. 2001. Fitting multivariate models
+to community data: a comment on distance-based redundancy analysis.
+<em>Ecology.</em> 82:290–297.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

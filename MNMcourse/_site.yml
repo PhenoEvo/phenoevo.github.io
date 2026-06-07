@@ -1,0 +1,15 @@
+name: "Introduction to Geometric Morphometrics"
+output_dir: "."
+navbar:
+  title: ""
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Schedule"
+      href: schedule.html
+    - text: "Theory lectures"
+      href: lectures.html
+    - text: "Practical sessions"
+      href: labs.html
+    - text: "References"
+      href: references.html

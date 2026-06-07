@@ -1,0 +1,22 @@
+---
+  title: "Schedule"
+---
+## Daily Schedule of Activities
+
+### Monday: Introduction to Morphometrics
+- Morphometrics: History, Introduction and Data Types
+- Superimposition: Generalized Procrustes Analysis (GPA)
+- **Practical session:** data acquisition
+    
+### Tuesday: Basic shape analyses
+- Shape Variables & PCA 
+- Linear models: group differences and allometry
+- **Practical session:** statistical models and visualization of shape change
+    
+### Wednesday: Miscellaneous
+- Asymmetry
+- Articulated structures
+- Semilandmarks
+- Missing data
+- **Practical session:** functions and possibilities in *geomorph*  and *gmShiny*  
+

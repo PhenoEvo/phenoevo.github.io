@@ -1,0 +1,53 @@
+---
+title: Reference list
+---
+<style>
+/* This changes the headers */
+h1, h2, h3 {
+  font-family: Lucida Console, sans-serif;
+  color: #6954b0;
+}
+</style>
+
+
+#### Software Packages
+Baken E., Collyer M., Kaliontzopoulou A., Adams D. 2021. gmShiny and geomorph v4.0: new graphical interface and enhanced analytics for a comprehensive morphometric experience. *Methods in Ecology and Evolutionary Biology* 12(12).  
+
+Collyer, M.L, and D.C. Adams. 2018. RRPP: An R package for fitting linear models to high-dimensional data using residual randomization. *Methods in Ecology and Evolution* 9:1772-1779.
+
+Adams, D.C., and E. Otarola-Castillo. 2013. geomorph: an R package for the collection and analysis of geometric morphometric shape data. *Methods in Ecology and Evolution* 4:393-399.
+
+\
+
+#### General Overview of Geometric Morphometrics
+Adams, D.C., F. J. Rohlf, and D.E. Slice. 2013. A field comes of age: Geometric morphometrics in the 21^st^ century. *Hystrix* 24:7-14.
+
+\
+
+#### General Analytical Theory of Methods
+Collyer, M.L., D.J. Sekora, and D.C. Adams. 2015. A method for analysis of phenotypic change for phenotypes described by high-dimensional data. *Heredity* 115: 357-365.
+
+Collyer, M. L., and D.C. Adams. 2013. Phenotypic trajectory analysis: Comparison of shape change patterns in evolution and ecology. *Hystrix* 24:75-83.
+
+Adams, D.C., and M.L. Collyer. 2009. A general framework for the analysis of phenotypic trajectories in evolutionary studies. *Evolution* 63:1143-1154. 
+
+Adams, D. C., and M.L. Collyer. 2007. Analysis of character divergence along environmental gradients and other covariates. *Evolution* 61:510-515. 
+
+Collyer, M. L., and D. C. Adams. 2007. Analysis of two-state multivariate phenotypic change in ecological studies. *Ecology* 88:683-692. 
+
+Adams, D. C. 1999. Methods for shape analysis of landmark data from articulated structures. *Evolutionary Ecology Research* 1:959-970.
+
+\
+
+#### Further Theoretical Reading
+Anderson, M. J. and C. J. F. t. Braak. 2003. Permutation tests for multi-factorial analysis of variance. *Journal of Statistical Computation and Simulation*. 73:85-113.
+
+Anderson, M. J. (2001a). A new method for non-parametric multivariate analysis of variance. *Austral Ecology*. 26, 32–46.
+
+Anderson, M. J. (2001b). Permutation tests for univariate or multivariate analysis of variance and regression. *Canadian Journal of Fisheries and Aquatic Sciences, 58*. 626–639. 
+
+Anderson, M. J., and D. C. Walsh. 2012. PERMANOVA, ANOSIM, and the Mantel test in the face of heterogeneous dispersions: what null hypothesis are you testing?. *Ecological monographs.* 83:557-574.
+
+Gower J.C. 1966. Some distance properties of latent root and vector methods used in multivariate analysis. *Biometrika*. 53:325–338.
+
+McArdle, B. H., and M. J. Anderson. 2001. Fitting multivariate models to community data: a comment on distance-based redundancy analysis. *Ecology.* 82:290–297.
