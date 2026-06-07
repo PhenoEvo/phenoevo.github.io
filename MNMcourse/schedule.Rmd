@@ -3,20 +3,20 @@
 ---
 ## Daily Schedule of Activities
 
-### Monday: Introduction to Morphometrics
-- Morphometrics: History, Introduction and Data Types
-- Superimposition: Generalized Procrustes Analysis (GPA)
-- **Practical session:** data acquisition
-    
-### Tuesday: Basic shape analyses
-- Shape Variables & PCA 
-- Linear models: group differences and allometry
-- **Practical session:** statistical models and visualization of shape change
-    
-### Wednesday: Miscellaneous
-- Asymmetry
-- Articulated structures
-- Semilandmarks
-- Missing data
-- **Practical session:** functions and possibilities in *geomorph*  and *gmShiny*  
+### Monday: Microclimate models
+- Introduction to mechanistic niche models: concepts and differences with correlative models
+- Microclimate fundamentals: radiation, air and soil temperature, wind and humidity
+- The NicheMapR package: microclimate estimation at different spatial scales
+- Practical session: generating and visualising microclimatic profiles
 
+### Tuesday: The animal model
+- Biophysics of heat exchange: conduction, convection, radiation, evaporation and metabolism
+- Operative body temperature and its environmental and morphological determinants
+- The ectotherm module of NicheMapR: implementation and parameterisation
+- Practical session: simulating body temperatures and activity periods
+
+### Wednesday: DEB models and free work
+- (Very brief) introduction to Dynamic Energy Budget (DEB) theory: assimilation, maintenance, growth and reproduction
+- Integration of DEB with the animal model: predicting the life cycle under different environmental conditions
+- Practical session (optional): fitting and interpreting DEB models in ectotherms
+- Practical session: addressing questions, reviewing concepts and working on participants’ personal projects

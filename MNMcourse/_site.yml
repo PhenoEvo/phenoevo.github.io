@@ -1,4 +1,4 @@
-name: "Introduction to Geometric Morphometrics"
+name: "Introduction to Mechanistic Niche Modelling"
 output_dir: "."
 navbar:
   title: ""
@@ -11,5 +11,3 @@ navbar:
       href: lectures.html
     - text: "Practical sessions"
       href: labs.html
-    - text: "References"
-      href: references.html

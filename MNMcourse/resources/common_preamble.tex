@@ -1,0 +1,122 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode=true}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+
+% ---------- Packages ----------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{pgfpages}
+\usepackage{minted}
+\definecolor{mintedbg}{rgb}{0.969,0.969,0.969}
+\setminted{
+  bgcolor=mintedbg,
+  fontsize=\tiny,
+  breaklines=true,
+  tabsize=2,
+  style=tango,
+}
+\usepackage{tikz}
+\usetikzlibrary{shapes.callouts, shapes.arrows, arrows.meta, calc, positioning}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{backgrounds}
+\usepackage{mathtools}
+% \usepackage[thinc]{esdiff}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fontawesome}
+\usepackage{csquotes}
+\usepackage{bookmark}
+\usepackage[font=tiny]{caption}
+
+% ---------- Beamer configuration ----------
+\usetheme{Triton}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+\beamertemplatenavigationsymbolsempty
+
+% Prevent slide breaks in the middle of a paragraph
+\widowpenalties 1 10000
+\raggedbottom
+
+% Section pages
+\setbeamertemplate{section page}{
+  \centering
+  \begin{beamercolorbox}[sep=12pt,center]{part title}
+    \usebeamerfont{section title}\insertsection\par
+  \end{beamercolorbox}
+}
+
+% Fonts
+\usefonttheme[onlymath]{serif}
+\usepackage{lmodern}
+
+% Graphics setup
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+% ---------- Biblatex ----------
+\usepackage[backend=biber,style=apa]{biblatex}
+\addbibresource{/home/urtzi/Documents/zotero.bib}
+
+% ---------- Hyperref ----------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Blue,
+  filecolor=Blue,
+  citecolor=Blue,
+  urlcolor=Blue,
+  pdfcreator={LaTeX via knitr}
+}
+\urlstyle{same}
+
+
+% ---------- Author ----------
+\author{Urtzi Enriquez-Urzelai\inst{1}}
+
+% ---------- Institute ----------
+\institute{
+  \inst{1} Institute of Vertebrate Biology, \\
+  Czech Academy of Sciences
+  \newline \newline
+  \faGithub \hspace*{0.2ex}
+  \href{https://github.com/urtzienriquez}{\color{blue}{GitHub}}
+  \hspace*{0.5ex}
+  \faGlobe \hspace*{0.2ex}
+  \href{https://urtzienriquez.github.io/}{\color{blue}{webpage}}
+}
+
+% ---------- Title graphic ----------
+\titlegraphic{
+  \begin{minipage}[b]{0.20\textwidth}
+    \raggedright
+    ~
+  \end{minipage}%
+  \begin{minipage}[b]{0.20\textwidth}
+    \raggedright
+    ~
+  \end{minipage}%
+  \begin{minipage}[b]{0.20\textwidth}
+    \centering
+    \includegraphics[height=1cm]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/ivb-logo.png}
+  \end{minipage}%
+  \begin{minipage}[b]{0.20\textwidth}
+    \raggedright
+    ~
+  \end{minipage}%
+  \begin{minipage}[b]{0.20\textwidth}
+    \raggedright
+    \tiny Organized by: \\ [0.5ex]
+    \includegraphics[height=0.6cm]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/usfq-logo.png}
+  \end{minipage}
+}

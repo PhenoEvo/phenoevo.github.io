@@ -1,0 +1,306 @@
+---
+title: "Practical 2: Elevation gradients and soil moisture"
+author: "Urtzi Enriquez-Urzelai"
+date: "`r Sys.Date()`"
+# output: html_document
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    latex_engine: lualatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 5)
+```
+
+# Introduction
+
+In this practical we will compare microclimates at two elevations in the Ecuadorian Andes (i.e., a "low" and a high elevation site in Antisana), explore the soil moisture model, and investigate how snow affects the thermal environment.
+
+**Study sites:**
+
+| Site | Coordinates | Elevation |
+|------|-------------|-----------|
+| Low | -0.422961, -78.125341 | ~3753 m |
+| High | -0.487593, -78.133824 | ~5192 m |
+
+The **aim** of this practical is to see how elevation, by applying the lapse-rate, changes microclimate conditions and explore the consequences of having snow cover. Specifically we will use the elevation parameter to apply lapse-rate corrections, we will compare air temperature and soil temperature across elevations, enable and interpret the soil moisture sub-model, run the snow model at high elevation, use multi-year simulations to reach steady state, and apply these tools to ecologically relevant questions.
+
+# Setting up
+
+```{r setup-load, message=FALSE}
+library(NicheMapR)
+```
+
+Define both sites:
+
+```{r define-sites}
+low_lon <- -78.125341
+low_lat <- -0.422961
+low_elev <- 3753
+
+high_lon <- -78.133824
+high_lat <- -0.487593
+high_elev <- 5192
+```
+
+# Elevation effects on temperature and radiation
+
+When you provide the `elev` parameter, `micro_global()` applies an adiabatic lapse-rate correction to the climate data extracted from the global dataset. The default lapse rates are 0.0077 °C/m for daily maxima and 0.0039 °C/m for daily minima.
+
+Run the model for both sites:
+
+```{r elev-runs, message=FALSE, results='hide'}
+micro_low <- micro_global(
+  loc = c(low_lon, low_lat),
+  elev = low_elev,
+  timeinterval = 12
+)
+
+micro_high <- micro_global(
+  loc = c(high_lon, high_lat),
+  elev = high_elev,
+  timeinterval = 12
+)
+```
+
+Now compare air temperature at the local height:
+
+```{r plot-elev-temp, message=FALSE}
+par(mfrow = c(1, 2))
+
+# Air temperature
+plot(micro_low$metout[, "TALOC"], type = "l", col = "forestgreen", lwd = 1.5,
+  ylim = c(-5, 35), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Air temperature at local height")
+lines(micro_high$metout[, "TALOC"], col = "dodgerblue", lwd = 1.5)
+legend("topright", legend = c("3753 m", "5192 m"),
+  col = c("forestgreen", "dodgerblue"), lty = 1, lwd = 1.5)
+
+# Soil surface temperature
+plot(micro_low$soil[, "D0cm"], type = "l", col = "forestgreen", lwd = 1.5,
+  ylim = c(-5, 35), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Soil surface temperature")
+lines(micro_high$soil[, "D0cm"], col = "dodgerblue", lwd = 1.5)
+legend("topright", legend = c("3753 m", "5192 m"),
+  col = c("forestgreen", "dodgerblue"), lty = 1, lwd = 1.5)
+```
+
+**What is the difference?** The high site is ~1400 m higher, so with the standard lapse rate it should be roughly 5–10°C colder. This is a dramatic difference for any organism — it can mean the difference between a population that thrives and one that cannot survive.
+
+Let us also compare solar radiation:
+
+```{r plot-elev-solar, message=FALSE}
+plot(micro_low$metout[, "SOLR"], type = "l", col = "forestgreen", lwd = 1.5,
+  xlab = "Hour", ylab = expression(paste("Solar radiation (W m"^{-2}, ")")),
+  main = "Solar radiation at the two sites")
+lines(micro_high$metout[, "SOLR"], col = "dodgerblue", lwd = 1.5)
+legend("topright", legend = c("3753 m", "5192 m"),
+  col = c("forestgreen", "dodgerblue"), lty = 1, lwd = 1.5)
+```
+
+Higher elevations receive more solar radiation due to the thinner atmosphere (less scattering and absorption). This is why the high site's SOLR values are noticeably higher during daylight hours, despite being at the same latitude.
+
+## Challenge 4: Freezing line
+
+At what elevation does the minimum soil temperature at 2.5 cm depth first drop below 0°C? Run the model with `elev = 3753, 4000, 4500, 5000, 5192` and find the crossing point. This has direct implications for the upper elevation limit of freeze-intolerant species.
+
+```{r challenge4, message=FALSE, results='hide'}
+# Your code here
+elevs <- c(3753, 4000, 4500, 5000, 5192)
+```
+
+# Soil moisture
+
+The soil moisture sub-model uses Campbell's (1985) water balance model (Program 11.1). It tracks infiltration, evaporation, transpiration, and redistribution through the soil profile. Soil hydraulic properties can be looked up from the `CampNormTbl9_1` table.
+
+Enable the moisture model with `runmoist = 1`:
+
+```{r moist-run, message=FALSE, results='hide'}
+# Use CampNormTbl9_1 to look up soil hydraulic properties
+data(CampNormTbl9_1)
+print(CampNormTbl9_1)
+```
+
+Select a soil type (e.g., loam, soil type 4):
+
+```{r moist-params}
+soiltype <- 4
+CampNormTbl9_1[soiltype, ]
+```
+
+Now run the low site with moisture enabled:
+
+```{r moist-run-actual, message=FALSE, results='hide'}
+micro_moist <- micro_global(
+  loc = c(low_lon, low_lat),
+  elev = low_elev,
+  timeinterval = 12,
+  runmoist = 1,
+  soiltype = soiltype
+)
+```
+
+Explore the moisture outputs:
+
+```{r explore-moist, message=FALSE}
+# Soil moisture at each depth
+head(micro_moist$soilmoist)
+```
+
+Plot soil moisture over time at different depths:
+
+```{r plot-moist, message=FALSE}
+plot(micro_moist$soilmoist[, "WC0cm"], type = "l", col = "blue", lwd = 1.5,
+  ylim = c(0, 0.5), xlab = "Hour", ylab = "Soil moisture (m³/m³)",
+  main = "Soil moisture at 0 cm")
+lines(micro_moist$soilmoist[, "WC2.5cm"], col = "cyan", lwd = 1.5)
+lines(micro_moist$soilmoist[, "WC10cm"], col = "darkblue", lwd = 1.5)
+legend("topright", legend = c("0 cm", "2.5 cm", "10 cm"),
+  col = c("blue", "cyan", "darkblue"), lty = 1, cex = 0.8)
+```
+
+Soil moisture affects thermal conductivity — wet soil conducts heat better than dry soil, reducing surface temperature extremes.
+
+## Challenge 5: Moisture comparison between depths
+
+Run the low site with `runmoist = 1` and `soiltype = 1` (sand) and then with `soiltype = 4` (loam). Compare `soilmoist` at 2.5 cm and 50 cm depth. Which soil type retains more moisture at depth? Why?
+
+```{r challenge5, message=FALSE, results='hide'}
+# Your code here
+```
+
+# Snow at high elevation
+
+At 5192 m in the Andes, temperatures are often below freezing. Snow can accumulate and dramatically alter the microclimate by insulating the ground and reflecting solar radiation due to its high albedo.
+
+Enable the snow model with `snowmodel = 1`:
+
+```{r snow-run, message=FALSE, results='hide'}
+micro_snow <- micro_global(
+  loc = c(high_lon, high_lat),
+  elev = high_elev,
+  timeinterval = 12,
+  snowmodel = 1
+)
+```
+
+Check if snow is predicted:
+
+```{r check-snow}
+# Snow depth (column 18 of metout)
+max(micro_snow$metout[, "SNOWDEP"])
+```
+
+Compare soil temperature with and without snow:
+
+```{r no-snow-run, message=FALSE, results='hide'}
+micro_nosnow <- micro_global(
+  loc = c(high_lon, high_lat),
+  elev = high_elev,
+  timeinterval = 12,
+  snowmodel = 0
+)
+```
+
+```{r plot-snow, message=FALSE}
+par(mfrow = c(1, 2))
+plot(micro_snow$soil[, "D0cm"], type = "l", col = "dodgerblue", lwd = 1.5,
+  ylim = c(-7, 22), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "With snow model")
+plot(micro_nosnow$soil[, "D0cm"], type = "l", col = "red", lwd = 1.5,
+  ylim = c(-7, 22), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Without snow model")
+```
+
+Snow insulates the ground, keeping soil temperatures warmer in winter and cooler in summer. The albedo effect (snow reflects sunlight) also reduces daytime heating.
+
+## Multi-year simulation for snow
+
+The snow model needs time to build a realistic snowpack. Run for two years and discard the first:
+
+```{r snow-spinup, message=FALSE, results='hide'}
+micro_snow2 <- micro_global(
+  loc = c(high_lon, high_lat),
+  elev = high_elev,
+  timeinterval = 365,
+  nyears = 2,
+  snowmodel = 1
+)
+```
+
+```{r plot-snow-year2, message=FALSE}
+# Use the second year (hours 8761 to 17520)
+start <- 365 * 24 + 1
+end <- 2 * 365 * 24
+snowdep_year2 <- micro_snow2$metout[start:end, "SNOWDEP"]
+plot(snowdep_year2, type = "l", col = "dodgerblue", lwd = 1.5,
+  xlab = "Day of year", ylab = "Snow depth (cm)",
+  main = "Snow depth in year 2")
+```
+
+With a daily time step (`timeinterval = 365`), the model runs a full sequential simulation where each day's output feeds into the next. This is the most realistic mode but takes longer to compute.
+
+## Challenge 6: Snow buffering effect
+
+Re-run the high site with `snowmodel = 1` and `snowmodel = 0` using `timeinterval = 365`. Compare the minimum soil temperature at 2.5 cm depth in July (the coldest month in the Southern Hemisphere). Is the soil warmer or colder with snow cover? Why?
+
+```{r challenge6, message=FALSE, results='hide'}
+# Run high site with snow model
+micro_snow_on <- micro_global(
+  loc = c(high_lon, high_lat),
+  elev = high_elev,
+  timeinterval = 365,
+  snowmodel = 1
+)
+
+# Run high site without snow model
+micro_snow_off <- micro_global(
+  loc = c(high_lon, high_lat),
+  elev = high_elev,
+  timeinterval = 365,
+  snowmodel = 0
+)
+
+# Find July rows (DOY 182-212)
+july <- which(micro_snow_on$soil[, "DOY"] >= 274 &
+              micro_snow_on$soil[, "DOY"] <= 304)
+
+# Minimum soil temperature at 2.5 cm depth in July
+min_with_snow <- min(micro_snow_on$soil[july, "D0cm"])
+min_without_snow <- min(micro_snow_off$soil[july, "D0cm"])
+
+cat("With snow:   ", round(min_with_snow, 2), "°C\n")
+cat("Without snow:", round(min_without_snow, 2), "°C\n")
+cat("Difference:  ", round(min_with_snow - min_without_snow, 2), "°C\n")
+
+# Plot side-by-side: snow depth above, soil temperature below
+par(mfrow = c(2, 1))
+
+# Snow depth in July (with snow model on)
+plot(micro_snow_on$metout[july, "SNOWDEP"], type = "h", col = "lightblue",
+  lwd = 3, xlab = "Hour in July", ylab = "Snow depth (cm)",
+  main = "Snow depth at 2.5 cm in July (snow model on)")
+
+# Soil temperature comparison in July
+plot(micro_snow_on$soil[july, "D0cm"], type = "l", col = "dodgerblue",
+  lwd = 1.5, xlab = "Hour in July", ylab = "Temperature (°C)",
+  ylim = range(c(micro_snow_on$soil[july, "D0cm"],
+                 micro_snow_off$soil[july, "D0cm"])),
+  main = "Soil temperature at 2.5 cm in July")
+lines(micro_snow_off$soil[july, "D0cm"], col = "red", lwd = 1.5)
+# legend("topright", legend = c("With snow", "Without snow"),
+  # col = c("dodgerblue", "red"), lty = 1, lwd = 1.5)
+```
+
+# Summary
+
+In this practical you have learned to:
+
+1. Compare microclimates at two different elevations using lapse-rate correction
+2. Understand how elevation affects air temperature, soil temperature, and solar radiation
+3. Enable the soil moisture sub-model and interpret moisture profiles
+4. Run the snow model and understand its insulating effect
+5. Use multi-year simulations for realistic snowpack development
+
+These skills allow you to predict how climate change may affect species across elevation gradients — from the lowland Amazon to the high Andes.

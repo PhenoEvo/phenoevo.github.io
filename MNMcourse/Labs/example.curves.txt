@@ -1,2 +1,0 @@
-Head	LM1	LM2
-Eye	pt1	pt2

@@ -1,28 +1,26 @@
 ---
-  title: "Introduction to Geometric Morphometrics"
+  title: "Introduction to Mechanistic Niche Modelling"
   subtitle: "Universidad de San Francisco de Quito"
-  date: "1-3 June 2026"
+  date: "8-10 June 2026"
 
 ---
   
-Morphometrics is the study of shape variation and its covariation with other variables. This course provides a general review of the theory and methods used to analyze the shape of organisms. The primary objective is to provide participants with fundamental knowledge of these methods and their utility.
+Mechanistic ecological niche models integrate morphological, physiological and behavioural traits of organisms to predict their potential distribution and/or biological rates (e.g. rates of heat exchange and water loss) in space and time. Unlike correlative (i.e. statistical) approaches, they allow estimation of a species’ fundamental niche by linking its functional traits to local environmental conditions —such as air temperature, wind speed or radiation— through explicit mechanistic processes. This makes it possible to project the niche onto the landscape and infer the potential distribution of a species even under conditions with no analogue in the present, such as those projected under different climate change scenarios.
 
-To this end, the course focuses not only on establishing a solid understanding of these methods but also on providing a brief overview of the practical aspects of morphometric analysis, such as data acquisition, processing to obtain variables that describe organismal shape, statistical treatment, and the visualization of results.
+The aim of this course is to provide participants with a solid grounding in the theoretical and practical foundations of this approach. To this end, the course covers biophysical ecology methods for estimating microclimatic conditions and simulating the thermal and water balance of organisms with their environment. We will also briefly introduce Dynamic Energy Budget (DEB) theory, which allows simulation of, for example, growth and reproduction of organisms. Although the theoretical part will cover both endotherms and ectotherms, the practical sessions will focus on ectotherm animals.
 
-To ensure a more direct understanding of morphometric methods, core theoretical concepts will be reviewed and subsequently put into practice using biological examples, allowing participants to become familiar with the available tools. All procedures will be conducted using the R programming language; therefore, having basic prior knowledge of R is highly recommended to successfully follow the course and maximize the learning experience.  
-  
+Particular attention will be paid to the implementation of these models in R, so a basic knowledge of the language is recommended. 
+
 \
 \
 
-#####  Instructor: [Antigoni Kaliontzopoulou](https://sites.google.com/view/akaliontzopoulou/home)
-###### Departament de Biologia Evolutiva, Ecologia i Ciències Ambientals (BEECA)
-###### IRBio, Institut de Recerca de la Biodiversitat
-###### Universitat de Barcelona
+#####  Instructor: [Urtzi Enriquez-Urzelai](https://urtzienriquez.github.io/)
+###### Institute of Vertebrate Biology, Czech Academy of Sciences, Brno, Czechia
 
 \
 
 <center>
-![](IntroGM_USFQ2026.jpeg){width=60% height=60%}
+![](IntroMNM_USFQ2026.jpeg){width=60% height=60%}
 <center>
 
 

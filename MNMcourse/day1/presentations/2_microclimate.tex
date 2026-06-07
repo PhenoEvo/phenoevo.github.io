@@ -1,0 +1,955 @@
+\documentclass{beamer}
+
+\title{The microclimate model}
+\subtitle{Day 2: Introduction to microclimate model}
+\date{2026-06-09}
+
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode=true}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+
+% ---------- Packages ----------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[absolute,overlay]{textpos}
+\usepackage{pgfpages}
+\usepackage{minted}
+\definecolor{mintedbg}{rgb}{0.969,0.969,0.969}
+\setminted{
+  bgcolor=mintedbg,
+  fontsize=\tiny,
+  breaklines=true,
+  tabsize=2,
+  style=tango,
+}
+\usepackage{tikz}
+\usetikzlibrary{shapes.callouts, shapes.arrows, arrows.meta, calc, positioning}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{backgrounds}
+\usepackage{mathtools}
+% \usepackage[thinc]{esdiff}
+\usepackage{physics}
+\usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fontawesome}
+\usepackage{csquotes}
+\usepackage{bookmark}
+\usepackage[font=tiny]{caption}
+
+% ---------- Beamer configuration ----------
+\usetheme{Triton}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+\beamertemplatenavigationsymbolsempty
+
+% Prevent slide breaks in the middle of a paragraph
+\widowpenalties 1 10000
+\raggedbottom
+
+% Section pages
+\setbeamertemplate{section page}{
+  \centering
+  \begin{beamercolorbox}[sep=12pt,center]{part title}
+    \usebeamerfont{section title}\insertsection\par
+  \end{beamercolorbox}
+}
+
+% Fonts
+\usefonttheme[onlymath]{serif}
+\usepackage{lmodern}
+
+% Graphics setup
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+% ---------- Biblatex ----------
+\usepackage[backend=biber,style=apa]{biblatex}
+\addbibresource{/home/urtzi/Documents/zotero.bib}
+
+% ---------- Hyperref ----------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=Blue,
+  filecolor=Blue,
+  citecolor=Blue,
+  urlcolor=Blue,
+  pdfcreator={LaTeX via knitr}
+}
+\urlstyle{same}
+
+
+% ---------- Author ----------
+\author{Urtzi Enriquez-Urzelai\inst{1}}
+
+% ---------- Institute ----------
+\institute{
+  \inst{1} Institute of Vertebrate Biology, \\
+  Czech Academy of Sciences
+  \newline \newline
+  \faGithub \hspace*{0.2ex}
+  \href{https://github.com/urtzienriquez}{\color{blue}{GitHub}}
+  \hspace*{0.5ex}
+  \faGlobe \hspace*{0.2ex}
+  \href{https://urtzienriquez.github.io/}{\color{blue}{webpage}}
+}
+
+% ---------- Title graphic ----------
+\titlegraphic{
+  \begin{minipage}[b]{0.20\textwidth}
+    \raggedright
+    ~
+  \end{minipage}%
+  \begin{minipage}[b]{0.20\textwidth}
+    \raggedright
+    ~
+  \end{minipage}%
+  \begin{minipage}[b]{0.20\textwidth}
+    \centering
+    \includegraphics[height=1cm]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/ivb-logo.png}
+  \end{minipage}%
+  \begin{minipage}[b]{0.20\textwidth}
+    \raggedright
+    ~
+  \end{minipage}%
+  \begin{minipage}[b]{0.20\textwidth}
+    \raggedright
+    \tiny Organized by: \\ [0.5ex]
+    \includegraphics[height=0.6cm]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/usfq-logo.png}
+  \end{minipage}
+}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\begin{document}
+
+
+
+\frame{\titlepage}
+
+% \begin{frame}[allowframebreaks,plain]
+%   \frametitle{Outline}
+%   \tableofcontents
+% \end{frame}
+
+\section{What is microclimate?}
+\subsection{Defining the relevant scales}
+
+\begin{frame}
+  \frametitle{The problem of scale -- space}
+  \begin{figure}
+    \includegraphics[height=0.8\textheight]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/microclimate_scale.png}
+    \caption{The problem of scale, \parencite{potter2013}}\label{}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The environment organisms actually experience}
+
+  Weather stations measure conditions at \textasciitilde1--2\,m above ground.
+
+  \vspace{0.2cm}
+
+  Organisms live \textbf{at the surface} --- on soil, under rocks, in leaf litter, buried in nests.
+
+  \vspace{0.2cm}
+
+  \begin{block}{Definition}
+    Microclimate is the physical environment (temperature, radiation, humidity, wind) at the organism's actual location.
+  \end{block}
+
+  \vspace{0.2cm}
+
+  % \textbf{Relevant scales:}
+  % \begin{itemize}
+  %   \item \textbf{Spatial}: millimetres (skin boundary layer) to metres (nest site, burrow)
+  %   \item \textbf{Temporal}: minutes (basking bout) to seasons (hibernation, aestivation)
+  % \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Animals experience microclimates}
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}
+      \node (salamandra) {
+        \includegraphics[width=0.45\textwidth, trim={0 0 4cm 0}, clip]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/salamandra.jpg}
+      };
+      \node[right=0.5 mm of salamandra] (alytes) {
+        \includegraphics[width=0.45\textwidth, trim={0 0 1cm 0}, clip]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/alytes}
+      };
+    \end{tikzpicture}
+    \caption{Microclimates. Photos: Alfredo G. Nicieza}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Vertical scale and organism experience}
+
+  Different organisms live at different heights and depths --- they experience different microclimates simultaneously:
+
+  \vspace{0.2cm}
+
+  \begin{itemize}
+    \item \textbf{Above ground (0--2\,m)}: Solar radiation, wind, shade dominate. Hourly to daily variation. \textit{A basking lizard on a rock.}
+    \item \textbf{Surface}: The critical interface where energy balance is computed. Minutes to daily. \textit{A salamander under leaf litter.}
+    \item \textbf{Shallow soil (0--10\,cm)}: Nests, eggs. Daily cycles, damped and lagged. \textit{Reptile nest at 5\,cm depth.}
+    \item \textbf{Deep soil (10--200\,cm)}: Hibernation, burrows. Seasonal cycles with weeks--months lag. \textit{Amphibian overwintering at 50\,cm.}
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \begin{alertblock}{Key insight}
+    Two species at the same location can experience completely different microclimates if one is on the surface and the other is 10\,cm below.
+  \end{alertblock}
+\end{frame}
+
+\section{Why microclimate models?}
+\subsection{From weather data to organism experience}
+
+\begin{frame}
+  \frametitle{Climate is not enough}
+
+  \begin{itemize}
+    \item Standard weather data captures conditions at \textasciitilde2\,m in an open field
+    \item Organisms experience conditions near the surface, under vegetation, in burrows
+    \item Microclimates determine:
+      \begin{itemize}
+        \item Heat exchange and body temperature
+        \item Water balance and hydration
+        \item Behaviour (basking, sheltering, foraging)
+        \item Survival and reproduction
+      \end{itemize}
+  \end{itemize}
+
+  \vspace{0.3cm}
+
+  \begin{block}{Core motivation}
+    To predict how organisms respond to climate, we need microclimate --- not just macroclimate.
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The problem of scale -- time}
+  \begin{figure}
+    \only<1>{
+      \includegraphics[height=0.8\textheight]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/microclimate_time.png}
+    }
+    \only<2>{
+      \includegraphics[trim={0 0 0 27cm}, clip]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/microclimate_time.png}
+    }
+    \caption{The problem of scale, \parencite{kearney2012b}}\label{}
+  \end{figure}
+\end{frame}
+
+\section{NicheMapR overview}
+\subsection{A mechanistic microclimate framework}
+
+\begin{frame}
+  \frametitle{What is NicheMapR?}
+
+  \begin{itemize}
+    \item Developed by \textcite{kearney2017a}.
+    \item R package with a Fortran computational engine
+    \item Predicts hourly above- and below-ground conditions anywhere on Earth
+    \item Inputs: weather, terrain, vegetation, soil properties
+    \item Outputs: solar radiation, soil and air temperature, humidity, snow, soil moisture
+  \end{itemize}
+
+  \vspace{0.3cm}
+
+  \begin{block}{Main strength}
+    Mechanistic --- predictions are physically based, so they remain valid under novel environmental conditions.
+  \end{block}
+\end{frame}
+
+\section{Model architecture}
+\subsection{How the pieces fit together}
+
+\begin{frame}
+  \frametitle{Two layers: R and Fortran}
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Fortran engine}
+    \begin{itemize}
+      \item Numerical computations
+      \item Radiation physics
+      \item Soil heat transfer
+      \item Moisture dynamics
+      \item Snow modelling
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{R interface}
+    \begin{itemize}
+      \item Data preparation
+      \item Global climate databases
+      \item Running simulations
+      \item Visualization
+      \item User customization
+    \end{itemize}
+  \end{columns}
+
+  \vspace{0.3cm}
+
+  The complexity of coupled ODEs requires Fortran's speed; R provides the flexible, user-friendly interface.
+\end{frame}
+
+\section{Creating relevant microclimates}
+\subsection{How each component contributes}
+
+\begin{frame}
+  \frametitle{Biophysical Ecology processes}
+  \begin{figure}
+    \begin{center}
+      \begin{tikzpicture}
+        \node (figure) {
+          \includegraphics[width=0.60\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/be_processes.jpg}
+        };
+      \end{tikzpicture}
+    \end{center}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Solar radiation: the energy engine}
+
+  Solar radiation is the primary energy input to the surface. NicheMapR computes how much energy reaches the ground at each hour by modelling its path through space and atmosphere.
+
+  \vspace{0.2cm}
+
+  The wavelength-specific irradiance on a flat surface is:
+
+  \[I_\lambda = S_\lambda \left( \frac{a}{r} \right)^2 \cos Z\]
+
+  where $S_\lambda$ is the solar spectral irradiance, $(a/r)^2$ corrects for Earth-Sun distance, and $Z$ is the zenith angle.
+
+  \vspace{0.2cm}
+
+  The zenith angle is derived from latitude, solar declination, and time of day. NicheMapR calculates radiation at 111 wavelengths and accounts for attenuation by Rayleigh scattering, aerosols, ozone, and water vapour.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Solar radiation: relevance for organisms}
+
+  \begin{block}{What this means on the ground}
+    The solar radiation computation determines the daily and seasonal rhythm of energy input --- when basking is possible, how intense it is, and how it varies with latitude and season.
+  \end{block}
+
+  \vspace{0.2cm}
+
+  \textbf{Organism relevance:}
+  \begin{itemize}
+    \item Basking ectotherms depend on solar radiation reaching the surface --- cloud cover, shading, and slope aspect all modulate this
+    \item Seasonal changes in solar angle determine the activity window for reptiles at different latitudes
+    \item The spectral resolution (111 wavelengths) matters: UV and visible light penetrate differently through vegetation and water
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Slope, aspect, and the microclimate mosaic}
+
+  Most surfaces are not flat. A sloping surface receives different solar energy than a flat one:
+
+  \[Z_{SL} = \arccos\big( \cos(Z) \cos(SL) + \sin(Z) \sin(SL) \cos(AZ_{SUN} - AZ_{SL}) \big)\]
+
+  where $SL$ is the slope angle and $AZ_{SL}$ is the slope azimuth.
+
+  \vspace{0.2cm}
+
+  \textbf{Organism relevance:}
+  \begin{itemize}
+    \item A south-facing slope (northern hemisphere) receives more radiation --- basking sites warm faster in spring
+    \item A north-facing slope stays cooler and retains moisture --- refuge for amphibians on hot days
+    \item Adjacent slopes metres apart can differ in temperature by several degrees
+    \item This drives fine-scale habitat selection and nest-site choice in reptiles
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Atmospheric attenuation and elevation effects}
+
+  Solar radiation is attenuated by Rayleigh scattering, aerosols, ozone, and water vapour. At higher elevation, the thinner atmosphere scatters and absorbs less --- so more radiation reaches the surface despite colder air.
+
+  \vspace{0.2cm}
+
+  Temperature decreases with elevation (\textasciitilde0.77$\,^\circ$C per 100\,m for maxima, \textasciitilde0.39$\,^\circ$C for minima). The \textbf{freezing line} sets upper limits for freeze-intolerant species.
+
+  \vspace{0.2cm}
+
+  \begin{block}{Organism relevance}
+    A 1400\,m elevation gain can reduce temperatures by 5--10$\,^\circ$C while increasing solar radiation --- high-elevation organisms face colder air but more intense sunlight.
+  \end{block}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Biophysical Ecology processes}
+  \begin{figure}
+    \begin{center}
+      \begin{tikzpicture}
+        \node (figure) {
+          \includegraphics[width=0.60\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/be_processes.jpg}
+        };
+      \end{tikzpicture}
+    \end{center}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Longwave radiation: the invisible driver}
+
+  All objects emit infrared radiation proportional to $T^4$ (Stefan-Boltzmann law). At night, longwave radiation dominates the energy budget.
+
+  \vspace{0.2cm}
+
+  \textbf{Clear-sky emissivity} depends on air temperature and vapour pressure:
+
+  \[\epsilon_{SKY} = 1.72 \left( \frac{e_A}{T_A} \right)^{\frac{1}{7}}\]
+
+  \vspace{0.2cm}
+
+  NicheMapR combines five longwave sources:
+  \begin{itemize}
+    \item \textbf{Clear-sky} emission from the atmosphere
+    \item \textbf{Cloud} emission (clouds radiate as near-blackbodies)
+    \item \textbf{Vegetation} radiation from surrounding canopy
+    \item \textbf{Hill} radiation from surrounding terrain
+    \item \textbf{Ground} emission from the surface itself
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Longwave radiation and organism experience}
+
+  \textbf{Nighttime cooling:}
+  \begin{itemize}
+    \item Clear skies: the ground radiates to cold space --- rapid cooling, frost risk
+    \item Clouds: emit longwave back downward --- slower cooling, warmer nights
+    \item Canopy: blocks the view to cold sky --- warmer nighttime microclimates
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \textbf{Organism relevance:}
+  \begin{itemize}
+    \item Nocturnal amphibians depend on warm, humid nights for activity
+    \item Nest placement under canopy vs.\ open sky changes nighttime minima by 5--10$\,^\circ$C
+    \item Burrow walls radiate back at the occupant, buffering longwave losses
+    \item Frost at ground level can kill eggs even when air temperature is above freezing
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Biophysical Ecology processes}
+  \begin{figure}
+    \begin{center}
+      \begin{tikzpicture}
+        \node (figure) {
+          \includegraphics[width=0.60\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/be_processes.jpg}
+        };
+      \end{tikzpicture}
+    \end{center}
+  \end{figure}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Soil types and albedo}
+
+  NicheMapR includes 12 soil types. Three common examples:
+
+  \vspace{0.1cm}
+
+  \begin{itemize}
+    \item \textbf{Rock (type 0)}: high thermal conductivity --- heats slowly, stores heat, small daily range
+    \item \textbf{Sand (type 1)}: low conductivity and heat capacity --- heats and cools rapidly, large daily range
+    \item \textbf{Loam (type 4)}: intermediate properties
+  \end{itemize}
+
+  \vspace{0.1cm}
+
+  \textbf{Soil albedo (\texttt{REFL}):} Dark soil (\texttt{REFL}=0.05) absorbs most solar radiation and heats substantially; light soil (\texttt{REFL}=0.35) reflects more and stays cooler.
+
+  \vspace{0.1cm}
+
+  \begin{block}{Practical relevance}
+    Soil type and colour determine the thermal environment at nest depth --- sand heats faster than loam, dark soil reaches higher peak temperatures.
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Soil moisture and evaporative cooling}
+
+  NicheMapR can simulate depth-specific soil moisture using Campbell's water balance model. It tracks infiltration, evaporation, transpiration, and redistribution through 19 moisture nodes, with hydraulic properties from the \texttt{CampNormTbl9\_1} table.
+
+  \vspace{0.2cm}
+
+  \textbf{How moisture affects microclimate:}
+  \begin{itemize}
+    \item Wet soil has higher heat capacity and thermal conductivity --- dampens temperature extremes
+    \item Evaporation consumes heat --- wet surfaces stay cooler during the day
+    \item Dry soil heats faster and reaches higher maximum temperatures
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \textbf{Organism relevance:}
+  \begin{itemize}
+    \item Soil moisture determines habitat suitability for amphibians
+    \item Water potential at nest depth affects egg hydration and survival
+    \item Sand dries quickly near the surface but retains moisture at depth; loam retains moisture more evenly
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Biophysical Ecology processes}
+  \begin{figure}
+    \begin{center}
+      \begin{tikzpicture}
+        \node (figure) {
+          \includegraphics[width=0.60\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/be_processes.jpg}
+        };
+      \end{tikzpicture}
+    \end{center}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{From weather station to ground level}
+
+  Standard weather data is measured at \textasciitilde2\,m. Organisms live near the surface. NicheMapR bridges this gap using boundary layer physics.
+
+  \vspace{0.2cm}
+
+  \textbf{Wind speed decreases near the surface:}
+
+  \textcolor{red}{Add info but without equation}
+
+  % \[u_z = \frac{u^*}{k} \ln \left( \frac{z - d}{z_0} + 1 \right)\]
+  %
+  % where $u^*$ is the friction velocity, $k$ is the von Karman constant (0.4), $z_0$ is the roughness length, and $d$ is the zero-plane displacement.
+  %
+  % \vspace{0.2cm}
+
+  \textbf{Air temperature} at the organism's height is interpolated between surface temperature and the reference height, weighted by turbulent transport coefficients.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Why the boundary layer matters for organisms}
+
+  The difference between 2\,m and ground level is not just about height --- it shapes how organisms experience their environment:
+
+  \vspace{0.2cm}
+
+  \begin{itemize}
+    \item A lizard at ground level may experience air 5--10$\,^\circ$C hotter than the 2\,m reading --- critical for activity and thermoregulation
+    \item A salamander in leaf litter is in a nearly still air layer --- minimal convection, high humidity, stable conditions
+    \item Small ectotherms are tightly coupled to the microclimate at their specific height --- moving 5\,cm up or down can change body temperature substantially
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \begin{block}{Key scale insight}
+    The difference between 1\,mm and 1\,m above ground can be as large as the difference between two climate zones.
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The surface energy balance: everything comes together}
+
+  The model finds a surface temperature $T_{surf}$ that satisfies the balance of all energy fluxes:
+
+  \[
+    \dot{Q}_{solar} + \dot{Q}_{IR,in} - \dot{Q}_{IR,out} - \dot{Q}_{conv} - \dot{Q}_{evap} - \dot{Q}_{cond} = 0
+  \]
+
+  \vspace{0.2cm}
+
+  Each term corresponds to a physical process organisms experience:
+
+  \vspace{0.1cm}
+
+  \begin{itemize}
+    \item $\dot{Q}_{solar}$: absorbed sunlight --- basking, colouration, shade-seeking
+    \item $\dot{Q}_{IR}$: net longwave --- nighttime cooling, canopy buffering
+    \item $\dot{Q}_{conv}$: convection --- wind removes or adds heat
+    \item $\dot{Q}_{evap}$: evaporation --- evaporative cooling, moisture balance
+    \item $\dot{Q}_{cond}$: soil conduction --- heat storage, buffering
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  The model iterates this balance hourly, using bisection or Newton-Raphson, converging when $T_{surf}$ closes the budget. This is how microclimate is generated at the temporal scale that matters for organisms.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Biophysical Ecology processes}
+  \begin{figure}
+    \begin{center}
+      \begin{tikzpicture}
+        \node (figure) {
+          \includegraphics[width=0.60\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/be_processes.jpg}
+        };
+      \end{tikzpicture}
+    \end{center}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Soil heat: the temporal dimension}
+
+  Below the surface, temperature at depth $z$ and time $t$ is governed by the 1D heat conduction equation:
+
+  \[
+    \frac{\partial T}{\partial t} = \frac{k}{\rho c} \frac{\partial^2 T}{\partial z^2}
+  \]
+
+  \vspace{0.2cm}
+
+  \textbf{Numerical implementation:}
+  \begin{itemize}
+    \item 10 soil nodes, spaced more closely near the surface
+    \item Adams predictor-corrector solver
+    \item Thermal properties updated hourly based on soil moisture
+    \item Bottom boundary set to mean annual air temperature
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Depth creates lag and damping}
+
+  Heat penetrates soil slowly. Different depths experience very different thermal regimes:
+
+  \vspace{0.2cm}
+
+  \begin{itemize}
+    \item \textbf{Surface:} Full diurnal cycle, maximum amplitude, rapid response --- \textit{surface-active organisms}
+    \item \textbf{2--5\,cm:} Daily cycle, slightly damped, lagged by hours --- \textit{typical reptile egg depth, embryos experience daily fluctuations}
+    \item \textbf{10--15\,cm:} Amplitude halved, lagged by 6--12 hours --- \textit{deeper nests, more stable temperatures}
+    \item \textbf{50--100\,cm:} Diurnal cycle disappears, seasonal cycle dominates, lagged by weeks --- \textit{hibernation sites}
+    \item \textbf{200\,cm:} Nearly constant at mean annual temperature --- \textit{deep burrows, fully buffered}
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \begin{alertblock}{Climate change implication}
+    A 1$\,^\circ$C rise in air temperature shifts soil temperature at all depths. For shallow nests, this directly affects embryo development rate and survival.
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Snow: insulation and albedo at high elevation}
+
+  NicheMapR includes a snow module that adds up to 8 snow nodes above the soil surface. Snow has two main effects:
+
+  \vspace{0.2cm}
+
+  \begin{itemize}
+    \item \textbf{Insulation}: snow acts as a thermal blanket --- ground stays warmer in winter and cooler in summer
+    \item \textbf{Albedo}: fresh snow reflects most incoming solar radiation, reducing daytime heating
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  Realistic snowpack requires sequential daily simulation (\texttt{timeinterval}=365) over multiple years; the first year is discarded as spin-up. Output includes hourly snow depth (\texttt{SNOWDEP}).
+
+  \vspace{0.2cm}
+
+  \begin{block}{Organism relevance}
+    Snow insulates hibernating amphibians and reptiles from lethal winter temperatures. Losing snow cover due to climate change exposes overwintering life stages to freezing.
+  \end{block}
+\end{frame}
+
+\section{Summary: from components to microclimates}
+\subsection{The integrative picture}
+
+% \begin{frame}
+%   \frametitle{How components generate organism-relevant microclimates}
+%
+%   \centering
+%   \renewcommand{\arraystretch}{1.15}
+%   \resizebox{\textwidth}{!}{%
+%     \begin{tabular}{p{2.5cm}p{1.8cm}p{1.8cm}p{3.5cm}}
+%       \hline
+%       \textbf{Component} & \textbf{Spatial scale}   & \textbf{Temporal scale} & \textbf{Organism relevance}                \\
+%       \hline
+%       Solar radiation    & Metres (slope, aspect)   & Hours--seasons          & Basking, activity timing, nest-site choice \\
+%       Boundary layer     & mm--m above ground       & Minutes--hours          & Body temperature, convection, drying rate  \\
+%       Longwave radiation & Local (canopy, sky view) & Hours (nighttime)       & Night activity, frost risk, nest minima    \\
+%       Soil heat          & 0--300\,cm depth         & Hours--seasons          & Egg development, hibernation, buffering    \\
+%       Soil moisture      & Depth profile            & Days--weeks             & Hydric conditions, evaporative cooling     \\
+%       \hline
+%     \end{tabular}%
+%   }
+% \end{frame}
+
+\begin{frame}
+  \frametitle{The integrative picture}
+
+  \begin{block}{Take-home message}
+    Each component operates at different spatial and temporal scales. Together, they generate the microclimate that determines whether and how organisms persist.
+  \end{block}
+
+  \vspace{0.3cm}
+
+  Every organism --- whether a basking lizard, a buried turtle egg, or a hibernating amphibian --- experiences a unique combination of these components at its specific location, height, depth, and time of day.
+\end{frame}
+
+\section{Inputs, outputs, and global data}
+\subsection{Running the model}
+
+\begin{frame}
+  \frametitle{Inputs and outputs}
+
+  \textbf{Inputs:}
+  \begin{itemize}
+    \item Air temperature, relative humidity, wind speed
+    \item Cloud cover, rainfall
+    \item Soil properties: conductivity, density, water-holding capacity
+    \item Terrain: slope, aspect, horizon angles
+    \item Vegetation: shade fraction, leaf area index
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \textbf{Outputs:}
+  \begin{itemize}
+    \item Hourly soil temperature at multiple depths
+    \item Air temperature and wind at user-specified heights
+    \item Solar and longwave radiation components
+    \item Sky temperature, soil moisture, snow depth
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Global workflow}
+
+  \begin{enumerate}
+    \item \textbf{\texttt{micro\_global}} (R): Aggregates climate (CRU), aerosols (GADS), and soil moisture (NOAA) data for any location
+    \item \textbf{\texttt{microrun}} (R interface): Passes parameters to the Fortran DLL
+    \item \textbf{Fortran engine}: Performs hourly iterations, solving the energy balance until $T_{surf}$ converges
+  \end{enumerate}
+
+  \vspace{0.3cm}
+
+  \textbf{Key output matrices:}
+  \begin{itemize}
+    \item \texttt{metout}: surface and air conditions, hourly
+    \item \texttt{soil}: temperatures at 10 depths, hourly
+    \item \texttt{soilmoist}: water content and potential at 19 depths
+  \end{itemize}
+
+  \vspace{0.2cm}
+
+  \begin{block}{Global applicability}
+    Users can run microclimate simulations almost anywhere on Earth using built-in global datasets.
+  \end{block}
+\end{frame}
+
+\section{The egg microclimate}
+\subsection{A case study}
+
+\begin{frame}
+  \frametitle{The egg microclimate}
+
+  \tikzset{
+  box1/.style={
+      draw, fill=white, rounded corners,thick,font=\fontsize{5}{6}\selectfont,align=left
+    },
+  connector/.style={ line width=3pt, shorten <=1.5pt, shorten >=1.5pt, rounded corners=8pt,>={[width=6pt,length=4pt]Triangle} },
+  egg/.style={
+      circle, draw, fill=yellow!10, inner sep=10pt
+    }
+  }
+
+  \begin{figure}
+    \begin{center}
+      \begin{tikzpicture}[scale=0.6]
+        \uncover<1->{
+          \draw[gray!25,fill=gray!25,rounded corners=16pt] (0,0) rectangle (8,8);
+          \node[inner sep=0mm] (NEST) at (1,2.5) {
+            \scriptsize \textbf{Nest}
+          };
+          \node[box1] (CL) at (3,9) {
+            \scriptsize \textbf{Climate}
+          };
+          \node[egg] at (2,1){};
+          \node[egg] at (2.5,1.5){};
+          \node[egg] at (2.7,0.9){};
+          \node[egg] at (5.5,0.9){};
+          \node[egg, inner sep=15] at (4,1.3){};
+          \node (EMBR) at (4.2,1.5) {
+            \scriptsize \textbf{Embryo}
+          };
+          \only<1>{
+            \draw[connector,->] ($(CL.south)+(0.2,0mm)$) to[bend left=20] (NEST.north east);
+          }
+        }
+        \uncover<2->{
+          \node[box1] (SC) at (6,6.5) {
+            \textbf{Nest site characteristics}: \\
+            \fontsize{3}{4}{\(\bullet\)} shade \\
+            \fontsize{3}{4}{\(\bullet\)} soil depth \\
+            \fontsize{3}{4}{\(\bullet\)} soil reflectance
+          };
+          \node[box1] (NM) at (5.3,4.5) {
+            \textbf{NicheMapR} \\
+            microclimate model
+          };
+          \node[box1,fill=orange!30] (HS) at (4,3) {
+            \textbf{hourly soil temperature}
+          };
+          \draw[connector,->] ($(CL.south)+(0.2,0mm)$) to[bend right=10] (NM.north west);
+          \draw[connector,->] ($(SC.south east)+(-0.2,0mm)$) |- (NM.east);
+          \draw[connector,->] ($(NM.south east)+(-0.2,0mm)$) |- (HS.east);
+        }
+        \uncover<3->{
+          \node[box1] (ST) at (1.6,4.5) {
+            Statistical \\ comparison
+          };
+          \node[box1,text width=1.5cm] (ED) at (1.6,6.5) {
+            \textbf{Empirical data}: \\
+            \fontsize{3}{4}
+            \(\bullet\) soil temperature \\
+            \(\bullet\) nest temperature
+          };
+          \draw[connector,->,blue!75] (HS.west) -| (ST.south);
+          \draw[connector,->,blue!75] (ED.south) -- (ST.north);
+        }
+        \uncover<4->{
+          \draw[connector,->,cyan!75] (ST.east) -- (NM.west);
+        }
+      \end{tikzpicture}
+    \end{center}
+    \caption{We can model the microclimates eggs experience at relevant temporal and spatial scales. Based on \textcite{mitchell2016}}\label{fig:egg-microclimate}
+  \end{figure}
+
+\end{frame}
+
+\section{Example: egg translocation}
+\subsection{Validating and applying the model}
+
+\begin{frame}
+  \frametitle{Egg translocations informed by microclimate}
+
+  \tikzset{
+  white box/.pic={
+      \path[overlay,fill=white] (-0.5,-0.3) rectangle (0.4,0.3);
+    },
+  POI/.style={circle,fill=none,inner sep=1pt},
+  POI label/.append style={node font=\tiny, inner sep=0.1em},
+  POI edge/.append style={-{Latex[length=1mm,width=1mm]}, bend left},
+  }
+
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}
+      \node (current) {
+        \includegraphics[width=0.9\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/egg_transloc1.png}
+      };
+      \node[anchor=north west] (2008) at ($(current.north west)+(1,0cm)$) {\textbf{2008-2009}};
+      \pic at (0,0) {white box};
+      \pic at (-3.5,0) {white box};
+      \pic at (3.5,0) {white box};
+      \path (2.33,-0.25) node[POI] (star) {};
+      \path (2.33,-0.07) node[POI] (diamond) {};
+      \path (2.5,-1.22) node[POI] (circle) {};
+      \path (diamond) ++(1.3,1) node[POI label] {Current translocation sites} edge[POI edge] (diamond);
+      \path (star) ++(2,0.3) node[POI label] {Current population} edge[POI edge] (star);
+      \path (circle) ++(1.5,-0.5) node[POI label] {Proposed translocation sites} edge[POI edge, bend right] (circle);
+      \node[below=5mm of current] (future) {
+        \includegraphics[width=0.9\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/egg_transloc2.png}
+      };
+      \node[anchor=north west] (2070) at ($(future.north west)+(1,0cm)$) {\textbf{2070}};
+      \node[fill=white] at (-3.5,-3.65) (depth) {\scriptsize{2.5 cm}};
+      \node[right=2.4cm of depth,fill=white] (depth2) {\scriptsize{8.25 cm}};
+      \node[right=2.4cm of depth2,fill=white] (depth3) {\scriptsize{15 cm}};
+    \end{tikzpicture}
+    \caption{Simulated egg performance. Modified from \textcite{mitchell2016}}\label{fig:egg-transloc}
+  \end{figure}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Calibrating microclimates}
+  \begin{tikzpicture}
+    \node (A) {
+      \includegraphics[height=0.8\textheight]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/dataloggers1.jpg}
+    };
+    \node[right=1mm of A] {
+      \includegraphics[width=0.5\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/dataloggers2.jpg}
+    };
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Calibrating microclimates}
+  \begin{figure}
+    \includegraphics[height=0.8\textheight, trim={0 0 0 16.3cm}, clip]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/microclimates_param.png}
+    \caption{Calibrating microclimates, taken from \textcite{puig2026}}
+  \end{figure}
+\end{frame}
+
+\section{Strengths and limitations}
+\subsection{Key takeaways}
+
+\begin{frame}
+  \frametitle{Strengths and limitations}
+
+  \textbf{Strengths:}
+  \begin{itemize}
+    \item \textbf{Mechanistic:} physically based --- valid under novel climates
+    \item \textbf{Fine resolution:} hourly output captures diurnal cycles critical for ectotherms
+    \item \textbf{Integrated:} combines solar, longwave, convection, soil heat, and moisture in one framework
+    \item \textbf{Proven:} extensively validated against field observations
+  \end{itemize}
+
+  \vspace{0.3cm}
+
+  \textbf{Limitations:}
+  \begin{itemize}
+    \item \textbf{Point-based:} no lateral heat flow --- represents one vertical column
+    \item \textbf{Data-hungry:} requires many parameters; sensitive to input quality
+    \item \textbf{No vegetation dynamics:} vegetation structure is prescribed, not predicted
+  \end{itemize}
+\end{frame}
+
+\section{Conclusions}
+\subsection{The big picture}
+
+\begin{frame}
+  \frametitle{What NicheMapR enables}
+
+  \begin{itemize}
+    \item Predicting microclimate at the spatial and temporal scales that actually matter to organisms
+    \item Connecting macroclimate (weather data) to organism experience (temperature at the nest, the leaf litter, the burrow)
+    \item Mechanistic species distribution modelling --- asking not just where species occur, but why and whether they will persist
+  \end{itemize}
+
+  \vspace{0.3cm}
+
+  \begin{alertblock}{Core insight}
+    Organisms experience microclimates, not climate averages. To understand their biology and predict their fate, we must model the environment at their scale.
+  \end{alertblock}
+\end{frame}
+
+\section{References}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+\end{document}

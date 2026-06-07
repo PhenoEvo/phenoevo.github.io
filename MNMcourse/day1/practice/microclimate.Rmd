@@ -1,0 +1,357 @@
+---
+title: "Practical 1: Microclimate modelling under different conditions"
+author: "Urtzi Enriquez-Urzelai"
+date: "`r Sys.Date()`"
+# output: html_document
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    latex_engine: lualatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 5)
+```
+
+# Introduction
+
+In this practical we will work with NicheMapR's microclimate model. The main aim is to simulate soil temperatures at a site in the Ecuadorian Andes (i.e., in Antisana). 
+
+**Study site:** Low elevation (-0.422961, -78.125341, ~3753 m)
+
+In the next practical we will explore microclimatic differences across elevations, but this first practical session is focused on exploring the microclimate model's input and outputs thoroughly. These will include modifying shade levels and observe their effect, changing soil properties and see how they affect thermal conditions, and adding terrain (slope, aspect) and compare north vs south-facing slopes.
+
+# Setting up
+
+First, load the NicheMapR package. It contains all the functions we need.
+
+```{r load-pkg, message=FALSE}
+library(NicheMapR)
+```
+
+The global climate data should already be available. Let us verify:
+
+```{r check-data}
+gcfolder_file <- paste0(.libPaths()[1], "/gcfolder.rda")
+if (file.exists(gcfolder_file)) {
+  load(gcfolder_file)
+  message("Global climate data is at: ", folder)
+} else {
+  message("Please run: get.global.climate(folder = 'path/to/data')")
+}
+```
+
+# Your first model run
+
+The function `micro_global()` extracts climate data from a global database and runs the microclimate model. Let us run it for our low-elevation site with default settings.
+
+```{r first-run, message=FALSE, results='hide'}
+micro <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12,
+  nyears = 1
+)
+```
+
+**Note:** `timeinterval = 12` runs the model for the average day of each month. `nyears = 1` runs a single year. The model first does a 3-iteration spin-up (using the output of day 1 as the input for day 2, and so on) to stabilise the soil temperature profile.
+
+The output object `micro` is a list containing matrices with the results:
+
+- `micro$metout` — above-ground conditions under **minimum shade**
+- `micro$shadmet` — above-ground conditions under **maximum shade**
+- `micro$soil` — soil temperatures at 10 depths under minimum shade
+- `micro$shadsoil` — soil temperatures at 10 depths under maximum shade
+
+Let us look at the first few rows of `metout`:
+
+```{r examine-metout}
+head(micro$metout[, 1:10], 10)
+```
+
+The columns are:
+
+| Col | Name | Description |
+|-----|------|-------------|
+| 1 | DOY | Day of year |
+| 2 | TIME | Time of day (minutes) |
+| 3 | TALOC | Air temperature at local height — °C |
+| 4 | TAREF | Air temperature at reference height — °C |
+| 5 | RHLOC | Relative humidity at local height — % |
+| 6 | RH | Relative humidity at reference height — % |
+| 7 | VLOC | Wind speed at local height — m/s |
+| 8 | VREF | Wind speed at reference height — m/s |
+| 12 | ZEN | Solar zenith angle — degrees |
+| 13 | SOLR | Solar radiation — W/m² |
+| 14 | TSKYC | Sky radiant temperature — °C |
+
+# Plotting the results
+
+Let us plot the hourly air temperature for each month, for both local and reference heights.
+
+```{r plot-temp, message=FALSE}
+# Convert time to hours
+metout <- cbind(micro$metout, hour = micro$metout[, 2] / 60)
+
+# Plot air temperature at local height
+plot(metout[, "hour"], metout[, "TALOC"],
+  type = "l", col = "tomato", lwd = 1.5,
+  xlab = "Hour of day", ylab = "Temperature (°C)",
+  main = "Air temperature at local height (0.01 m)"
+)
+```
+
+Now let us look at the soil temperature profiles under minimum shade vs maximum shade:
+
+```{r plot-soil, message=FALSE}
+soil <- micro$soil
+shadsoil <- micro$shadsoil
+
+# Soil depths
+depths <- c("D0cm", "D2.5cm", "D5cm", "D10cm", "D15cm",
+  "D20cm", "D30cm", "D50cm", "D100cm", "D200cm")
+
+# Plot soil temperature at 0 cm, 2.5 cm, and 10 cm under min shade
+par(mfrow = c(1, 2))
+plot(soil[, "D0cm"], type = "l", col = "red", ylim = c(0, 30),
+  xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Soil temp - minimum shade")
+lines(soil[, "D2.5cm"], col = "orange")
+lines(soil[, "D10cm"], col = "gold")
+legend("topright", legend = c("0 cm", "2.5 cm", "10 cm"),
+  col = c("red", "orange", "gold"), lty = 1, cex = 0.8)
+
+plot(shadsoil[, "D0cm"], type = "l", col = "red", ylim = c(0, 30),
+  xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Soil temp - maximum shade")
+lines(shadsoil[, "D2.5cm"], col = "orange")
+lines(shadsoil[, "D10cm"], col = "gold")
+legend("topright", legend = c("0 cm", "2.5 cm", "10 cm"),
+  col = c("red", "orange", "gold"), lty = 1, cex = 0.8)
+```
+
+**What do you notice?** The maximum shade scenario keeps soil temperatures cooler during the day but slightly warmer at night (due to longwave radiation from vegetation). The deeper layers (10 cm) show less daily variation.
+
+# Shade effects
+
+Different shade levels simulate different habitat types: open soil, partial canopy, and dense forest. Let us run the model with three distinct shade levels.
+
+```{r shade-runs, message=FALSE, results='hide'}
+# Open: no shade
+micro_open <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, runshade = 0, minshade = 0
+)
+
+# Partial shade (50%)
+micro_partial <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, runshade = 0, minshade = 50
+)
+
+# Dense shade (90%)
+micro_dense <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, minshade = 90, maxshade = 100
+)
+```
+
+Now compare the soil surface temperatures:
+
+```{r plot-shade, message=FALSE}
+par(mfrow = c(1, 1))
+plot(micro_open$soil[, "D0cm"], type = "l", col = "red", lwd = 1.5,
+  ylim = c(0, 35), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Soil surface temperature under different shade levels")
+lines(micro_partial$soil[, "D0cm"], col = "orange", lwd = 1.5)
+lines(micro_dense$soil[, "D0cm"], col = "darkgreen", lwd = 1.5)
+legend("topright", legend = c("0% shade", "50% shade", "90% shade"),
+  col = c("red", "orange", "darkgreen"), lty = 1, lwd = 1.5)
+```
+
+**What do you observe?** Dense shade reduces peak temperatures by 10–15°C. This has huge implications for egg incubation — shaded nests are much cooler.
+
+## Challenge 1: Optimal incubation temperature
+
+Many tropical reptile eggs incubate best between 28–32°C. Run the model with `runshade = 0, minshade = 0, 25, 50, 75, 90` and find which shade level keeps the soil temperature at 5 cm depth closest to 30°C during the hottest part of the day.
+
+Hint: extract `micro$soil[, "D5cm"]` for each run and compute the mean or median.
+
+```{r challenge1, message=FALSE, results='hide'}
+# Your code here
+shade_levels <- c(0, 25, 50, 75, 90)
+# Fill in the loop to run the model for each shade level
+# and extract D5cm temperatures
+```
+
+# Soil properties
+
+Soil type strongly influences thermal conductivity and heat capacity. NicheMapR provides soil types 0 (rock) through 11 (clay), plus the option to specify custom properties.
+
+Let us compare sand (`soiltype = 1`), loam (`soiltype = 4`), and rock (`soiltype = 0`):
+
+```{r soil-runs, message=FALSE, results='hide'}
+micro_sand <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, soiltype = 1
+)
+micro_loam <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, soiltype = 4
+)
+micro_rock <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, soiltype = 0
+)
+```
+
+```{r plot-soiltypes, message=FALSE}
+plot(micro_sand$soil[, "D0cm"], type = "l", col = "gold", lwd = 1.5,
+  ylim = c(0, 35), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Surface temperature for different soil types")
+lines(micro_loam$soil[, "D0cm"], col = "brown", lwd = 1.5)
+lines(micro_rock$soil[, "D0cm"], col = "gray40", lwd = 1.5)
+legend("topright", legend = c("Sand", "Loam", "Rock"),
+  col = c("gold", "brown", "gray40"), lty = 1, lwd = 1.5)
+```
+
+```{r soil-runs-2, message=FALSE, results='hide'}
+micro_sand <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  runmoist = 1,
+  timeinterval = 12, soiltype = 1
+)
+micro_loam <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  runmoist = 1,
+  timeinterval = 12, soiltype = 4
+)
+micro_rock <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  runmoist = 1,
+  timeinterval = 12, soiltype = 0
+)
+```
+
+```{r plot-soiltypes-2, message=FALSE}
+plot(micro_sand$soil[, "D0cm"], type = "l", col = "gold", lwd = 1.5,
+  ylim = c(0, 35), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Surface temperature for different soil types")
+lines(micro_loam$soil[, "D0cm"], col = "brown", lwd = 1.5)
+lines(micro_rock$soil[, "D0cm"], col = "gray40", lwd = 1.5)
+legend("topright", legend = c("Sand", "Loam", "Rock"),
+  col = c("gold", "brown", "gray40"), lty = 1, lwd = 1.5)
+```
+
+```{r plot-soiltypes-moist, message=FALSE}
+plot(micro_sand$soilmoist[, "WC0cm"], type = "l", col = "gold", lwd = 1.5,
+  ylim = c(0, 0.4), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Surface temperature for different soil types")
+lines(micro_loam$soilmoist[, "WC0cm"], col = "brown", lwd = 1.5)
+# lines(micro_rock$soilmoist[, "WC0cm"], col = "gray40", lwd = 1.5)
+legend("topright", legend = c("Sand", "Loam"),
+  col = c("gold", "brown"), lty = 1, lwd = 1.5)
+```
+
+You can also change the soil solar reflectance (`REFL`). This is the albedo:
+
+```{r reflec-run, message=FALSE, results='hide'}
+micro_dark <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, REFL = 0.05 # dark soil
+)
+micro_light <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, REFL = 0.35 # light soil
+)
+```
+
+```{r plot-refl, message=FALSE}
+plot(micro_dark$soil[, "D0cm"], type = "l", col = "black", lwd = 1.5,
+  ylim = c(0, 35), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Effect of soil reflectance on surface temperature")
+lines(micro_light$soil[, "D0cm"], col = "gray80", lwd = 1.5)
+legend("topright", legend = c("REFL = 0.05 (dark)", "REFL = 0.35 (light)"),
+  col = c("black", "gray80"), lty = 1, lwd = 1.5)
+```
+
+Darker soils absorb more solar radiation and reach higher temperatures. This is why tilled fields can be much hotter than bare rock of the same colour.
+
+## Challenge 2: Daily temperature range by soil type
+
+Compare the daily temperature range (maximum minus minimum at the surface) for sand, loam, and rock. Which soil type shows the largest range? Why?
+
+Hint: use `max()` and `min()` on the surface temperature column.
+
+```{r challenge2}
+# Your code here
+```
+
+# Terrain effects
+
+Slope and aspect change the amount of solar radiation received. In the Southern Hemisphere, north-facing slopes receive more sun (opposite to the Northern Hemisphere).
+
+Compare a flat surface, a steep north-facing slope, and a steep south-facing slope. Remember that Ecuador is in the Southern Hemisphere, so `aspect = 0` (north) receives more direct sunlight.
+
+```{r terrain-runs, message=FALSE, results='hide'}
+micro_flat <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, slope = 0, aspect = 0
+)
+micro_north <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, slope = 30, aspect = 0
+)
+micro_south <- micro_global(
+  loc = c(-78.125341, -0.422961),
+  elev = 3753,
+  timeinterval = 12, slope = 30, aspect = 180
+)
+```
+
+```{r plot-terrain, message=FALSE}
+par(mfrow = c(1, 1))
+plot(micro_flat$soil[, "D0cm"], type = "l", col = "black", lwd = 1.5,
+  ylim = c(0, 35), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Effect of slope and aspect on surface temperature")
+lines(micro_north$soil[, "D0cm"], col = "red", lwd = 1.5)
+lines(micro_south$soil[, "D0cm"], col = "blue", lwd = 1.5)
+legend("topright", legend = c("Flat", "North-facing (30°)", "South-facing (30°)"),
+  col = c("black", "red", "blue"), lty = 1, lwd = 1.5)
+```
+
+**Notice the difference:** In the Southern Hemisphere, north-facing slopes receive more solar energy, so they are substantially hotter. South-facing slopes can be 5–10°C cooler — a huge difference for organisms.
+
+## Challenge 3: Slope aspect and nesting
+
+Imagine you are a reptile choosing a nest site on a 20° slope. Compare `aspect = 0` (north), `aspect = 90` (east), `aspect = 180` (south), and `aspect = 270` (west). Which aspect gives the warmest incubation conditions at 2.5 cm depth? Which gives the coolest?
+
+```{r challenge3, message=FALSE, results='hide'}
+# Your code here
+aspects <- c(0, 90, 180, 270)
+```
+
+# Summary
+
+In this practical you have learned to:
+
+1. Run NicheMapR's `micro_global()` function
+2. Extract and plot air temperature and soil temperature outputs
+3. Modify shade levels and understand their effect on ground temperatures
+4. Change soil types and soil reflectance
+5. Add slope and aspect, and compare thermal conditions between orientations
+
+These are the same tools used by researchers to predict incubation conditions for endangered species, map thermal refugia under climate change, and understand the fundamental niche of ectotherms.

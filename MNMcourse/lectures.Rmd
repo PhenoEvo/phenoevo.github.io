@@ -2,20 +2,8 @@
   title: "Lectures"
 ---
 
+### Day 1
 [01 - Morphometrics: History, Introduction and Data Types](https://phenoevo.github.io/GMcourse/Lectures/01-IntroHistory.html)
 
 [02 - Superimposition: Generalized Procrustes Analysis (GPA)](https://phenoevo.github.io/GMcourse/Lectures/02-Superimposition.html)
-
-[03 - Shape Spaces, Shape Variables, & PCA](https://phenoevo.github.io/GMcourse/Lectures/03-ShapeVariablesSpaces.html)
-
-[04 - Group Differences](https://phenoevo.github.io/GMcourse/Lectures/04-GroupDifferences.html)  
-  [04b - Group Differences additions](https://phenoevo.github.io/GMcourse/Lectures/04b-GroupDifferences_additions.html)
-
-[05 - Allometry](https://phenoevo.github.io/GMcourse/Lectures/05-Allometry.html)
-
-[06 - Asymmetry](https://phenoevo.github.io/GMcourse/Lectures/06-Asymmetry.html)
-
-[07 - Semilandmarks](https://phenoevo.github.io/GMcourse/Lectures/07-Semilandmarks.html)
-
-[08 - Missing Data](https://phenoevo.github.io/GMcourse/Lectures/08-MissingData.html)
 
