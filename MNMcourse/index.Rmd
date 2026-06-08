@@ -20,7 +20,7 @@ Particular attention will be paid to the implementation of these models in R, so
 \
 
 <center>
-![](IntroMNM_USFQ2026.jpeg){width=60% height=60%}
+![](IntroMNM.jpeg){width=60% height=60%}
 <center>
 
 
