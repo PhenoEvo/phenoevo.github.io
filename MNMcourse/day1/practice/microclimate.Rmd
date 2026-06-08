@@ -353,5 +353,3 @@ In this practical you have learned to:
 3. Modify shade levels and understand their effect on ground temperatures
 4. Change soil types and soil reflectance
 5. Add slope and aspect, and compare thermal conditions between orientations
-
-These are the same tools used by researchers to predict incubation conditions for endangered species, map thermal refugia under climate change, and understand the fundamental niche of ectotherms.

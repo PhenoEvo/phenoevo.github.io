@@ -126,7 +126,6 @@
     \includegraphics[height=0.6cm]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/usfq-logo.png}
   \end{minipage}
 }
-\usepackage{xcolor}
 \usepackage{graphicx}
 \begin{document}
 
@@ -146,7 +145,7 @@
   \frametitle{The problem of scale -- space}
   \begin{figure}
     \includegraphics[height=0.8\textheight]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/microclimate_scale.png}
-    \caption{The problem of scale, \parencite{potter2013}}\label{}
+    \caption{Species distribution models use environmental layers orders of magnitude greater than the organisms of interest \parencite{potter2013}}\label{}
   \end{figure}
 \end{frame}
 
@@ -186,7 +185,7 @@
         \includegraphics[width=0.45\textwidth, trim={0 0 1cm 0}, clip]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/alytes}
       };
     \end{tikzpicture}
-    \caption{Microclimates. Photos: Alfredo G. Nicieza}
+    \caption{\emph{Salamandra salamandra} and \emph{Alytes obstetricans} microclimates. Photos: Alfredo G. Nicieza}
   \end{figure}
 \end{frame}
 
@@ -198,8 +197,8 @@
   \vspace{0.2cm}
 
   \begin{itemize}
-    \item \textbf{Above ground (0--2\,m)}: Solar radiation, wind, shade dominate. Hourly to daily variation. \textit{A basking lizard on a rock.}
-    \item \textbf{Surface}: The critical interface where energy balance is computed. Minutes to daily. \textit{A salamander under leaf litter.}
+    \item \textbf{Above ground (0--2\,m)}: Solar radiation, wind, shade dominate. \textit{A basking lizard on a rock.}
+    \item \textbf{Surface}: The critical interface where energy balance is computed. \textit{A salamander under leaf litter.}
     \item \textbf{Shallow soil (0--10\,cm)}: Nests, eggs. Daily cycles, damped and lagged. \textit{Reptile nest at 5\,cm depth.}
     \item \textbf{Deep soil (10--200\,cm)}: Hibernation, burrows. Seasonal cycles with weeks--months lag. \textit{Amphibian overwintering at 50\,cm.}
   \end{itemize}
@@ -245,7 +244,7 @@
     \only<2>{
       \includegraphics[trim={0 0 0 27cm}, clip]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/microclimate_time.png}
     }
-    \caption{The problem of scale, \parencite{kearney2012b}}\label{}
+    \caption{In addition to spatial scale, the temporal scale of predictor/forcing variables are also critical \parencite{kearney2012b}}\label{}
   \end{figure}
 \end{frame}
 
@@ -258,7 +257,7 @@
   \begin{itemize}
     \item Developed by \textcite{kearney2017a}.
     \item R package with a Fortran computational engine
-    \item Predicts hourly above- and below-ground conditions anywhere on Earth
+    \item NicheMapR's microclimate model predicts hourly above- and below-ground conditions anywhere on Earth
     \item Inputs: weather, terrain, vegetation, soil properties
     \item Outputs: solar radiation, soil and air temperature, humidity, snow, soil moisture
   \end{itemize}
@@ -532,9 +531,7 @@
 
   \vspace{0.2cm}
 
-  \textbf{Wind speed decreases near the surface:}
-
-  \textcolor{red}{Add info but without equation}
+  \textbf{Wind speed decreases near the surface.}
 
   % \[u_z = \frac{u^*}{k} \ln \left( \frac{z - d}{z_0} + 1 \right)\]
   %
@@ -542,7 +539,7 @@
   %
   % \vspace{0.2cm}
 
-  \textbf{Air temperature} at the organism's height is interpolated between surface temperature and the reference height, weighted by turbulent transport coefficients.
+  \textbf{Air temperature increases towards the surface}.
 
 \end{frame}
 
@@ -629,10 +626,6 @@
 
 \begin{frame}
   \frametitle{Depth creates lag and damping}
-
-  Heat penetrates soil slowly. Different depths experience very different thermal regimes:
-
-  \vspace{0.2cm}
 
   \begin{itemize}
     \item \textbf{Surface:} Full diurnal cycle, maximum amplitude, rapid response --- \textit{surface-active organisms}
@@ -727,7 +720,7 @@
   \textbf{Outputs:}
   \begin{itemize}
     \item Hourly soil temperature at multiple depths
-    \item Air temperature and wind at user-specified heights
+    \item Air temperature, relative humidity and wind speed at user-specified heights
     \item Solar and longwave radiation components
     \item Sky temperature, soil moisture, snow depth
   \end{itemize}
@@ -737,7 +730,7 @@
   \frametitle{Global workflow}
 
   \begin{enumerate}
-    \item \textbf{\texttt{micro\_global}} (R): Aggregates climate (CRU), aerosols (GADS), and soil moisture (NOAA) data for any location
+    \item \textbf{\texttt{micro\_global}} (R): Aggregates climate \parencite{new2002}, aerosols (GADS), and soil moisture (NOAA) data for any location
     \item \textbf{\texttt{microrun}} (R interface): Passes parameters to the Fortran DLL
     \item \textbf{Fortran engine}: Performs hourly iterations, solving the energy balance until $T_{surf}$ converges
   \end{enumerate}
@@ -754,7 +747,7 @@
   \vspace{0.2cm}
 
   \begin{block}{Global applicability}
-    Users can run microclimate simulations almost anywhere on Earth using built-in global datasets.
+    Users can run microclimate simulations anywhere on Earth using built-in global datasets.
   \end{block}
 \end{frame}
 
@@ -911,7 +904,7 @@
   \textbf{Strengths:}
   \begin{itemize}
     \item \textbf{Mechanistic:} physically based --- valid under novel climates
-    \item \textbf{Fine resolution:} hourly output captures diurnal cycles critical for ectotherms
+    \item \textbf{Fine resolution:} hourly output captures diurnal cycles critical for organisms
     \item \textbf{Integrated:} combines solar, longwave, convection, soil heat, and moisture in one framework
     \item \textbf{Proven:} extensively validated against field observations
   \end{itemize}

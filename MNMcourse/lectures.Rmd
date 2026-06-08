@@ -6,3 +6,6 @@
 [1 - Introduction (pdf)](https://phenoevo.github.io/MNMcourse/day1/presentations/1_intro.pdf)
     [(Rnw)](https://phenoevo.github.io/MNMcourse/day1/presentations/1_intro.Rnw)
 
+[2 - Microclimates (pdf)](https://phenoevo.github.io/MNMcourse/day1/presentations/2_microclimate.pdf)
+    [(Rnw)](https://phenoevo.github.io/MNMcourse/day1/presentations/2_microclimate.Rnw)
+

@@ -372,7 +372,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Mechanistic Ecological Niche Models}
+  \frametitle{From niches to distributions}
 
   \vspace{1cm}
   \begin{figure}
@@ -393,8 +393,8 @@
         }
       \end{column}
     \end{columns}
-    \caption{\tiny Taken from \textcite{maino2016}}
-    \label{fig:hypervolume_combined}
+    % \caption{\tiny Taken from \textcite{maino2016}}
+    % \label{fig:hypervolume_combined}
   \end{figure}
 
 \end{frame}
@@ -409,8 +409,6 @@
   \textcolor{gray!25}{ecological niche}
   models
 \end{frame}
-
-\subsection{What are models}
 
 \begin{frame}
   \frametitle{What are models}
@@ -434,7 +432,7 @@
   \end{table}
 \end{frame}
 
-\subsection{What are mechanistic models}
+\section{Mechanistic Models}
 
 \begin{frame}
   \frametitle{Disecting\ldots}
@@ -464,7 +462,7 @@
 
     \vspace{0.2cm}
     \includegraphics[width=0.6\textwidth]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/lv-model.png}
-    \caption{\tiny Population dynamics of rabbits and lynx}
+    \caption{\tiny The classic population dynamics of hare and lynx}
     \label{fig:lv-model}
   \end{figure}
 
@@ -485,8 +483,8 @@
     \begin{column}{0.55\textwidth}
       \footnotesize
       \textbf{Parameters:}\\
-      \textbf{\(x\)}: density of prey (e.g., rabbits) \\
-      \textbf{\(y\)}: density of predators (e.g., foxes) \\
+      \textbf{\(x\)}: density of prey (e.g., hare) \\
+      \textbf{\(y\)}: density of predators (e.g., lynx) \\
       \textbf{\(\alpha\)}: intrinsic growth rate of prey \\
       \textbf{\(\beta\)}: predation rate \\
       \textbf{\(\delta\)}: predator reproduction rate \\
@@ -535,7 +533,7 @@ out <- ode(
     \column{0.5\textwidth}
 
     \begin{figure}
-\includegraphics[width=\maxwidth]{/home/urtzi/Documents/courses/usfq_mnm/day1/presentations/figure/lv_plot-1}
+\includegraphics[width=\maxwidth]{/home/urtzi/Documents/courses/usfq_mnm/figure/lv_plot-1}
 
       \caption{Observed hare--lynx dynamics and Lotka--Volterra simulation.}
     \end{figure}
@@ -549,13 +547,13 @@ out <- ode(
 
   \begin{figure}
     \includegraphics[height=0.8\textheight]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/models.png}
-    \caption{\tiny models and theory... Taken from \textcite{kearney2021a}}
+    \caption{\tiny The links between the ``real'' and the ``abstract'' world, and how theory is used to connect them. Taken from \textcite{kearney2021a}}
     \label{fig:models-and-theory}
   \end{figure}
 
 \end{frame}
 
-\subsection{Species distribution models}
+\section{Mechanistic Niche Models}
 
 \begin{frame}
   \frametitle{Disecting\ldots}
@@ -570,53 +568,48 @@ out <- ode(
   \only<1>{
     \begin{figure}
       \includegraphics[height=0.8\textheight]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/sdm_mods_1.png}
-      \newline \tiny
-      \caption{\tiny caption}
-      \label{fig:sdm-models}
+      \caption{\tiny The two different philosophies to model species distributions. Correlative: where processes (or mechanisms) are implicit, and Mechanistic: where processes (or mechanisms) are explicitly included in the models.}
     \end{figure}
   }
   \only<2>{
     \begin{figure}
       \includegraphics[height=0.8\textheight]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/sdm_mods_2.png}
-      \newline \tiny
-      \caption{\tiny caption}
-      \label{fig:sdm-models}
+      \caption{\tiny The two different philosophies to model species distributions. Correlative: where processes (or mechanisms) are implicit, and Mechanistic: where processes (or mechanisms) are explicitly included in the models.}
     \end{figure}
   }
   \only<3>{
     \begin{figure}
       \includegraphics[height=0.8\textheight]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/sdm_mods_3.png}
-      \newline \tiny
-      \caption{\tiny caption}
+      \caption{\tiny The two different philosophies to model species distributions. Correlative: where processes (or mechanisms) are implicit, and Mechanistic: where processes (or mechanisms) are explicitly included in the models.}
       \label{fig:sdm-models}
     \end{figure}
   }
 
-  \begin{textblock*}{2cm}(1.4cm, 6cm)
+  \begin{textblock*}{2cm}(1.8cm, 6cm)
     \visible<1->{\scriptsize Environmental layers}
   \end{textblock*}
-  \begin{textblock*}{3cm}(4.2cm, 1.9cm)
+  \begin{textblock*}{3cm}(4.6cm, 1.9cm)
     \visible<2->{\scriptsize Correlative models (\textbf{process implicit})}
   \end{textblock*}
-  \begin{textblock*}{3cm}(8.6cm, 1.8cm)
+  \begin{textblock*}{3cm}(9cm, 1.8cm)
     \visible<2->{\scriptsize Probability of occurrence}
   \end{textblock*}
-  \begin{textblock*}{3cm}(3.8cm, 8cm)
+  \begin{textblock*}{3cm}(4.2cm, 8cm)
     \visible<3->{\scriptsize Mechanistic models (\textbf{process explicit})}
   \end{textblock*}
-  \begin{textblock*}{2cm}(8.6cm, 7.5cm)
+  \begin{textblock*}{2cm}(9cm, 7.5cm)
     \visible<3->{\scriptsize Length of activity period}
   \end{textblock*}
 
 \end{frame}
 
 \begin{frame}
-  \frametitle{extrapolation}
+  \frametitle{Why mechanistic models?}
 
   \only<1>{
     \begin{figure}
       \includegraphics[height=0.6\textheight, trim={4cm 2cm 4cm 4cm}, clip]{/home/urtzi/Documents/courses/usfq_mnm/resources/images/extrapolation1.png}
-      \caption{\tiny Taken from \textcite{maino2016}}
+      \caption{\tiny The problem (and solution) of extrapolation. Taken from \textcite{maino2016}}
       \label{fig:extrapolation}
     \end{figure}
   }
@@ -637,7 +630,6 @@ out <- ode(
 
 \end{frame}
 
-\section{Mechanistic Niche Models}
 
 
 \begin{frame}

@@ -99,7 +99,7 @@ legend("topright", legend = c("3753 m", "5192 m"),
   col = c("forestgreen", "dodgerblue"), lty = 1, lwd = 1.5)
 ```
 
-Higher elevations receive more solar radiation due to the thinner atmosphere (less scattering and absorption). This is why the high site's SOLR values are noticeably higher during daylight hours, despite being at the same latitude.
+What is happening here?
 
 ## Challenge 4: Freezing line
 
@@ -246,51 +246,7 @@ With a daily time step (`timeinterval = 365`), the model runs a full sequential 
 Re-run the high site with `snowmodel = 1` and `snowmodel = 0` using `timeinterval = 365`. Compare the minimum soil temperature at 2.5 cm depth in July (the coldest month in the Southern Hemisphere). Is the soil warmer or colder with snow cover? Why?
 
 ```{r challenge6, message=FALSE, results='hide'}
-# Run high site with snow model
-micro_snow_on <- micro_global(
-  loc = c(high_lon, high_lat),
-  elev = high_elev,
-  timeinterval = 365,
-  snowmodel = 1
-)
-
-# Run high site without snow model
-micro_snow_off <- micro_global(
-  loc = c(high_lon, high_lat),
-  elev = high_elev,
-  timeinterval = 365,
-  snowmodel = 0
-)
-
-# Find July rows (DOY 182-212)
-july <- which(micro_snow_on$soil[, "DOY"] >= 274 &
-              micro_snow_on$soil[, "DOY"] <= 304)
-
-# Minimum soil temperature at 2.5 cm depth in July
-min_with_snow <- min(micro_snow_on$soil[july, "D0cm"])
-min_without_snow <- min(micro_snow_off$soil[july, "D0cm"])
-
-cat("With snow:   ", round(min_with_snow, 2), "°C\n")
-cat("Without snow:", round(min_without_snow, 2), "°C\n")
-cat("Difference:  ", round(min_with_snow - min_without_snow, 2), "°C\n")
-
-# Plot side-by-side: snow depth above, soil temperature below
-par(mfrow = c(2, 1))
-
-# Snow depth in July (with snow model on)
-plot(micro_snow_on$metout[july, "SNOWDEP"], type = "h", col = "lightblue",
-  lwd = 3, xlab = "Hour in July", ylab = "Snow depth (cm)",
-  main = "Snow depth at 2.5 cm in July (snow model on)")
-
-# Soil temperature comparison in July
-plot(micro_snow_on$soil[july, "D0cm"], type = "l", col = "dodgerblue",
-  lwd = 1.5, xlab = "Hour in July", ylab = "Temperature (°C)",
-  ylim = range(c(micro_snow_on$soil[july, "D0cm"],
-                 micro_snow_off$soil[july, "D0cm"])),
-  main = "Soil temperature at 2.5 cm in July")
-lines(micro_snow_off$soil[july, "D0cm"], col = "red", lwd = 1.5)
-# legend("topright", legend = c("With snow", "Without snow"),
-  # col = c("dodgerblue", "red"), lty = 1, lwd = 1.5)
+# your code here
 ```
 
 # Summary
@@ -298,9 +254,7 @@ lines(micro_snow_off$soil[july, "D0cm"], col = "red", lwd = 1.5)
 In this practical you have learned to:
 
 1. Compare microclimates at two different elevations using lapse-rate correction
-2. Understand how elevation affects air temperature, soil temperature, and solar radiation
+2. Understand how elevation affects air temperature and soil temperature
 3. Enable the soil moisture sub-model and interpret moisture profiles
 4. Run the snow model and understand its insulating effect
 5. Use multi-year simulations for realistic snowpack development
-
-These skills allow you to predict how climate change may affect species across elevation gradients — from the lowland Amazon to the high Andes.
