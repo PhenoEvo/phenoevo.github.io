@@ -3,7 +3,6 @@
 ---
 
 ### Day 1
-[01 - Morphometrics: History, Introduction and Data Types](https://phenoevo.github.io/GMcourse/Lectures/01-IntroHistory.html)
-
-[02 - Superimposition: Generalized Procrustes Analysis (GPA)](https://phenoevo.github.io/GMcourse/Lectures/02-Superimposition.html)
+[1 - Introduction (pdf)](https://phenoevo.github.io/MNMcourse/day1/presentations/1_intro.pdf)
+    [(Rnw)](https://phenoevo.github.io/MNMcourse/day1/presentations/1_intro.Rnw)
 
