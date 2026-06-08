@@ -3,6 +3,6 @@
 ---
 
 ### Day 1
-- <a href="https://raw.githubusercontent.com/PhenoEvo/phenoevo.github.io/master/MNMcourse/day1/practice/microclimate.Rmd" download>P1: Microclimate modelling under different conditions</a>
+- [P1: Microclimate modelling under different conditions](https://phenoevo.github.io/MNMcourse/day1/practice/microclimate.Rmd)
 
-- <a href="https://raw.githubusercontent.com/PhenoEvo/phenoevo.github.io/master/MNMcourse/day1/practice/microclimate_elevation.Rmd" download>P2: Elevation gradients and soil moisture</a>
+- [P2: Elevation gradients and soil moisture](https://phenoevo.github.io/MNMcourse/day1/practice/microclimate_elevation.Rmd)
