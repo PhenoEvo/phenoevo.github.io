@@ -1,0 +1,1366 @@
+\documentclass{beamer}
+
+\title{Biophysical animal models}
+\subtitle{Day 2: From biophysics to macroecology}
+\date{2026-06-09}
+
+\input{/home/urtzi/Documents/courses/usfq_mnm/resources/common_preamble.tex}
+
+\begin{document}
+
+<<setup, include=FALSE>>=
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  dev = "tikz",
+  fig.ext = "tex"
+)
+@
+
+\frame{\titlepage}
+
+% \begin{frame}[allowframebreaks,plain]
+%   \frametitle{Outline}
+%   \tableofcontents
+% \end{frame}
+
+\section{Biophysical ecology framework}
+\subsection{What is biophysical ecology?}
+
+\begin{frame}
+  \frametitle{Biophysical ecology}
+
+  Biophysical ecology applies the principles of thermodynamics to organisms
+  to derive mechanistic models of energy and mass exchange
+  \parencite{porter1969,gates1980,porter1973}.
+
+  \vfill
+
+  \begin{block}{Core idea}
+    Organisms are open thermodynamic systems exchanging heat, water, and
+    gases with their environment. These exchanges can be described by
+    the conservation laws of physics.
+  \end{block}
+
+  \vfill
+
+  % \begin{itemize}
+  %   \item Heat transfer: conduction, convection, radiation, evaporation
+  %   \item Mass transfer: water, respiratory gases, food
+  %   \item Momentum transfer: locomotion, fluid dynamics
+  % \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{The four domains of energy and mass balance}
+  \centering
+  \begin{tikzpicture}[font=\sffamily, inner sep=1pt]
+
+    % Frog background (fixed position)
+    \uncover<1-2>{
+      \node[inner sep=0] at (0,0.5) {\includegraphics[width=10cm]{../../resources/images/frog_pic.jpg}};
+    }
+    \uncover<3->{
+      \node[opacity=0.2, inner sep=0] at (0,0.5) {\includegraphics[width=10cm]{../../resources/images/frog_pic.jpg}};
+    }
+    \pause
+
+    \begin{scope}[yshift=0.75cm]
+
+      % Energy arrows
+      \node[single arrow, draw, very thick, red, fill=red!20, minimum height=3cm, minimum width=1cm, inner sep=3pt, single arrow head extend=0.5cm] at (-5, 0.5) {\bfseries\small energy in};
+      \node[single arrow, draw, very thick, blue, fill=blue!20, minimum height=3cm, minimum width=1cm, inner sep=3pt, single arrow head extend=0.5cm] at (3.5, 0.5) {\bfseries\small energy out};
+      \pause
+
+      % TEMPERATURE (diagonal, -45 deg)
+      \def\tempcol{orange!80!black}
+      \node[rotate=-45] (t_t) at (-2.5, 2.0) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{t}};
+      \node[rotate=-45] (t_e1) at (-2.0, 1.5) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{e}};
+      \node[rotate=-45] (t_m) at (-1.5, 1.0) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{m}};
+      \node[rotate=-45] (t_p) at (-1.0, 0.5) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{p}};
+      \node[rotate=-45] (t_e2) at (-0.5, 0.0) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{e}};
+      \node[rotate=-45] (t_r1) at ( 0.0,-0.5) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{r}};
+      \node[rotate=-45] (t_a)  at ( 0.5,-1.0) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{a}};
+      \node[rotate=-45] (t_t2) at ( 1.0,-1.5) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{t}};
+      \node[rotate=-45] (t_u)  at ( 1.5,-2.0) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{u}};
+      \node[rotate=-45] (t_r2) at ( 2.0,-2.5) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{r}};
+      \node[rotate=-45] (t_e3) at ( 2.5,-3.0) {\fontsize{16}{18}\selectfont \textcolor{\tempcol}{e}};
+
+      % BREATHING (vertical, shares first e with temperature)
+      \def\brecol{green!50!black}
+      \node (b_b) at (-2.0, 2.5) {\fontsize{16}{18}\selectfont \textcolor{\brecol}{b}};
+      \node (b_r) at (-2.0, 2.0) {\fontsize{16}{18}\selectfont \textcolor{\brecol}{r}};
+      \node (b_a) at (-2.0, 1.0) {\fontsize{16}{18}\selectfont \textcolor{\brecol}{a}};
+      \node (b_t) at (-2.0, 0.5) {\fontsize{16}{18}\selectfont \textcolor{\brecol}{t}};
+      \node (b_h) at (-2.0, 0.0) {\fontsize{16}{18}\selectfont \textcolor{\brecol}{h}};
+      \node (b_i) at (-2.0,-0.5) {\fontsize{16}{18}\selectfont \textcolor{\brecol}{i}};
+      \node (b_n) at (-2.0,-1.0) {\fontsize{16}{18}\selectfont \textcolor{\brecol}{n}};
+      \node (b_g) at (-2.0,-1.5) {\fontsize{16}{18}\selectfont \textcolor{\brecol}{g}};
+
+
+      % FEEDING (horizontal, shares second e with temperature's first e)
+      \def\feedcol{blue!80!black}
+      \node (f_f) at (-3.0, 1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\feedcol}{f}};
+      \node (f_e1) at (-2.5, 1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\feedcol}{e}};
+      \node (f_d) at (-1.5, 1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\feedcol}{d}};
+      \node (f_i) at (-1.0, 1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\feedcol}{i}};
+      \node (f_n) at (-0.5, 1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\feedcol}{n}};
+      \node (f_g) at ( 0.0, 1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\feedcol}{g}};
+
+
+      % WATER (horizontal, shares second t with temperature)
+      \def\watcol{cyan!80!black}
+      \node (w_w) at ( 0.0,-1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\watcol}{w}};
+      \node (w_a) at ( 0.5,-1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\watcol}{a}};
+      \node (w_e) at ( 1.5,-1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\watcol}{e}};
+      \node (w_r) at ( 2.0,-1.5) {\fontsize{16}{18}\selectfont \strut\textcolor{\watcol}{r}};
+
+    \end{scope}
+
+
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Coupled energy and mass balance}
+  \fontsize{5}{6}\selectfont
+  \centering
+  \begin{tikzpicture}[font=\sffamily, >=Stealth, scale=0.5]
+
+    % Style for the split circles
+    \tikzset{
+      splitcircle/.style={
+          circle, draw, dashed, minimum size=1.2cm, inner sep=0pt
+        }
+    }
+
+    % --- TOP CIRCLE (METAB) ---
+    \node[splitcircle] (metab) at (0,0) {};
+    \draw[dashed] (metab.north west) -- (metab.south east);
+    \node at (0.4, 0.4) {$\dot{Q}$};
+    \node at (-0.4, -0.4) {$m$};
+    \node[below right=0.1cm and -0.2cm of metab] {\tiny METAB};
+
+    % Left of Metab
+    \node[left=0.1cm of metab] (mf_left) {$m_{\text{F,I}} - m_{\text{F,D}} = m_{\text{F,A}} =$};
+
+    % Above Metab
+    \node[above=0.4cm of metab] (mo2) {$m_{\text{O2}}$};
+    \node at ($(mo2)!0.25!(metab)$) {$+$};
+
+    \node[above left=0.3cm and 0.1cm of metab] (qirin) {$\dot{Q}_{\text{IR,in}}$};
+    \node[above left=0.2cm and 0.1cm of qirin] (qsolar) {$\dot{Q}_{\text{SOLAR}}$};
+    \node at ($(qirin)!0.5!(qsolar)$) {$+$};
+    \node at ($(qirin)!0.35!(metab)$) {$+$};
+
+
+    % Right of Metab
+    \node[right=0.1cm of metab] (mf_right) {$+\; m_{\text{F,G}} + m_{\text{F,R}} + m_{\text{F,S}}$};
+    \node[above right=0cm and 0.1cm of metab, rotate=45] (work) {$+ \text{ Work}$};
+    \node[below right=0.3cm and 0.6cm of metab, rotate=-45] (eq_metab) {$=$};
+
+    % Below Metab (Vertical flow)
+    \node[below=0.3cm of metab] (mf_co2) {$m_{\text{F,CO2}}$};
+    \node[below=0.2cm of metab, xshift=0.1cm, rotate=-90] (eq_mass) {$=$};
+    \node[below=0.005cm of mf_co2] (plus2) {$+$};
+    \node[below=0.005cm of plus2] (mf_nh3) {$m_{\text{F,NH3+}}$};
+    \node[below=0.005cm of mf_nh3] (plus3) {$+$};
+    \node[below=0.005cm of plus3] (mf_w) {$m_{\text{F,W}}$};
+
+    % Diagonal flow from Metab
+    \node[below right=0.6cm and 0.5cm of metab] (qirout) {$\dot{Q}_{\text{IR,out}}$};
+    \node[below right=0.2cm and 0.1cm of qirout] (qconv) {$\dot{Q}_{\text{CONV}}$};
+    \node at ($(qirout)!0.5!(qconv)$) {$+$};
+
+    % --- BOTTOM CIRCLE (EVAP) ---
+    \node[splitcircle] (evap) at (7,-5.3) {};
+    \draw[dashed] (evap.north west) -- (evap.south east);
+    \node at (7.4, -4.9) {$\dot{Q}$};
+    \node at (6.6, -5.7) {$m$};
+    \node[below right=0.1cm and -0.2cm of evap] {\tiny EVAP};
+    \node at ($(qconv)!0.4!(evap)$) {$+$};
+
+    % Left of Evap
+    \node[left=0.1cm of evap] (mw_left) {$m_{\text{W,I}} - m_{\text{W,D}} = m_{\text{W,A}} + m_{\text{F,W}} =$};
+
+    % Right of Evap
+    \node[right=0.1cm of evap] (mw_right) {$+ \; m_{\text{W,U}} + m_{\text{W,S}}$};
+
+    % Below Evap
+    \node[below right=0.5cm and 0.4cm of evap] (qcond) {$\dot{Q}_{\text{COND}}$};
+    \node at ($(evap)!0.75!(qcond)$) {$+$};
+    \node[below right=0.2cm and 0.1cm of qcond] (qs) {$\dot{Q}_{\text{S}}$};
+    \node at ($(qcond)!0.6!(qs)$) {$+$};
+
+    % Arrow from mf_w to mw_left
+    \draw[->] (mf_w.east) to[bend left=20] ($(mw_left.north east)-(2,0)$);
+
+    % % --- LEGEND ---
+    % \node[anchor=north west, align=left] at (-6,-2.5) {
+    %   $Q = \text{Heat}$ \\
+    %   $m = \text{Mass}$ \\
+    %   $\text{F} = \text{Food}$ \\
+    %   $\text{W} = \text{Water}$ \\
+    %   $\text{I} = \text{Ingested}$ \\
+    %   $\text{D} = \text{Defecated}$ \\
+    %   $\text{A} = \text{Absorbed}$ \\
+    %   $\text{U} = \text{Urine}$ \\
+    %   $\text{G} = \text{Growth}$ \\
+    %   $\text{R} = \text{Reproduction}$ \\
+    %   $\text{S} = \text{Stored}$
+    % };
+
+  \end{tikzpicture}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Coupled energy and mass balance}
+
+  Organisms must simultaneously satisfy energy and mass balance:
+
+  \vfill
+
+  \[
+    \dot{Q}_{solar} + \dot{Q}_{IR,in} + \dot{Q}_{metab} =
+    \dot{Q}_{IR,out} + \dot{Q}_{conv} + \dot{Q}_{evap} + \dot{Q}_{cond} + \dot{Q}_{s}
+  \]
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Energy balance} determines:
+    \begin{itemize}
+      \item body temperature (ectotherms)
+      \item metabolic rate (endotherms)
+      \item activity and performance
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Mass balance} determines:
+    \begin{itemize}
+      \item water status
+      \item energy reserves
+      \item growth and reproduction
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \centering
+  \tiny Based on \textcite{kearney2009}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{The fundamental niche from first principles}
+
+  \begin{itemize}
+    \item An organism cannot survive where it would be in negative energy
+      or mass balance
+    \item Reproductive capacity depends on ``profits'' in these currencies
+    \item The set of environmental conditions where energy and mass
+      balance is positive defines the \textbf{fundamental niche}
+  \end{itemize}
+
+  \vfill
+
+  \uncover<2->{
+    \begin{block}{Key insight}
+      The fundamental niche can be \textbf{computed} from first principles ---
+      it is not merely a statistical description of where a species is found.
+    \end{block}
+  }
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{From functional traits to climate space}
+
+  An organism's functional traits (morphology, physiology, behaviour)
+  determine how it experiences a given set of environmental conditions:
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Functional traits:}
+    \begin{itemize}
+      \item body size and shape
+      \item solar reflectivity (albedo)
+      \item skin permeability
+      \item metabolic rate
+      \item behavioural repertoire
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Environmental axes:}
+    \begin{itemize}
+      \item air temperature
+      \item solar radiation
+      \item wind speed
+      \item humidity
+      \item substrate temperature
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \uncover<2->{
+    The energy balance equation translates environmental conditions into
+    body temperature --- the key physiological variable for ectotherms.
+  }
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Workflow for mechanistic niche modelling}
+
+  \begin{figure}
+    \centering
+    \begin{tikzpicture}[
+        node distance = 2mm,
+        box/.style = {draw, rounded corners, align = center, font = \scriptsize,
+            fill = white, inner sep = 3pt},
+        arrow/.style = {->, thick, >=stealth}
+      ]
+      \node[box] (GIS) {GIS data\\climate, terrain,\\vegetation, soil};
+      \node[box, below =0.5cm of GIS] (MIC) {Microclimate\\model};
+      \node[box, right =0.5cm of MIC] (ORG) {Organism\\model};
+      \node[box, right =0.5cm of ORG] (FIT) {Fitness\\components};
+      \node[box, below =0.5cm of FIT] (DIST) {Potential\\distribution};
+
+      \draw[arrow] (GIS) -- (MIC);
+      \draw[arrow] (MIC) -- (ORG);
+      \draw[arrow] (ORG) -- (FIT);
+      \draw[arrow] (FIT) -- (DIST);
+
+      \node[box, above =0.5 of ORG, fill = blue!10] (TRAIT) {Functional\\traits};
+      \draw[arrow] (TRAIT) -- (ORG);
+    \end{tikzpicture}
+    \caption{\tiny Workflow: GIS data $\to$ microclimate $\to$ organism
+      model $\to$ fitness $\to$ distribution. Based on
+      \textcite{kearney2009}.}
+  \end{figure}
+
+\end{frame}
+
+\section{Biophysical processes}
+\subsection{Biophysical Ecology processes}
+
+
+\begin{frame}
+  \frametitle{Biophysical Ecology processes}
+
+  \begin{figure}
+    \begin{center}
+      \begin{tikzpicture}
+        \node[anchor=south west, inner sep=0] (img) at (0,0) {\includegraphics[width=0.4\textwidth]{../../resources/images/frog_pic.jpg}};
+        \begin{scope}[x={(img.south east)}, y={(img.north west)}]
+          \tikzset{
+            eqn/.style={font=\scriptsize, align=center, xshift=1mm},
+            label/.style={font=\scriptsize\bfseries, inner sep=1},
+            wavy/.style={thick, decorate, decoration={snake, amplitude=0.5mm}}
+          }
+          % SOLAR (incoming from top)
+          \draw[orange, {Stealth}-, wavy, decoration={pre length=2mm}] (0.5, 0.8) -- ++(-0.2, 0.6)
+          node[pos=1, anchor=south, label] {solar radiation}
+          node[pos=0.9, anchor=west, eqn] {\(\dot{Q}_{solar} = A_d a S\)};
+          % EVAPORATION (outgoing to right)
+          \draw[cyan, -{Stealth},thick] (0.6, 0.8) -- ++(0.15, 0.3)
+          node[pos=1, anchor=south west, label] {evaporation}
+          node[pos=0.8, anchor=west, eqn] {\(\dot{Q}_{evap} = A_d h_d(\rho_{skin} - \rho_{air}) \Delta H_{vap}\)};
+          % INFRARED (outgoing to left)
+          \draw[orange, -{Stealth}, wavy, decoration={post length=2mm}] (0.15, 0.6) -- ++(-0.25, -0.25)
+          node[pos=1, anchor=north east, label] {infrared radiation}
+          node[pos=0.5, anchor=east, eqn, xshift=-3mm] {\(\dot{Q}_{IR} = A_d \varepsilon \sigma T^{4}_{skin}\)};
+          % CONDUCTION (outgoing to bottom)
+          \draw[brown, -{Stealth}, thick] (0.8, 0.15) -- ++(0.1, -0.15)
+          node[pos=1, anchor=north, label] {conduction}
+          node[pos=0.3, anchor=west, eqn, xshift=1.5mm] {\(\dot{Q}_{cond} = A_v K (T_{skin} - T_{sub})\)};
+          % CONVECTION (outgoing to top-left)
+          \draw[blue!50, -{Stealth}, thick] (-0.05, 0.8) to[bend right]
+          node[pos=1, anchor=south east, label] {convection}
+          node[pos=0.5, anchor=south, eqn, xshift=-20mm] {\(\dot{Q}_{conv} = A_d h_c(T_{skin} - T_{air})\)}
+          (0.15, 1);
+        \end{scope}
+      \end{tikzpicture}
+      \caption{Heat transfer mechanisms for a frog.}
+    \end{center}
+  \end{figure}
+
+\end{frame}
+
+\subsection{Convection}
+
+\begin{frame}
+  \frametitle{Convective heat transfer}
+
+  Convection is the transfer of heat between a surface and a moving fluid (air or water).
+  In biophysical ecology, convection determines how quickly an organism exchanges heat with the surrounding air.
+
+  \[
+    \dot{Q}_{conv} = A_d h_c (T_{skin} - T_{air})
+  \]
+
+  \textbf{Where:}
+
+  \begin{itemize}
+    \item \(\dot{Q}_{conv}\) = convective heat flux (\(\mathrm{W}\))
+    \item \(A_d\) = characteristic surface area exchanging heat (\(\mathrm{m^2}\))
+    \item \(h_c\) = convective heat transfer coefficient (\(\mathrm{W\,m^{-2}\,K^{-1}}\))
+    \item \(T_{skin}\) = skin or body surface temperature (\(^\circ\mathrm{C}\) or \(\mathrm{K}\))
+    \item \(T_{air}\) = air temperature (\(^\circ\mathrm{C}\) or \(\mathrm{K}\))
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Key concepts}
+
+  \begin{itemize}
+    \item Heat flows from warmer to colder regions.
+    \item Wind speed strongly affects \(h_c\):
+      \begin{itemize}
+        \item low wind \(\rightarrow\) weak convection
+        \item high wind \(\rightarrow\) strong convection
+      \end{itemize}
+    \item Small organisms often experience stronger convective effects because of their high surface-area-to-volume ratio.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Ecological relevance}
+
+  Convection is critical for:
+  \begin{itemize}
+    \item thermoregulation
+    \item overheating risk
+    \item cooling efficiency
+    \item boundary layer dynamics
+  \end{itemize}
+
+  For example, a lizard exposed to strong wind may cool rapidly even under direct sunlight.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{NicheMapR implementation: convection}
+
+  The effective convection area in \texttt{CONV\_ecto} is
+  \(\texttt{CONVAR} = A_{tot} - A_v - A_t\) (total area minus
+  ventral and touching surfaces). Free and forced convection are
+  computed separately via Nusselt--Reynolds correlations, then
+  combined into a single \(\dot{Q}_{conv}\).
+
+  \vfill
+
+  \centering \tiny See \texttt{CONV\_ecto.R} in the NicheMapR source.
+
+\end{frame}
+
+\subsection{Conduction}
+
+\begin{frame}
+  \frametitle{Conductive heat transfer}
+
+  Conduction is the direct transfer of heat between objects in physical contact.
+
+  \[
+    \dot{Q}_{cond} = A_v K (T_{skin} - T_{sub})
+  \]
+
+  \textbf{Where:}
+
+  \begin{itemize}
+    \item \(\dot{Q}_{cond}\) = conductive heat flux (\(\mathrm{W}\))
+    \item \(A_v\) = contact area with the substrate (\(\mathrm{m^2}\))
+    \item \(K\) = thermal conductance coefficient (\(\mathrm{W\,m^{-2}\,K^{-1}}\))
+    \item \(T_{skin}\) = body surface temperature (\(^\circ\mathrm{C}\) or \(\mathrm{K}\))
+    \item \(T_{sub}\) = substrate temperature (\(^\circ\mathrm{C}\) or \(\mathrm{K}\))
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Key concepts}
+
+  \begin{itemize}
+    \item Heat transfer occurs through molecular collisions.
+    \item The efficiency of conduction depends on:
+      \begin{itemize}
+        \item thermal conductivity of the substrate
+        \item contact area
+        \item temperature difference
+      \end{itemize}
+    \item Wet soils generally conduct heat better than dry soils.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Ecological relevance}
+
+  Conduction is especially important for:
+  \begin{itemize}
+    \item burrowing organisms
+    \item eggs in nests
+    \item ectotherms resting on rocks or soil
+  \end{itemize}
+
+  For example, reptile eggs exchange heat conductively with the surrounding soil.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{NicheMapR implementation: conduction}
+
+  The conductance coefficient in \texttt{COND\_ecto} is computed as
+  \(K_{sub}/d\) where \(K_{sub}\) is the substrate thermal conductivity
+  and \(d\) is the depth over which conduction occurs (default 2.5\,cm).
+
+  \vfill
+
+  \centering \tiny See \texttt{COND\_ecto.R} in the NicheMapR source.
+
+\end{frame}
+
+\subsection{Infrared radiation}
+
+\begin{frame}
+  \frametitle{Thermal infrared radiation}
+
+  All objects with a temperature above absolute zero emit thermal infrared radiation.
+
+  \[
+    \dot{Q}_{IR} = A_d \varepsilon \sigma T_{skin}^{4}
+  \]
+
+  \textbf{Where:}
+
+  \begin{itemize}
+    \item \(\dot{Q}_{IR}\) = emitted infrared radiation (\(\mathrm{W}\))
+    \item \(A_d\) = radiative surface area (\(\mathrm{m^2}\))
+    \item \(\varepsilon\) = emissivity of the surface (dimensionless)
+    \item \(\sigma\) = Stefan--Boltzmann constant
+  \end{itemize}
+
+  \[
+    \sigma = 5.67 \times 10^{-8}\,\mathrm{W\,m^{-2}\,K^{-4}}
+  \]
+
+  \begin{itemize}
+    \item \(T_{skin}\) = absolute skin temperature (\(\mathrm{K}\))
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Key concepts}
+
+  \begin{itemize}
+    \item Infrared radiation increases rapidly with temperature because of the fourth-power relationship.
+    \item Organisms both:
+      \begin{itemize}
+        \item emit infrared radiation
+        \item absorb infrared radiation from the environment
+      \end{itemize}
+    \item Net infrared exchange depends on the temperatures of surrounding surfaces and the sky.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Ecological relevance}
+
+  Infrared radiation strongly influences:
+  \begin{itemize}
+    \item nocturnal cooling
+    \item desert thermoregulation
+    \item nighttime frost exposure
+  \end{itemize}
+
+  Clear skies often increase radiative heat loss at night.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{NicheMapR implementation: infrared radiation}
+
+  Incoming IR is computed separately for sky and ground using
+  configuration factors \(F_{atosk}\) (to sky) and \(F_{atosb}\)
+  (to ground). Outgoing IR also uses \(F_{atosk}\) for the
+  fraction of emitted radiation reaching the sky.
+
+  \vfill
+
+  \centering \tiny See \texttt{RADIN\_ecto.R} and \texttt{RADOUT\_ecto.R}
+  in the NicheMapR source.
+
+\end{frame}
+
+\subsection{Solar radiation}
+
+\begin{frame}
+  \frametitle{Absorption of solar radiation}
+
+  Solar radiation is one of the main heat inputs for organisms exposed to sunlight.
+
+  \[
+    \dot{Q}_{solar} = A_d a S
+  \]
+
+  \textbf{Where:}
+
+  \begin{itemize}
+    \item \(\dot{Q}_{solar}\) = absorbed solar heat flux (\(\mathrm{W}\))
+    \item \(A_d\) = projected area exposed to radiation (\(\mathrm{m^2}\))
+    \item \(a\) = absorptivity of the surface (dimensionless)
+    \item \(S\) = incoming solar radiation (\(\mathrm{W\,m^{-2}}\))
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Key concepts}
+
+  \begin{itemize}
+    \item Solar radiation includes:
+      \begin{itemize}
+        \item direct radiation
+        \item diffuse radiation
+        \item reflected radiation
+      \end{itemize}
+    \item Dark surfaces usually absorb more solar energy than light surfaces.
+    \item Body posture and orientation affect the projected area.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Ecological relevance}
+
+  Solar radiation is fundamental for:
+  \begin{itemize}
+    \item basking behavior
+    \item warming of ectotherms
+    \item nest heating
+    \item microhabitat selection
+  \end{itemize}
+
+  For example, reptiles regulate body temperature behaviorally by changing sun exposure.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{NicheMapR implementation: solar radiation}
+
+  Absorbed solar is the sum of:
+  \begin{itemize}
+    \item direct beam (via \texttt{ASIL}, \texttt{ZEN})
+    \item diffuse sky (via \texttt{FATOSK})
+    \item reflected from substrate (via \texttt{ABSSB})
+  \end{itemize}
+  --- each modulated by appropriate geometry factors.
+
+  \vfill
+
+  \centering \tiny See \texttt{SOLAR\_ecto.R} in the NicheMapR source.
+
+\end{frame}
+
+\subsection{Evaporation}
+
+\begin{frame}
+  \frametitle{Evaporative heat loss}
+
+  Evaporation removes heat because water requires energy to change from liquid to vapor.
+
+  \[
+    \dot{Q}_{evap} =
+    A_d h_d (\rho_{skin} - \rho_{air}) \Delta H_{vap}
+  \]
+
+  \textbf{Where:}
+
+  \begin{itemize}
+    \item \(\dot{Q}_{evap}\) = evaporative heat loss (\(\mathrm{W}\))
+    \item \(A_d\) = evaporative surface area (\(\mathrm{m^2}\))
+    \item \(h_d\) = mass transfer coefficient (\(\mathrm{m\,s^{-1}}\))
+    \item \(\rho_{skin}\) = water vapor density at the skin (\(\mathrm{kg\,m^{-3}}\))
+    \item \(\rho_{air}\) = water vapor density of the air (\(\mathrm{kg\,m^{-3}}\))
+    \item \(\Delta H_{vap}\) = latent heat of vaporization (\(\mathrm{J\,kg^{-1}}\))
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Key concepts}
+
+  \begin{itemize}
+    \item Evaporation always cools the surface.
+    \item Dry air increases evaporation rates.
+    \item Wind enhances evaporation by removing humid boundary layers.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Ecological relevance}
+
+  Evaporative cooling is important for:
+  \begin{itemize}
+    \item amphibians
+    \item sweating mammals
+    \item panting birds
+    \item plant transpiration
+  \end{itemize}
+
+  Water balance and heat balance are therefore tightly linked.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{NicheMapR implementation: evaporation}
+
+  \texttt{SEVAP\_ecto} computes cutaneous, ocular, and oral evaporation
+  separately. The effective skin area is modulated by \texttt{pct\_wet}.
+  Respiratory water loss is handled by \texttt{RESP\_ecto}.
+
+  \vfill
+
+  \centering \tiny See \texttt{SEVAP\_ecto.R} in the NicheMapR source.
+
+\end{frame}
+
+\subsection{Metabolism}
+
+\begin{frame}
+  \frametitle{Metabolic heat production}
+
+  Metabolic processes generate heat as a by-product:
+
+  \vfill
+
+  \[
+    \dot{Q}_{metab} = f(M, T_b, \text{activity})
+  \]
+
+  \vfill
+
+  \textbf{Where:}
+  \begin{itemize}
+    \item \(M\) = body mass (\(\mathrm{kg}\))
+    \item \(T_b\) = body temperature
+  \end{itemize}
+
+  \vfill
+
+  \begin{itemize}
+    \item \textbf{Ectotherms:} usually negligible in the energy balance
+      (\(< 5\%\) of environmental fluxes)
+    \item \textbf{Endotherms:} the dominant heat source, maintaining
+      stable body temperature above ambient
+    \item Scales with body mass and follows a Boltzmann--Arrhenius
+      relationship with temperature
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{NicheMapR implementation: metabolism}
+
+  \texttt{MET\_ecto} uses the allometric-Arrhenius form:
+  \[
+    \text{VO}_2 = M_1 \, M^{M_2} \, 10^{M_3 T} \, 10^{M_4}
+  \]
+  (ml O\(_2\)\,h\(^{-1}\)). Metabolic heat production is then:
+  \[
+    \dot{Q}_{metab} = \frac{20.1}{3600} \times \text{VO}_2
+  \]
+  plus an activity offset \(\dot{Q}_{act}\) for active behaviours.
+
+  \vfill
+
+  \centering \tiny See \texttt{MET\_ecto.R} in the NicheMapR source.
+
+\end{frame}
+
+\section{Types of organism models}
+\subsection{Different organisms, different models}
+
+\begin{frame}
+  \frametitle{Organism classes in biophysical models}
+
+  Biophysical models must be tailored to the organism's physiology:
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Ectotherms (dry-skinned)}
+    \begin{itemize}
+      \item steady-state energy balance
+      \item no significant cutaneous water loss
+      \item e.g. lizards, insects, snakes
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \textbf{Ectotherms (wet-skinned)}
+    \begin{itemize}
+      \item coupled heat--water balance
+      \item significant evaporative cooling
+      \item e.g. amphibians, molluscs
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Large organisms}
+    \begin{itemize}
+      \item transient (time-dependent) balance
+      \item thermal inertia buffers fluctuations
+      \item e.g. large reptiles, mammals
+    \end{itemize}
+
+    \vspace{0.3cm}
+
+    \textbf{Endotherms}
+    \begin{itemize}
+      \item metabolic heat as energy source
+      \item thermoneutral zone concept
+      \item e.g. birds, mammals
+    \end{itemize}
+  \end{columns}
+
+\end{frame}
+
+\subsection{Dry-skinned ectotherms}
+
+\begin{frame}
+  \frametitle{Dry-skinned ectotherms}
+
+  For reptiles, insects and many invertebrates, cutaneous water loss is
+  negligible for the energy balance:
+
+  \vfill
+
+  \[
+    \dot{Q}_{solar} + \dot{Q}_{IR,in} = \dot{Q}_{IR,out} + \dot{Q}_{conv} + \dot{Q}_{cond}
+  \]
+
+  \vfill
+
+  \begin{itemize}
+    \item Solved as a \textbf{steady-state} balance (operative environmental
+      temperature)
+    \item Core temperature stabilises quickly due to low thermal inertia
+    \item Key traits: solar reflectivity, surface areas, convection coefficients
+    \item Body temperature generally exceeds air temperature when in the sun
+  \end{itemize}
+
+  \vfill
+
+  \uncover<2->{
+    \begin{block}{Classic approach}
+      Empirical physical models (copper casts, taxidermic mounts) capture
+      the thermal properties and are placed in the field to measure
+      operative temperature.
+    \end{block}
+  }
+
+\end{frame}
+
+\subsection{Wet-skinned ectotherms}
+
+\begin{frame}
+  \frametitle{Wet-skinned ectotherms}
+
+  Amphibians and other wet-skinned organisms have significant evaporative
+  heat loss:
+
+  \vfill
+
+  \[
+    \dot{Q}_{solar} + \dot{Q}_{IR,in} = \dot{Q}_{IR,out} + \dot{Q}_{conv} + \dot{Q}_{cond} + \dot{Q}_{evap}
+  \]
+
+  \vfill
+
+  \begin{itemize}
+    \item Coupled \textbf{heat and water balance}
+    \item Evaporative cooling can keep body temperature \emph{below} air temperature
+    \item Key trait: fraction of skin acting as a free-water exchanger
+    \item Water balance often more limiting than thermal balance
+  \end{itemize}
+
+  \vfill
+
+  \uncover<2->{
+    Methods for partitioning cutaneous and respiratory water loss
+    are detailed by \textcite{tracy1976} and generalised in
+    \textcite{kearney2004}.
+  }
+
+\end{frame}
+
+\subsection{Large organisms and transient effects}
+
+\begin{frame}
+  \frametitle{Large organisms and transient effects}
+
+  As body size increases, thermal inertia becomes important:
+
+  \vfill
+
+  \[
+    \dv{T_b}{t} = \frac{\dot{Q}_{net}}{c_p M}
+  \]
+
+  \vfill
+
+  \textbf{Where:}
+  \begin{itemize}
+    \item \(T_b\) = body temperature (\(^\circ\mathrm{C}\) or \(\mathrm{K}\))
+    \item \(c_p\) = specific heat capacity of tissue (\(\mathrm{J\,kg^{-1}\,K^{-1}}\))
+    \item \(M\) = body mass (\(\mathrm{kg}\))
+  \end{itemize}
+
+  \vfill
+
+  \begin{itemize}
+    \item Temperature changes more slowly in larger animals (lower
+      surface-area-to-volume ratio)
+    \item Environmental conditions may change faster than body temperature
+    \item Requires solving the \textbf{transient} (time-dependent) energy balance
+    \item Relevant for large reptiles, endotherms, and fine temporal scales
+  \end{itemize}
+
+  \vfill
+
+  \uncover<2->{
+    \centering
+    Solutions have been proposed by
+    \textcite{spotila1973,stevenson1985,seebacher1999}.
+  }
+
+\end{frame}
+
+\subsection{Endotherms}
+
+\begin{frame}
+  \frametitle{Endotherms}
+
+  Birds and mammals produce sufficient metabolic heat to maintain a stable,
+  elevated body temperature:
+
+  \vfill
+
+  \begin{itemize}
+    \item Solve for the \textbf{metabolic rate} required to maintain
+      homeothermy under given conditions
+    \item Below the thermoneutral zone, metabolic rate increases
+      to compensate for heat loss
+    \item Above it, evaporative cooling (panting, sweating) is activated
+    \item Insulation (fur, feathers, fat) modifies heat exchange
+  \end{itemize}
+
+  \vfill
+
+  \uncover<2->{
+    \textbf{Key outputs:}
+    \begin{itemize}
+      \item Minimum and maximum metabolisable energy requirements
+      \item Water requirements for evaporative cooling
+      \item Critical environmental limits for survival
+    \end{itemize}
+  }
+
+\end{frame}
+
+\subsection{Aquatic organisms}
+
+\begin{frame}
+  \frametitle{Aquatic organisms}
+
+  For organisms permanently under water, heat exchange is dominated by
+  convection:
+
+  \vfill
+
+  \begin{itemize}
+    \item Body temperature closely tracks water temperature
+      (exceptions: some endothermic fish and marine mammals)
+    \item Momentum balance (swimming costs) can dominate energy budgets
+    \item Locomotion in water is much more costly than in air
+    \item Water availability is not limiting (unlike terrestrial organisms)
+  \end{itemize}
+
+  \vfill
+
+  \uncover<2->{
+    \textbf{Intertidal organisms} face a unique challenge:
+    \begin{itemize}
+      \item Periodic shifts between aerial and aquatic conditions
+      \item Wave splash effects on heat and mass exchange
+      \item Detailed model: e.g., \textcite{helmuth1998}
+    \end{itemize}
+  }
+
+\end{frame}
+
+\section{Approaches to computing body temperature}
+\subsection{The core challenge}
+
+\begin{frame}
+  \frametitle{Different questions, different models}
+
+  Computing body temperature from environmental conditions requires solving
+  the energy balance equation, but the right approach depends on the question:
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Steady-state:} \( \sum Q = 0 \) each time step
+    \begin{itemize}
+      \item Instantaneous thermal equilibrium
+      \item Appropriate for small ectotherms
+      \item Behaviour as deterministic rules
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Transient:} \( \dv*{T_b}{t} = f(\dot{Q}_{net}) \)
+    \begin{itemize}
+      \item Thermal inertia buffers fluctuations
+      \item Necessary for large organisms
+      \item Behaviour as probabilistic choice
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \uncover<2->{
+    Here we compare two implementations: NicheMapR's steady-state model
+    and Rubalcaba et al.'s transient approach.
+  }
+
+\end{frame}
+
+\subsection{Rubalcaba et al.: transient approach}
+
+\begin{frame}
+  \frametitle{Body size gradients in ectotherms}
+
+  \textbf{Question:} Do biophysical mechanisms explain latitudinal body
+  size gradients in ectotherms (e.g. Bergmann's rule)?
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Bergmann's rule (endotherms):}
+    \begin{itemize}
+      \item Larger body size at higher latitudes
+      \item Better heat retention (surface-to-volume)
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Ectotherms:}
+    \begin{itemize}
+      \item Complex, often contradictory patterns
+      \item No single mechanism established
+      \item Heat balance \emph{and} water balance may interact
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \uncover<2->{
+    Rubalcaba et al.\ (2019) built a biophysical model to derive
+    null predictions of how body size should vary with latitude
+    based purely on heat and water balance \textcite{rubalcaba2019}.
+  }
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{The transient heat balance equation}
+
+  Rubalcaba et al.\ used a \textbf{dynamic} (time-dependent) energy balance:
+
+  \vfill
+
+  \[
+    \dv{T_b}{t} = \frac{\dot{Q}_{sol} + \dot{Q}_{IR} + \dot{Q}_{conv}
+      + \dot{Q}_{cond} + \dot{Q}_{evap}}{c_p M}
+  \]
+
+  \vfill
+
+  \textbf{Where:}
+  \begin{itemize}
+    \item \(\dot{Q}_{sol}\) = absorbed solar radiation (\(\mathrm{W}\))
+    \item \(\dot{Q}_{IR}\) = net infrared radiation (\(\mathrm{W}\))
+    \item \(\dot{Q}_{conv}\) = convective heat flux (\(\mathrm{W}\))
+    \item \(\dot{Q}_{cond}\) = conductive heat flux (\(\mathrm{W}\))
+    \item \(\dot{Q}_{evap}\) = evaporative heat loss (\(\mathrm{W}\))
+    \item \(c_p\) = specific heat capacity (\(\mathrm{J\,kg^{-1}\,K^{-1}}\))
+    \item \(M\) = body mass (\(\mathrm{kg}\))
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Implications of thermal inertia}
+
+  \begin{itemize}
+    \item Body mass \(M\) and specific heat \(c_p\) determine thermal inertia
+    \item Rate of temperature change \(\propto\) surface-to-mass ratio
+    \item Larger animals warm up and cool down \emph{more slowly}
+  \end{itemize}
+
+  \vfill
+
+  \begin{block}{Key consequence}
+    Large ectotherms attain higher body temperatures when basking and
+    retain heat longer --- an advantage in cold climates but a risk
+    of overheating in warm climates.
+  \end{block}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Behavioural model: probabilistic choice}
+
+  Animals select among microenvironments and postures to optimise thermal
+  performance:
+
+  \vfill
+
+  \[
+    p(w_i) = \frac{\exp(\lambda w_i)}{\sum_{j=1}^n \exp(\lambda w_j)}
+  \]
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Repertoire (6 behaviours):}
+    \begin{itemize}
+      \item 3 shade levels (0\%, 50\%, 90\%)
+      \item 2 postures (100\% or 40\% exposed area)
+      \item[$\to$] maximise $w(T)$ = thermal performance
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{$\lambda$ parameter:}
+    \begin{itemize}
+      \item $\lambda = 0$: random (non-thermoregulatory)
+      \item $\lambda > 0$: thermoregulatory optimisation
+      \item high $\lambda$ $\to$ effective thermoregulation
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+  \centering \tiny \textcite{rubalcaba2019}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Key findings}
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Heat balance:}
+    \begin{itemize}
+      \item Large ectotherms achieve higher Tb at temperate latitudes
+      \item But overheat risk at southern latitudes
+      \item Body size advantage vanishes at boreal latitudes
+      \item Predicts Bergmann-like clines in temperate regions
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Water balance:}
+    \begin{itemize}
+      \item EWL decreases nonlinearly with body size
+      \item Larger wet-skinned ectotherms conserve water better
+      \item Predicts larger body size in dry southern areas
+      \item Hydroregulation may drive converse Bergmann patterns
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \uncover<2->{
+    \begin{block}{Implication}
+      Biophysical null models can generate testable predictions about
+      macroecological patterns without requiring species occurrence data.
+    \end{block}
+  }
+
+\end{frame}
+
+\subsection{NicheMapR: steady-state ectotherm model}
+
+\begin{frame}
+  \frametitle{The NicheMapR ectotherm model}
+
+  The model solves the coupled heat and water balance for an ectotherm
+  at each time step, given microclimate inputs (\textcite{kearney2020c}):
+
+  \vfill
+
+  \textbf{Energy balance:}
+  \[
+    \dot{Q}_{solar} + \dot{Q}_{IR,in} + \dot{Q}_{metab} =
+    \dot{Q}_{IR,out} + \dot{Q}_{conv} + \dot{Q}_{cond} + \dot{Q}_{evap}
+  \]
+  Body temperature is found by root-solving
+  $\sum \dot{Q}_{in} = \sum \dot{Q}_{out}$.
+
+  \vfill
+
+  \textbf{Water balance:}
+  \[
+    \text{Intake} = \text{Cutaneous} +
+    \text{Respiratory} + \text{Excretion}
+  \]
+  Coupled through evaporation and metabolism.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{NicheMapR model features}
+
+  \begin{itemize}
+    \item Driven by microclimate data (two shade extremes)
+    \item Key functional traits: body size, shape, solar absorptivity,
+      skin wetness, thermal tolerances
+    \item Behavioural options: colour change, posture change,
+      shade-seeking, climbing, panting, burrowing
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Behavioural thermoregulation}
+  \framesubtitle{The decision sequence (1)}
+
+  The model implements a \textbf{deterministic state machine} with a
+  fixed hierarchy of thermoregulatory responses:
+
+  \vfill
+
+  \begin{enumerate}
+    \item \textbf{Emerge} --- if $T_b > T_{RB,min}$ (minimum emergence temperature)
+    \item \textbf{Bask} --- maximise silhouette area perpendicular to sun
+    \item \textbf{Forage} --- if $T_{F,min} < T_b < T_{F,max}$ at $T_{pref}$
+    \item \textbf{Reduce absorptivity} --- decrease $\alpha$ in 5\% steps
+    \item \textbf{Change posture} --- align parallel to sun's rays
+  \end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Behavioural thermoregulation}
+  \framesubtitle{The decision sequence (2)}
+
+  \setcounter{enumi}{5}
+
+  \begin{enumerate}
+    \item \textbf{Seek shade} --- up to \texttt{maxshades}
+    \item \textbf{Climb} --- move to reference height (milder conditions)
+    \item \textbf{Pant} --- increase respiratory airflow, oral evaporation
+    \item \textbf{Retreat underground} --- find shallowest tolerable depth
+      (SELDEP: between $CT_{min}$ and $(T_{F,max} + CT_{max})/2$)
+  \end{enumerate}
+
+  \vfill
+
+  \begin{block}{Key principle}
+    Behaviour follows a \textbf{discrete sequence} of increasingly costly
+    responses, triggered by body temperature thresholds ---
+    simple but ecologically realistic.
+  \end{block}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Steady-state vs transient}
+
+  \begin{table}
+    \footnotesize
+    \begin{tabular}{p{2.2cm}p{3.5cm}p{3.5cm}}
+      \toprule
+      Aspect          & NicheMapR (steady-state)    & Rubalcaba (transient)             \\
+      \midrule
+      Heat balance    & \(\sum Q = 0\) each hour    & \(\dv*{T_b}{t}\) solved over time \\
+      Thermal inertia & Neglected                   & Explicit (\(c_p M\))              \\
+      Behaviour       & Deterministic state machine & Probabilistic (multinomial logit) \\
+      Computation     & Fast (root-finding)         & Slower (ODE integration)          \\
+      Best suited for & Small organisms      & Large organisms    \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vfill
+
+  \centering \footnotesize Both use the same physical principles, but differ in
+  their treatment of time, behaviour, and computational cost.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{From Tb to activity and development}
+
+  Biophysical body temperature estimates feed into higher-level processes:
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Activity windows:}
+    \begin{itemize}
+      \item Three states: \textbf{inactive}, \textbf{basking}, \textbf{foraging}
+      \item Foraging only between $T_{F,min}$ and $T_{F,max}$
+      \item Activity hours per day $\to$ foraging opportunity
+      \item Constrains energy intake and growth
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Development:}
+    \begin{itemize}
+      \item Degree-days above a developmental threshold
+      \item Egg development driven by nest temperature
+      \item Determines phenology and life-cycle completion
+      \item Often the most thermally-sensitive life stage
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \uncover<2->{
+    \begin{block}{Key outputs}
+      \texttt{TC} (body temperature), \texttt{ACT} (activity state: 0=inactive,
+      1=basking, 2=foraging), \texttt{SHADE}, \texttt{DEP} (burrow depth),
+      \texttt{enbal} (energy balance), \texttt{masbal} (mass balance)
+    \end{block}
+  }
+
+\end{frame}
+
+\section{References}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+
+  \printbibliography[heading=none]
+
+\end{frame}
+
+\end{document}
