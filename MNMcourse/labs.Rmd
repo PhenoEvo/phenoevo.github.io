@@ -6,3 +6,10 @@
 - [P1: Microclimate modelling under different conditions](https://phenoevo.github.io/MNMcourse/day1/practice/microclimate.Rmd)
 
 - [P2: Elevation gradients and soil moisture](https://phenoevo.github.io/MNMcourse/day1/practice/microclimate_elevation.Rmd)
+
+### Day 2
+- [P3: Dissecting the ectotherm energy budget with ectoR_devel](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_devel.Rmd)
+
+- [P4: Behavioural thermoregulation with ectoR_devel](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_behaviour.Rmd)
+
+- [P5: Ectotherm model across elevation gradients](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_elevation.Rmd)

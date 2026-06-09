@@ -1,0 +1,415 @@
+---
+title: "Practical 5: Ectotherm model across elevation gradients"
+author: "Urtzi Enriquez-Urzelai"
+date: "`r Sys.Date()`"
+# output: html_document
+output:
+  bookdown::pdf_document2:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 5)
+```
+
+# Introduction
+
+In this practical you will use NicheMapR's ectotherm model to simulate body temperatures, activity, and energy budgets of *Stenocercus* lizards at three sites in the Ecuadorian Andes. You will compare the same species across elevation, and then contrast two different species at different elevations.
+
+The data come from Guerra-Correa et al. (2020, PLOS ONE), which measured thermal biology parameters for populations of *Stenocercus guentheri* and *S. festae*.
+
+**Study sites and species:**
+
+| Site | Species | Elev. | Tpref | CTmin | CTmax | Tb |
+|------|---------|-------|-------|-------|-------|----|
+| Jerusalem RP | *S. guentheri* | 2278 m | 31.8 | 7.9 | 43.8 | 31.5 |
+| Calacalí | *S. guentheri* | 2950 m | 22.6 | 6.5 | 44.4 | 32.3 |
+| La Paz | *S. festae* | 3100 m | 22.7 | 5.6 | 46.8 | 28.2 |
+
+**What you will learn:**
+
+- Run the ectotherm model with species-specific thermal biology data
+- Compare body temperature and activity patterns across elevations
+- Explore the heat budget (enbal) and mass budget (masbal) outputs
+- Simulate climate change scenarios
+- Test whether a species can survive at a different elevation
+
+# Setting up
+
+```{r setup-load, message=FALSE}
+library(NicheMapR)
+```
+
+Define the three sites:
+
+```{r define-sites}
+# Jerusalem RP - S. guentheri (low elevation)
+jer_lon <- -78.261458
+jer_lat <- 0.008269
+jer_elev <- 2278
+
+# Calacalí - S. guentheri (mid elevation)
+cal_lon <- -78.517833
+cal_lat <- -0.007361
+cal_elev <- 2950
+
+# La Paz - S. festae (high elevation)
+paz_lon <- -79.171669
+paz_lat <- -3.338333
+paz_elev <- 3100
+```
+
+# Microclimate for each site
+
+Run the microclimate model at all three sites:
+
+```{r micro-runs, message=FALSE}
+mic_jer <- micro_global(loc = c(jer_lon, jer_lat),
+  elev = jer_elev, timeinterval = 12)
+mic_cal <- micro_global(loc = c(cal_lon, cal_lat),
+  elev = cal_elev, timeinterval = 12)
+mic_paz <- micro_global(loc = c(paz_lon, paz_lat),
+  elev = paz_elev, timeinterval = 12)
+```
+
+Compare air temperature across sites:
+
+```{r plot-micro, message=FALSE}
+par(mfrow = c(1, 1))
+plot(mic_jer$metout[, "TALOC"], type = "l", col = "red", lwd = 1.5,
+  ylim = c(0, 35), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Air temperature at local height")
+lines(mic_cal$metout[, "TALOC"], col = "blue", lwd = 1.5)
+lines(mic_paz$metout[, "TALOC"], col = "forestgreen", lwd = 1.5)
+legend("topright", legend = c("Jerusalem (2278 m)", "Calacalí (2950 m)",
+  "La Paz (3100 m)"), col = c("red", "blue", "forestgreen"),
+lty = 1, lwd = 1.5)
+```
+
+The temperature drops with elevation — Jerusalem is warmest, La Paz coolest. This is the environmental gradient your lizards experience.
+
+# Species thermal parameters
+
+Enter the thermal biology data from Table 1 of Guerra-Correa et al. (2020):
+
+```{r species-params}
+# Morphological parameters (shared)
+Ww_g <- 40 # wet weight (g)
+alpha_min <- 0.85 # minimum solar absorptivity
+alpha_max <- 0.85 # maximum solar absorptivity
+shape <- 3 # lizard shape
+pct_wet <- 0.2 # skin wetness (%)
+mindepth <- 2 # minimum burrow depth (node)
+maxdepth <- 10 # maximum burrow depth (node)
+shade_seek <- 1 # can seek shade?
+burrow <- 1 # can burrow?
+climb <- 0 # can climb?
+nocturn <- 0 # nocturnal?
+crepus <- 0 # crepuscular?
+diurn <- 1 # diurnal?
+
+# S. guentheri at Jerusalem RP (low: 2278 m)
+# Field Tb range 24.3-34.7 °C (Table 1)
+jer_T_RB_min <- 17.5 # min Tb to leave retreat
+jer_T_B_min <- 17.5 # min Tb to bask
+jer_T_F_min <- 28 # min Tb to forage
+jer_T_F_max <- 34 # max Tb to forage
+jer_T_pref <- 31.8 # preferred Tb
+jer_CT_max <- 43.8 # critical thermal maximum
+jer_CT_min <- 7.9 # critical thermal minimum
+
+# S. guentheri at Calacalí (mid: 2950 m)
+# Field Tb range 25.1-35.6 °C
+cal_T_RB_min <- 17.5
+cal_T_B_min <- 17.5
+cal_T_F_min <- 22
+cal_T_F_max <- 33
+cal_T_pref <- 22.6
+cal_CT_max <- 44.4
+cal_CT_min <- 6.5
+
+# S. festae at La Paz (high: 3100 m)
+# Field Tb range 16.0-34.8 °C
+paz_T_RB_min <- 15
+paz_T_B_min <- 15
+paz_T_F_min <- 20
+paz_T_F_max <- 30
+paz_T_pref <- 22.7
+paz_CT_max <- 46.8
+paz_CT_min <- 5.6
+```
+
+# Body temperature and behaviour — native species at each site
+
+First, run the ectotherm model for the species that actually occurs at each site — *S. guentheri* at Jerusalem and Calacalí, *S. festae* at La Paz:
+
+```{r tc-plot-all, message=FALSE}
+micro <- mic_jer
+ecto_gue_jer <- ectotherm(Ww_g = Ww_g, alpha_min = alpha_min, alpha_max = alpha_max,
+  shape = shape, pct_wet = pct_wet, T_F_max = jer_T_F_max, T_F_min = jer_T_F_min,
+  T_B_min = jer_T_B_min, T_RB_min = jer_T_RB_min, CT_max = jer_CT_max,
+  CT_min = jer_CT_min, T_pref = jer_T_pref, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus)
+
+micro <- mic_cal
+ecto_gue_cal <- ectotherm(Ww_g = Ww_g, alpha_min = alpha_min, alpha_max = alpha_max,
+  shape = shape, pct_wet = pct_wet, T_F_max = cal_T_F_max, T_F_min = cal_T_F_min,
+  T_B_min = cal_T_B_min, T_RB_min = cal_T_RB_min, CT_max = cal_CT_max,
+  CT_min = cal_CT_min, T_pref = cal_T_pref, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus)
+
+micro <- mic_paz
+ecto_fes_paz <- ectotherm(Ww_g = Ww_g, alpha_min = alpha_min, alpha_max = alpha_max,
+  shape = shape, pct_wet = pct_wet, T_F_max = paz_T_F_max, T_F_min = paz_T_F_min,
+  T_B_min = paz_T_B_min, T_RB_min = paz_T_RB_min, CT_max = paz_CT_max,
+  CT_min = paz_CT_min, T_pref = paz_T_pref, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus)
+
+env_gue_jer <- as.data.frame(ecto_gue_jer$environ); env_gue_jer$hour <- env_gue_jer$TIME / 60
+env_gue_cal <- as.data.frame(ecto_gue_cal$environ); env_gue_cal$hour <- env_gue_cal$TIME / 60
+env_fes_paz <- as.data.frame(ecto_fes_paz$environ); env_fes_paz$hour <- env_fes_paz$TIME / 60
+
+par(mfrow = c(3, 2))
+for (site in list(
+  list(env_gue_jer, "S. guentheri, Jerusalem (2278 m)", jer_T_F_min, jer_T_pref, jer_T_F_max),
+  list(env_gue_cal, "S. guentheri, Calacalí (2950 m)", cal_T_F_min, cal_T_pref, cal_T_F_max),
+  list(env_fes_paz, "S. festae, La Paz (3100 m)", paz_T_F_min, paz_T_pref, paz_T_F_max))) {
+  env <- site[[1]]
+  plot(env$TC ~ env$hour, type = "l", col = "black", lwd = 1.5,
+    ylim = c(-5, 45), xlab = "Hour", ylab = "Temperature (°C)", main = site[[2]])
+  points(env$ACT * 2 + 7 ~ env$hour, pch = 16, col = "orange", cex = 0.5)
+  points(env$SHADE / 10 - 6 ~ env$hour, type = "l", col = "darkgreen")
+  points(env$DEP - 10 ~ env$hour, type = "l", col = "brown")
+  abline(h = site[[3]], lty = 2, col = "blue")
+  abline(h = site[[4]], lty = 2, col = "orange")
+  abline(h = site[[5]], lty = 2, col = "red")
+  if (site[[2]] == "S. guentheri, Jerusalem (2278 m)") {
+    legend("topright", legend = c("TC", "ACT", "SHADE", "DEP", "T_F_min", "T_pref", "T_F_max"),
+      col = c("black", "orange", "darkgreen", "brown", "blue", "orange", "red"),
+      lty = c(1, NA, 1, 1, 2, 2, 2), pch = c(NA, 16, NA, NA, NA, NA, NA), cex = 0.6)
+  }
+}
+```
+
+# Activity windows: species $\times$ elevation
+
+Now run both species at all three sites — a 2 $\times$ 3 design (species × elevation) to separate the effects of climate from species-specific physiology.
+
+```{r all-runs, message=FALSE}
+# Additional combinations not yet run
+micro <- mic_paz; ecto_gue_paz <- ectotherm(Ww_g = Ww_g, alpha_min = alpha_min,
+  alpha_max = alpha_max, shape = shape, pct_wet = pct_wet,
+  T_F_max = jer_T_F_max, T_F_min = jer_T_F_min, T_B_min = jer_T_B_min,
+  T_RB_min = jer_T_RB_min, CT_max = jer_CT_max, CT_min = jer_CT_min,
+  T_pref = jer_T_pref, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus)
+
+micro <- mic_jer; ecto_fes_jer <- ectotherm(Ww_g = Ww_g, alpha_min = alpha_min,
+  alpha_max = alpha_max, shape = shape, pct_wet = pct_wet,
+  T_F_max = paz_T_F_max, T_F_min = paz_T_F_min, T_B_min = paz_T_B_min,
+  T_RB_min = paz_T_RB_min, CT_max = paz_CT_max, CT_min = paz_CT_min,
+  T_pref = paz_T_pref, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus)
+
+micro <- mic_cal; ecto_fes_cal <- ectotherm(Ww_g = Ww_g, alpha_min = alpha_min,
+  alpha_max = alpha_max, shape = shape, pct_wet = pct_wet,
+  T_F_max = paz_T_F_max, T_F_min = paz_T_F_min, T_B_min = paz_T_B_min,
+  T_RB_min = paz_T_RB_min, CT_max = paz_CT_max, CT_min = paz_CT_min,
+  T_pref = paz_T_pref, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus)
+```
+
+```{r activity-windows, message=FALSE}
+sp_names <- c("S. guentheri", "S. festae")
+site_names <- c("Jerusalem (2278 m)", "Calacalí (2950 m)", "La Paz (3100 m)")
+
+all_ects <- list(
+  list(ecto_gue_jer, ecto_gue_cal, ecto_gue_paz),
+  list(ecto_fes_jer, ecto_fes_cal, ecto_fes_paz)
+)
+
+par(mfrow = c(2, 3))
+
+for (sp in 1:2) {
+  for (si in 1:3) {
+    env <- as.data.frame(all_ects[[sp]][[si]]$environ)
+    forage <- subset(env, ACT == 2)
+    bask <- subset(env, ACT == 1)
+    night <- subset(env, SOLAR == 0)
+    plot(night$TIME ~ night$DOY, ylab = "Hour of Day", xlab = "Day of Year",
+      pch = 15, cex = 1.2, col = "darkblue",
+      main = paste0(sp_names[sp], "\n", site_names[si]),
+      xlim = c(0, 365), ylim = c(0, 24))
+    points(forage$TIME ~ forage$DOY, pch = 15, cex = 1.2, col = "orange")
+    points(bask$TIME ~ bask$DOY, pch = 15, cex = 1.2, col = "lightblue")
+    if (sp == 1 && si == 1) {
+      legend("topright", legend = c("Night", "Basking", "Foraging"),
+        col = c("darkblue", "lightblue", "orange"), pch = 15, cex = 0.6)
+    }
+  }
+}
+```
+
+# Heat budget
+
+The `enbal` table shows the components of the energy balance. Compare how *S. guentheri* at Jerusalem (low) and *S. festae* at La Paz (high) gain and lose heat:
+
+```{r heat-budget, message=FALSE}
+enbal_jer <- as.data.frame(ecto_gue_jer$enbal)
+enbal_paz <- as.data.frame(ecto_fes_paz$enbal)
+
+par(mfrow = c(2, 1))
+
+# Jerusalem (low)
+plot(enbal_jer$QSOL, type = "l", col = "red", lwd = 1.5,
+  ylim = c(-5, max(enbal_jer$QSOL)), xlab = "Hour", ylab = "Heat (W)",
+  main = "S. guentheri at Jerusalem RP (2278 m -- low)")
+lines(enbal_jer$QIRIN, col = "orange", lwd = 1.5)
+lines(enbal_jer$QCONV, col = "dodgerblue", lwd = 1.5)
+lines(enbal_jer$QCOND, col = "brown", lwd = 1.5)
+lines(enbal_jer$QEVAP, col = "purple", lwd = 1.5)
+legend("topright", legend = c("QSOL", "QIRIN", "QCONV", "QCOND", "QEVAP"),
+  col = c("red", "orange", "dodgerblue", "brown", "purple"),
+  lty = 1, lwd = 1.5, cex = 0.7)
+
+# La Paz (high)
+plot(enbal_paz$QSOL, type = "l", col = "red", lwd = 1.5,
+  ylim = c(-5, max(enbal_paz$QSOL)), xlab = "Hour", ylab = "Heat (W)",
+  main = "S. festae at La Paz (3100 m -- high)")
+lines(enbal_paz$QIRIN, col = "orange", lwd = 1.5)
+lines(enbal_paz$QCONV, col = "dodgerblue", lwd = 1.5)
+lines(enbal_paz$QCOND, col = "brown", lwd = 1.5)
+lines(enbal_paz$QEVAP, col = "purple", lwd = 1.5)
+legend("topright", legend = c("QSOL", "QIRIN", "QCONV", "QCOND", "QEVAP"),
+  col = c("red", "orange", "dodgerblue", "brown", "purple"),
+  lty = 1, lwd = 1.5, cex = 0.7)
+```
+
+# Mass budget — metabolic rate and water loss
+
+The `masbal` table shows oxygen consumption and water loss:
+
+```{r mass-budget, message=FALSE}
+masbal_jer <- as.data.frame(ecto_gue_jer$masbal)
+masbal_paz <- as.data.frame(ecto_fes_paz$masbal)
+
+par(mfrow = c(1, 2))
+plot(masbal_jer$O2_ml, type = "l", col = "darkred", lwd = 1.5,
+  xlab = "Hour", ylab = expression(paste("O"[2], " (ml/h)")),
+  main = "Metabolic rate (low vs high)")
+lines(masbal_paz$O2_ml, col = "forestgreen", lwd = 1.5)
+legend("topright", legend = c("Jerusalem (2278 m)", "La Paz (3100 m)"),
+  col = c("darkred", "forestgreen"), lty = 1, lwd = 1.5, cex = 0.8)
+
+plot(masbal_jer$H2OResp_g, type = "l", col = "darkred", lwd = 1.5,
+  xlab = "Hour", ylab = "Respiratory water loss (g/h)",
+  main = "Water loss (low vs high)")
+lines(masbal_paz$H2OResp_g, col = "forestgreen", lwd = 1.5)
+legend("topright", legend = c("Jerusalem (2278 m)", "La Paz (3100 m)"),
+  col = c("darkred", "forestgreen"), lty = 1, lwd = 1.5, cex = 0.8)
+```
+
+# Climate change scenario
+
+Simulate +2$^\circ$C warming by modifying the microclimate output:
+
+```{r warming-sim, message=FALSE}
+# Copy the microclimate object and add 2°C to air and soil temps
+mic_jer_warm <- mic_jer
+mic_jer_warm$metout[, c("TALOC", "TAREF")] <-
+  mic_jer_warm$metout[, c("TALOC", "TAREF")] + 2
+mic_jer_warm$shadmet[, c("TALOC", "TAREF")] <-
+  mic_jer_warm$shadmet[, c("TALOC", "TAREF")] + 2
+mic_jer_warm$soil[, 3:12] <- mic_jer_warm$soil[, 3:12] + 2
+mic_jer_warm$shadsoil[, 3:12] <- mic_jer_warm$shadsoil[, 3:12] + 2
+
+# Rerun ectotherm with warmed microclimate
+micro <- mic_jer_warm
+ecto_gue_jer_warm <- ectotherm(
+  Ww_g = Ww_g, alpha_min = alpha_min, alpha_max = alpha_max,
+  shape = shape, pct_wet = pct_wet,
+  T_F_max = jer_T_F_max, T_F_min = jer_T_F_min,
+  T_B_min = jer_T_B_min, T_RB_min = jer_T_RB_min,
+  CT_max = jer_CT_max, CT_min = jer_CT_min,
+  T_pref = jer_T_pref,
+  mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus
+)
+```
+
+Compare activity before and after warming:
+
+```{r plot-warming, message=FALSE}
+env_warm <- as.data.frame(ecto_gue_jer_warm$environ)
+env_warm$hour <- env_warm$TIME / 60
+
+par(mfrow = c(2, 1))
+plot(env_gue_jer$TC ~ env_gue_jer$hour, type = "l", col = "black", lwd = 1.5,
+  ylim = c(-5, 50), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "Current climate -- S. guentheri at Jerusalem RP")
+points(env_gue_jer$ACT * 2 + 7 ~ env_gue_jer$hour, pch = 16, col = "orange", cex = 0.5)
+abline(h = jer_T_F_min, lty = 2, col = "blue")
+abline(h = jer_T_F_max, lty = 2, col = "red")
+
+plot(env_warm$TC ~ env_warm$hour, type = "l", col = "black", lwd = 1.5,
+  ylim = c(-5, 50), xlab = "Hour", ylab = "Temperature (°C)",
+  main = "+2°C warming -- S. guentheri at Jerusalem RP")
+points(env_warm$ACT * 2 + 7 ~ env_warm$hour, pch = 16, col = "orange", cex = 0.5)
+abline(h = jer_T_F_min, lty = 2, col = "blue")
+abline(h = jer_T_F_max, lty = 2, col = "red")
+```
+
+# Challenges
+
+## Challenge 1: Foraging hours across elevation
+
+For *S. guentheri*, count how many hours per day the lizard spends foraging (`ACT == 2`) at Jerusalem RP vs Calacalí. Which elevation gives more foraging opportunity?
+
+```{r challenge1, message=FALSE}
+# yoour code here
+```
+
+## Challenge 2: Low-to-high transplant
+
+What if *S. guentheri* from Jerusalem RP (Tpref = 31.8$^\circ$C, 2278 m) had to live at La Paz (3100 m)? Run the ectotherm with Jerusalem parameters at the La Paz microclimate. Does the lizard survive? How many hours can it forage? Why?
+
+```{r challenge2, message=FALSE}
+# your code here
+```
+
+## Challenge 3: +4$^\circ$C warming at the low and mid sites
+
+Simulate a +4$^\circ$C warming at Jerusalem and Calacalí. Compare the loss of foraging hours at each site. Is the low or mid population more at risk?
+
+```{r challenge3, message=FALSE}
+# your code here
+```
+
+## Challenge 4: No shade scenario
+
+*S. guentheri* at Jerusalem RP currently has up to 90% shade from shrubs and trees. What if deforestation removes all shade at the low site? Set `maxshades = rep(0, 12 * 24)` and see what happens to body temperature and activity.
+
+```{r challenge4, message=FALSE}
+# your code here
+```
+
+# Summary
+
+1. Run NicheMapR's ectotherm model with species-specific thermal parameters
+2. Compare body temperatures and activity patterns across an elevation gradient
+3. Interpret heat budget and mass budget outputs
+4. Simulate climate change scenarios by modifying microclimate inputs
+5. Test the limits of a species' thermal tolerance through transplant experiments
+
+These tools are used in conservation physiology to predict which populations are most vulnerable to climate change and habitat alteration.
+
+# Reference
+
+Guerra-Correa, E.S., Merino-Viteri, A., Andrango, M.B. & Torres-Carvajal, O. (2020). Thermal biology of two tropical lizards from the Ecuadorian Andes and their vulnerability to climate change. *PLOS ONE* 15(1): e0228043.
