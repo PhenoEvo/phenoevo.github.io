@@ -1,0 +1,885 @@
+\documentclass{beamer}
+
+\title{Dynamic Energy Budget theory}
+\subtitle{Day 3: From empirical patterns to formal metabolic theory}
+\date{2026-06-10}
+
+\input{/home/urtzi/Documents/courses/usfq_mnm/resources/common_preamble.tex}
+
+\begin{document}
+
+<<setup, include=FALSE>>=
+knitrmini::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  dev = "tikz",
+  fig.ext = "tex"
+)
+@
+
+\frame{\titlepage}
+
+% \begin{frame}[allowframebreaks,plain]
+%   \frametitle{Outline}
+%   \tableofcontents
+% \end{frame}
+
+% ============================================================
+% SECTION 1: HISTORICAL ROOTS
+% ============================================================
+\section{Historical roots}
+\subsection{From P\"utter to von Bertalanffy}
+
+\begin{frame}
+  \frametitle{The first mechanistic growth model}
+
+  \begin{block}{P\"utter's insight (1920)}
+    Growth is a \textbf{surface--volume conflict}:
+    \begin{itemize}
+      \item Food is taken up across surfaces (gain \(\propto V^{2/3}\))
+      \item Maintenance is a whole-body cost (loss \(\propto V\))
+      \item Growth stops when gains balance losses
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{von Bertalanffy's contribution (1938)}
+    He integrated P\"utter's equation and showed that length growth
+    follows a simple curve:
+    \[
+      \dv{L}{t} = \dot{r}_B (L_\infty - L)
+    \]
+    where the growth rate \(\dot{r}_B\) and asymptotic length
+    \(L_\infty\) summarise the underlying mechanisms.
+  \end{block}
+
+  \vfill
+
+  \centering
+  \tiny \textcite{kearney2021}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What P\"utter left unresolved}
+
+  \begin{itemize}
+    \item P\"utter could not explain \textbf{why} the anabolic
+          coefficient varies with food --- he described it as
+          ``nutritive material'' without a dynamical model
+    \item His theory had \textbf{no life stages}: embryos, juveniles,
+          and adults were all the same
+    \item \textbf{Reproduction} was not included
+    \item \textbf{Respiration} and \textbf{stoichiometry} were not
+          addressed
+  \end{itemize}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{DEB theory (Kooijman 1986) fills these gaps \nocite{kooijman2010}}
+    It keeps P\"utter's surface--volume principle but adds:
+    \begin{itemize}
+      \item An explicit \textbf{reserve} pool that buffers food
+            fluctuations
+      \item A \textbf{\(\kappa\)-rule} for energy allocation
+      \item \textbf{Life stages} driven by maturation
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+% ============================================================
+% SECTION 2: EMPIRICAL PATTERNS
+% ============================================================
+\section{Empirical patterns}
+\subsection{What a metabolic theory must explain}
+
+\begin{frame}
+  \frametitle{Growth patterns (G1--G6)}
+
+  \begin{block}{G1: von Bertalanffy growth}
+    At constant food, most animals follow a decelerating growth curve
+    toward an asymptotic size.
+  \end{block}
+
+  \begin{block}{G2--G3: Indeterminate and foetal growth}
+    Many species grow after maturity. Foetal weight increases as
+    the cube of time.
+  \end{block}
+
+  \begin{block}{G4--G5: Growth scales with size}
+    \textbf{Across species:} larger species grow more slowly.
+    \textbf{Within species:} well-fed individuals grow to a larger size
+    but at a slower rate.
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Respiration, feeding, and stoichiometry}
+
+  \begin{block}{Respiration}
+    \begin{itemize}
+      \item Eggs barely respire (mostly reserve)
+      \item Metabolic rate scales with body mass (Kleiber's law,
+            exponent \(\approx 0.75\))
+      \item Feeding causes a transient increase in metabolism
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Feeding}
+    Starving animals survive, grow, and reproduce using stored reserves.
+  \end{block}
+
+  \begin{block}{Stoichiometry}
+    Body composition varies with food, but stabilises at constant food
+    --- implying at least two pools (structure and reserve).
+  \end{block}
+\end{frame}
+
+% ============================================================
+% SECTION 3: CORE DEB
+% ============================================================
+\section{Core DEB}
+\subsection{State variables}
+
+\begin{frame}
+  \frametitle{Three state variables}
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \begin{block}{Structural volume \(V\)}
+      Permanent biomass that requires maintenance.
+    \end{block}
+
+    \begin{block}{Reserve energy \(E\)}
+      Temporary biomass that can be mobilised.
+      No maintenance cost.
+    \end{block}
+
+    \column{0.48\textwidth}
+    \begin{block}{Maturity \(E_H\)}
+      Cumulative energy invested in complexity.
+      Controls stage transitions (birth, puberty).
+      Not a mass or energy pool.
+    \end{block}
+  \end{columns}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{Why two biomass pools?}
+    Reserve decouples \textbf{feeding from growth}. An organism can
+    survive, grow, and even reproduce without eating --- something
+    a single-pool model cannot explain.
+  \end{block}
+
+  \vfill
+
+  \centering
+  \tiny \textcite{sousa2008}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The standard DEB model}
+  \centering
+  \includegraphics[trim={0 12cm 10cm 0}, clip, height=0.8\textheight]{../../resources/images/deb.pdf}
+\end{frame}
+
+\subsection{Fluxes}
+
+\begin{frame}
+  \frametitle{Feeding and assimilation}
+
+  \begin{block}{Feeding is proportional to surface area}
+    Maximum ingestion scales with \(V^{2/3}\). The actual intake
+    depends on food availability through the functional response
+    \(f = X/(X + K)\), which ranges from 0 (no food) to 1
+    (ad libitum).
+  \end{block}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{Assimilation}
+    A fixed fraction of the ingested energy enters the reserve:
+    \[
+      \dot{p}_A = \{\dot{p}_{Am}\}\, V^{2/3}\, f
+    \]
+    \begin{itemize}
+      \item \(\{\dot{p}_{Am}\}\) = surface-specific assimilation rate
+      \item Assimilation efficiency is constant (fixed stoichiometry)
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \centering
+  \tiny \textcite{sousa2008}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Reserve dynamics}
+
+  \begin{block}{Reserve as a buffer}
+    Energy flows into the reserve (assimilation) and out of it
+    (catabolism). The reserve balance is:
+    \[
+      \dv{E}{t} = \dot{p}_A - \dot{p}_C
+    \]
+    where \(\dot{p}_A\) is assimilation and \(\dot{p}_C\) is
+    catabolism (mobilisation).
+  \end{block}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{Key properties}
+    \begin{itemize}
+      \item Reserve allows survival during fasting
+      \item Reserve fuels embryonic development (no feeding)
+      \item Reserve buffers environmental fluctuations
+      \item At constant food, reserve density \(e = E/V\) stabilises
+            --- this is \textbf{weak homeostasis}
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The \(\kappa\)-rule: energy allocation}
+
+  \begin{block}{How is mobilised energy spent?}
+    Catabolic power \(\dot{p}_C\) from the reserve is partitioned
+    at a fixed ratio:
+  \end{block}
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Soma} (\(\kappa\))
+    \begin{itemize}
+      \item Growth \(\dot{p}_G\)
+      \item Somatic maintenance \(\dot{p}_M\)
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Maturity/reproduction} (\(1 - \kappa\))
+    \begin{itemize}
+      \item Maturation \(\dot{p}_R\) (juveniles)
+      \item Reproduction \(\dot{p}_R\) (adults)
+      \item Maturity maintenance \(\dot{p}_J\)
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{Consequences}
+    \begin{itemize}
+      \item \(\kappa\) is constant throughout life
+      \item Growth and reproduction do not directly compete
+            (indeterminate growth)
+      \item Once maturity is reached, surplus \((1-\kappa)\) energy
+            goes entirely to reproduction
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\subsection{Growth}
+
+\begin{frame}
+  \frametitle{The DEB growth equation}
+
+  Combining assimilation, reserve dynamics, and the \(\kappa\)-rule
+  gives the DEB growth equation:
+
+  \[
+    \dv{L}{t} = \frac{\dot{v}}{3}\,
+    \frac{e - L_h/L_m - L/L_m}{g + e}
+  \]
+
+  \vfill
+
+  \begin{block}{Components}
+    \begin{itemize}
+      \item \(e = E/V\) = reserve density (how full the tank is)
+      \item \(\dot{v}\) = energy conductance (mobilisation speed)
+      \item \(g = [E_G]/(\kappa [E_m])\) = investment ratio
+            (cost of structure relative to reserve capacity)
+      \item \(L_m = \kappa \{\dot{p}_{Am}\}/[\dot{p}_M]\) =
+            maximum possible length
+      \item \(L_h = \{\dot{p}_T\}/[\dot{p}_M]\) = heating length
+            (surface correction)
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Maximum size}
+
+  \begin{block}{What sets the ultimate size?}
+    Growth stops when all available energy is spent on maintenance:
+    \[
+      L_m = \frac{\kappa \{\dot{p}_{Am}\}}{[\dot{p}_M]}
+    \]
+    \begin{itemize}
+      \item Higher assimilation \(\{\dot{p}_{Am}\}\) \(\to\) larger size
+      \item Higher maintenance \([\dot{p}_M]\) \(\to\) smaller size
+      \item A larger \(\kappa\) (more to soma) \(\to\) larger size
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{When food is limited}
+    \begin{itemize}
+      \item At lower food \(f\), ultimate size is smaller:
+            \(L_\infty = f L_m - L_h\)
+      \item Growth is slower because less energy reaches the reserve
+      \item This is the mechanism behind pattern G5
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\subsection{Derived patterns}
+
+\begin{frame}
+  \frametitle{von Bertalanffy growth from DEB}
+
+  When food and temperature are constant, reserve density stabilises
+  (\(e = f\)). The DEB growth equation simplifies to:
+
+  \[
+    \dv{L}{t} = \dot{r}_B (L_\infty - L)
+  \]
+
+  \vfill
+
+  \begin{block}{Why this matters}
+    \begin{itemize}
+      \item P\"utter and von Bertalanffy \textbf{assumed} this curve
+      \item DEB \textbf{derives} it from first principles
+      \item When food or temperature varies, DEB predicts
+            \emph{departures} from the simple curve
+      \item The parameters \(\dot{r}_B\) and \(L_\infty\) now have
+            mechanistic interpretations
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+% ============================================================
+% SECTION 4: SUMMARY
+% ============================================================
+\section{Summary}
+
+\begin{frame}
+  \frametitle{What DEB explains}
+
+  \begin{block}{Core mechanism}
+    Biomass is partitioned into \textbf{structure} (permanent,
+    requires maintenance) and \textbf{reserve} (temporary,
+    no maintenance).
+  \end{block}
+
+  \vfill
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Empirical patterns}
+    \begin{itemize}
+      \item von Bertalanffy growth
+      \item Indeterminate growth
+      \item Foetal weight \(\propto t^3\)
+      \item Growth rate \(\propto 1/L_\infty\)
+      \item Kleiber's law
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Key assumptions}
+    \begin{itemize}
+      \item Feeding \(\propto V^{2/3}\)
+      \item Fixed stoichiometry
+      \item \(\kappa\)-rule allocation
+      \item Weak and strong homeostasis
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Connection to the course}
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Day 1--2: Biophysical ecology}
+    \begin{itemize}
+      \item Energy and mass \textbf{balance} equations
+      \item Body temperature from environment
+      \item NicheMapR implementation
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{Day 3: DEB theory}
+    \begin{itemize}
+      \item Energy \textbf{allocation} within organisms
+      \item Reserve, growth, reproduction
+      \item Life-history consequences
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \begin{block}{Next: NicheMapR implementation}
+    The next presentation shows how DEB theory is implemented in
+    NicheMapR \parencite{kearney2020c}, from parameter estimation to coupled biophysical
+    simulations.
+  \end{block}
+\end{frame}
+
+\section{DEB parameters in practice}
+\subsection{The Add-my-Pet database}
+
+\begin{frame}
+  \frametitle{The Add-my-Pet (AmP) database}
+
+  \begin{block}{What is AmP?}
+    A global, community-curated collection of DEB parameter estimates
+    for over 3000 animal species.
+  \end{block}
+
+  \vfill
+
+  \begin{itemize}
+    \item Started by Bas Kooijman, now a collaborative online resource
+    \item Each species entry includes parameter values, original data,
+          and references
+  \end{itemize}
+
+  \vfill
+
+  \centering
+  \tiny \url{https://www.bio.vu.nl/thb/deb/deblab/add_my_pet.html}
+\end{frame}
+
+\subsection{From observations to parameters}
+
+\begin{frame}
+  \frametitle{Linking data to DEB parameters}
+
+  \begin{block}{Core principle}
+    DEB parameters cannot be measured directly, but they can be
+    estimated from observable life-history traits such as age and
+    size at birth, age and size at puberty, ultimate size, and
+    maximum reproductive rate.
+  \end{block}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{The parameter estimation table}
+    Each observable trait maps to a combination of DEB parameters:
+    \begin{itemize}
+      \item Age at birth \(\to\) maturity threshold \(E_H^b\)
+      \item Age at puberty \(\to\) maturity threshold \(E_H^p\)
+      \item Length at birth/puberty/adulthood \(\to\) assimilation
+            rate, maintenance rate, \(\kappa\), and the shape
+            coefficient \(\delta_M\)
+      \item Maximum reproduction rate \(\to\) reproduction efficiency
+            and energy cost per offspring
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The shape coefficient \(\delta_M\)}
+
+  \begin{block}{Bridging theory and measurement}
+    DEB uses structural length \(L\), but we measure physical
+    length \(L_w\). The shape coefficient converts between them:
+    \[
+      L = L_w / \delta_M
+    \]
+    \begin{itemize}
+      \item \(\delta_M\) is estimated from weight--length data
+      \item A single value is used for a species, constant across
+            food and temperature
+      \item Getting \(\delta_M\) wrong affects all size-dependent
+            predictions
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \centering
+  \tiny \textcite{kearney2021}
+\end{frame}
+
+\subsection{Parameter extraction}
+
+\begin{frame}
+  \frametitle{From AmP to simulation-ready parameters}
+
+  \begin{enumerate}
+    \item Load \texttt{allStat} --- a named list of species entries
+    \item Check the model type for your species (\texttt{std},
+          \texttt{abj}, \texttt{abp})
+    \item Extract the 12 primary DEB parameters and the 4 temperature
+          correction parameters
+    \item Handle missing fields --- not all species have complete
+          data; some fields depend on the model type
+  \end{enumerate}
+
+\end{frame}
+
+\subsection{Name mapping}
+
+\begin{frame}
+  \frametitle{Theory $\leftrightarrow$ code name mapping}
+
+  \begin{block}{One concept, many names}
+    The same DEB parameter appears under different names in the
+    literature, AmP, and NicheMapR. Key mappings:
+  \end{block}
+
+  \vfill
+
+  \begin{itemize}
+    \item \(\{\dot{p}_{Am}\}\) (assimilation rate) \(\to\)
+          \texttt{p\_Am} in both AmP and NicheMapR
+    \item \(v\) (energy conductance) \(\to\) \texttt{v}
+    \item \(\kappa\) (allocation fraction) \(\to\) \texttt{kap}
+    \item \([\dot{p}_M]\) (maintenance rate) \(\to\) \texttt{p\_M}
+    \item \([E_G]\) (cost of structure) \(\to\) \texttt{E\_G}
+    \item \(E_H^b, E_H^p\) (maturity thresholds) \(\to\)
+          \texttt{E\_Hb, E\_Hp}
+    \item \(\delta_M\) (shape coefficient) \(\to\) \texttt{del\_M}
+  \end{itemize}
+\end{frame}
+
+\section{NicheMapR DEB toolbox}
+\subsection{Four functions}
+
+\begin{frame}
+  \frametitle{Four DEB functions for different needs}
+
+  \begin{itemize}
+    \item \texttt{DEB()}: DOPRI5 adaptive solver, most accurate,
+          best for stand-alone simulations of a single individual
+    \item \texttt{DEB\_const()}: deSolve-based, handles life-cycle
+          events (hatching, birth, puberty) automatically, for
+          constant temperature and food
+    \item \texttt{DEB\_var()}: Same as \texttt{DEB\_const()} but
+          accepts variable temperature and food time series
+    \item \texttt{DEB\_euler()}: Fixed-step Euler method, fastest,
+          used inside the coupled ectotherm model
+  \end{itemize}
+
+  \vfill
+
+  \begin{block}{R-side vs.\ Fortran-side}
+    The first three functions run in R. \texttt{DEB\_euler()} runs
+    inside the Fortran biophysical model for speed.
+  \end{block}
+\end{frame}
+
+\subsection{Stand-alone simulation}
+
+\begin{frame}
+  \frametitle{Stand-alone simulation with \texttt{rundeb()}}
+
+  \begin{block}{The wrapper function}
+    \texttt{rundeb()} provides a single interface to all four DEB
+    solvers:
+  \end{block}
+
+  \vfill
+
+  \begin{itemize}
+    \item You provide: species name, number of days, temperature
+          and food time series
+    \item It runs the appropriate solver and returns a 38-column
+          data frame (\texttt{debout})
+    \item Additional outputs include mass-balance and power-flux
+          summaries
+  \end{itemize}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{What \texttt{debout} contains}
+    \begin{itemize}
+      \item Stage (egg, juvenile, adult), structural volume,
+            reserve energy, maturity, reproduction buffer
+      \item Derived quantities: length, wet mass,
+            gonad mass, gut content
+      \item Metabolic fluxes: O\(_2\) consumption, CO\(_2\)
+            production, N-waste, water
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\subsection{Choosing a solver}
+
+\begin{frame}
+  \frametitle{Choosing the right solver}
+
+  \begin{block}{Decision guide}
+    \begin{itemize}
+      \item \textbf{Constant environment, want automatic events?}
+            \(\to\) \texttt{DEB\_const()}
+      \item \textbf{Variable temperature or food?}
+            \(\to\) \texttt{DEB\_var()}
+      \item \textbf{Maximum accuracy needed?}
+            \(\to\) \texttt{DEB()} (DOPRI5 adaptive step)
+      \item \textbf{Inside the coupled biophysical model?}
+            \(\to\) \texttt{DEB\_euler()} (fast, fixed step)
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \begin{block}{Model type matters}
+    The solver is chosen automatically based on the DEB model type
+    (standard, abj, abp), which controls the number of state
+    variables and the event structure.
+  \end{block}
+\end{frame}
+
+\section{Biophysical--DEB coupling}
+\subsection{Why couple?}
+
+\begin{frame}
+  \frametitle{Why couple biophysics and DEB?}
+
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Biophysics provides:}
+    \begin{itemize}
+      \item Body temperature
+      \item Activity status
+      \item Microclimate conditions
+    \end{itemize}
+
+    \column{0.48\textwidth}
+    \textbf{DEB provides:}
+    \begin{itemize}
+      \item Size-dependent surface area
+      \item Metabolic heat production
+      \item Growth, reproduction, survival
+    \end{itemize}
+  \end{columns}
+
+  \vfill
+
+  \begin{block}{The feedback loop}
+    Body temperature and activity control DEB rates.
+    DEB's size and heat output feed back into the energy balance.
+    Only coupled simulations capture this two-way interaction.
+  \end{block}
+\end{frame}
+
+\subsection{Software architecture}
+
+\begin{frame}
+  \frametitle{Software architecture}
+
+  \begin{enumerate}
+    \item Meteorological data \(\to\) \texttt{micro\_global()}
+          \(\to\) hourly microclimate
+    \item Microclimate + DEB parameters + biophysical parameters
+          \(\to\) \texttt{ectotherm(DEB = 1)}
+    \item \texttt{ectotherm()} calls the Fortran biophysical model
+          (\texttt{ECTORUN}), which runs hourly
+    \item At each hour, DEB is called: update size, reserve,
+          maturity, reproduction
+    \item Updated size feeds back into the biophysical calculations
+          for the next hour
+  \end{enumerate}
+
+  \vfill
+
+  \begin{block}{Two time scales}
+    Microclimate is typically daily (interpolated to hourly).
+    The ectotherm model runs hourly. DEB is called every hour.
+    Multi-year runs recycle the same daily microclimate pattern.
+  \end{block}
+\end{frame}
+
+\subsection{Coupling points}
+
+\begin{frame}
+  \frametitle{Coupling point 1: temperature}
+
+  \begin{block}{\(T_b\) controls all DEB rates}
+    The three core rate parameters (assimilation \texttt{p\_Am},
+    energy conductance \texttt{v}, maintenance \texttt{p\_M})
+    are corrected by an Arrhenius function of body temperature.
+    Higher \(T_b\) means faster rates --- up to thermal limits.
+  \end{block}
+
+  \vfill
+
+  \begin{block}{DEB produces metabolic heat}
+    Somatic maintenance, maturity maintenance, and reproduction
+    overhead all generate heat. This heat enters the biophysical
+    energy balance alongside solar and thermal radiation --- a
+    feedback that matters for large or active animals.
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Coupling point 2: size and shape}
+
+  \begin{block}{Size feeds back to biophysics}
+    As an animal grows, its surface area increases. This changes:
+    \begin{itemize}
+      \item \textbf{Solar radiation} absorption (bigger area)
+      \item \textbf{Convection} (boundary layer scales with size)
+      \item \textbf{Evaporative} water loss (more skin area)
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \pause
+
+  \begin{block}{A growing individual experiences a changing climate}
+    An animal that doubles in length has four times the surface
+    area. Its heat balance is fundamentally different from that of
+    a juvenile. Only coupled simulations capture this ontogenetic
+    shift.
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Coupling point 3: activity and feeding}
+
+  \begin{block}{Behaviour connects environment to DEB}
+    The biophysical model determines activity from body temperature:
+    \begin{itemize}
+      \item \textbf{Active} (foraging): \(T_b\) within voluntary range
+      \item \textbf{Basking}: \(T_b\) below voluntary minimum
+      \item \textbf{In shelter}: \(T_b\) extreme or night
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \begin{block}{Feeding in DEB}
+    Only active hours count toward feeding. The functional response
+    \(f\) (ranging 0--1) determines how much food is actually
+    assimilated. Assimilation is proportional to both \(f\) and
+    surface area.
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Coupling point 4: water budget}
+
+  \begin{block}{DEB produces and consumes water}
+    From the DEB mass balance, NicheMapR derives several water
+    fluxes:
+    \begin{itemize}
+      \item \textbf{Metabolic water} from respiration
+      \item \textbf{Food water} from ingested prey
+      \item \textbf{Faecal water} lost with waste
+      \item \textbf{N-waste water} used to excrete nitrogen
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \begin{block}{Why this matters}
+    These fluxes enter the biophysical water balance alongside
+    evaporation and drinking. In arid environments, the cumulative
+    water balance can determine survival.
+  \end{block}
+\end{frame}
+
+\subsection{Outputs}
+
+\begin{frame}
+  \frametitle{Data flow in a coupled simulation}
+
+  \begin{block}{Six output streams}
+    \begin{itemize}
+      \item \texttt{environ}: hourly body temperature, behaviour
+      \item \texttt{enbal}: hourly energy balance components
+      \item \texttt{masbal}: hourly water balance components
+      \item \texttt{debout}: hourly DEB state variables
+            (stage, length, mass, reserve, maturity, reproduction)
+      \item \texttt{yearout}: annual summaries
+            (max size, number of clutches, fecundity)
+      \item \texttt{yearsout}: lifetime summaries
+            (lifespan, generation time, \(R_0\), \(r_\text{max}\))
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Interpreting DEB outputs}
+
+  \begin{block}{Hourly time series (\texttt{debout})}
+    \begin{itemize}
+      \item Stage transitions: egg \(\to\) juvenile (birth),
+            juvenile \(\to\) adult (puberty)
+      \item Growth curves: how length and mass change with
+            temperature and food
+      \item Reserve dynamics: build up during feeding,
+            deplete during fasting
+      \item Reproduction: the reproduction buffer accumulates
+            and drops sharply at each clutch
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \begin{block}{Annual and lifetime summaries}
+    \begin{itemize}
+      \item \texttt{yearout}: which years were good or bad
+            for growth and reproduction
+      \item \texttt{yearsout}: does the population persist?
+            \(r_\text{max} < 0\) means a sink population
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\section{Summary}
+
+\begin{frame}
+  \frametitle{Key takeaways}
+
+  \begin{enumerate}
+    \item The \textbf{AmP database} provides DEB parameters for
+          over 3000 species
+    \item \textbf{NicheMapR} offers four DEB solvers: from
+          stand-alone exploration to coupled biophysical simulations
+    \item \textbf{Coupling} DEB with biophysics captures feedbacks
+          between size, temperature, activity, and water balance
+    \item The coupled model predicts emergent life-history patterns
+          (size clines, fecundity, range limits) from first
+          principles
+  \end{enumerate}
+\end{frame}
+
+\section{References}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+
+\printbibliography[heading=none]
+
+\end{frame}
+
+\end{document}

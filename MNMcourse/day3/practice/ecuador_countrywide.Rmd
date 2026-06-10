@@ -1,0 +1,309 @@
+---
+title: "Practical 7: Country-wide ectotherm simulations with parallel computing"
+author: "Urtzi Enriquez-Urzelai"
+date: "`r Sys.Date()`"
+output:
+  bookdown::pdf_document2:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 5)
+```
+
+# Introduction
+
+In the previous practicals we simulated microclimate and body temperature at individual sites (Jerusalem RP, Calacalí, La Paz). A single *Stenocercus guentheri* population at one elevation tells us about that specific place — but how do we understand the species' **thermal niche across the entire country**?
+
+**What you will learn:**
+
+- Extract the spatial grid from NicheMapR's global climate dataset (CRU 10
+  arc-minute climatology)
+- Run `micro_global()` and `ectotherm()` across hundreds of Ecuador grid cells
+- Use `future.apply::future_lapply()` to parallelise the work
+- Build raster maps from scattered point results with `terra`
+- Compare species and climate-change scenarios at the country scale
+
+# Setup
+
+```{r setup-load, message=FALSE}
+library(NicheMapR)
+library(terra)
+library(future)
+library(future.apply)
+```
+
+Verify the global climate data location:
+
+```{r check-data}
+gcfolder_file <- paste0(.libPaths()[1], "/gcfolder.rda")
+if (file.exists(gcfolder_file)) {
+  load(gcfolder_file)
+  cat("Global climate data at:", folder, "\n")
+} else {
+  stop("Run get.global.climate(folder = 'path/to/data') first")
+}
+```
+
+# Ecuador grid from the global climate dataset
+
+The global climate data used by `micro_global()` is a NetCDF file at **10 arc-minute** resolution (~18 km at the equator). We open it and crop it to Ecuador's bounding box (longitude $-81$ to $-75$, latitude $-5$ to $2$).
+
+```{r build-grid, message=FALSE}
+# Open the NetCDF
+global_rast <- terra::rast(paste0(folder, "/global_climate.nc"))
+
+# Crop to Ecuador
+ec_ext <- ext(-81, -75, -5, 2)
+ec_rast <- crop(global_rast[[1]], ec_ext)
+
+# Extract grid coordinates and elevation
+lons <- xFromCol(ec_rast)
+lats <- yFromRow(ec_rast)
+elev <- values(ec_rast)
+
+# Build the full grid as a data frame
+grid <- expand.grid(lon = lons, lat = lats)
+grid$elev <- as.vector(elev)
+
+# Remove ocean cells (NA elevation)
+grid <- grid[!is.na(grid$elev), ]
+rownames(grid) <- NULL
+
+cat("Grid cells:", nrow(grid), "\n")
+cat("Elevation range:", range(grid$elev), "m\n")
+```
+
+The grid has `r nrow(grid)` land cells across Ecuador with elevations from `r min(grid$elev)` to `r max(grid$elev)` m. We will run the model for every single cell to produce a complete country-wide map.
+
+Plot the sampled locations:
+
+```{r plot-grid}
+plot(ec_rast, col = "grey90", legend = FALSE,
+     main = "Sampled grid cells across Ecuador")
+points(grid$lon, grid$lat, pch = 16, cex = 0.4, col = "dodgerblue")
+# Mark the three known sites
+points(-78.261458, 0.008269, pch = 16, col = "red", cex = 1.2)
+points(-78.517833, -0.007361, pch = 16, col = "blue", cex = 1.2)
+points(-79.171669, -3.338333, pch = 16, col = "forestgreen", cex = 1.2)
+legend("bottomleft",
+  legend = c("Grid cells", "Jerusalem RP", "Calacalí", "La Paz"),
+  col = c("dodgerblue", "red", "blue", "forestgreen"), pch = 16, cex = 0.8)
+```
+
+# Species parameters
+
+We reuse the thermal biology of *Stenocercus guentheri* from the Jerusalem RP population (Guerra-Correa et al. 2020). These parameters define when the lizard can bask, forage, and retreat.
+
+```{r species-params}
+# Morphology
+Ww_g <- 40
+alpha_min <- 0.85
+alpha_max <- 0.85
+shape <- 3
+pct_wet <- 0.2
+mindepth <- 2
+maxdepth <- 10
+shade_seek <- 1
+burrow <- 1
+climb <- 0
+nocturn <- 0
+crepus <- 0
+diurn <- 1
+
+# Thermal biology — S. guentheri (Jerusalem RP)
+T_RB_min <- 17.5
+T_B_min <- 17.5
+T_F_min <- 28
+T_F_max <- 34
+T_pref <- 31.8
+CT_max <- 43.8
+CT_min <- 7.9
+```
+
+# Parallel simulation function
+
+We write a function that, given a single cell's coordinates and elevation:
+
+1. Runs `micro_global()` (extracts climate + runs the microclimate model)
+2. Runs `ectotherm()` (solves the energy balance with behaviour)
+3. Extracts summary metrics (mean body temperature, activity counts, etc.)
+
+The function must handle failures gracefully — some cells may produce NA results if climate data is missing or the model does not converge. The thermal biology parameters are explicit arguments so we can easily swap species or scenarios.
+
+```{r sim-function, message=FALSE}
+run_cell <- function(lon, lat, elev,
+                     T_F_min = 28, T_F_max = 34,
+                     T_B_min = 17.5, T_RB_min = 17.5,
+                     CT_min = 7.9, CT_max = 43.8,
+                     T_pref = 31.8) {
+
+  # Step 1: microclimate
+  # NOTE: ectotherm() looks for 'micro' in .GlobalEnv,
+  # so we use <<- to assign it there
+  micro <<- micro_global(loc = c(lon, lat), elev = elev,
+                         timeinterval = 12)
+
+  # Step 2: ectotherm
+  ecto <- ectotherm(Ww_g = Ww_g, alpha_min = alpha_min,
+    alpha_max = alpha_max, shape = shape, pct_wet = pct_wet,
+    T_F_max = T_F_max, T_F_min = T_F_min,
+    T_B_min = T_B_min, T_RB_min = T_RB_min,
+    CT_max = CT_max, CT_min = CT_min, T_pref = T_pref,
+    mindepth = mindepth, maxdepth = maxdepth,
+    shade_seek = shade_seek, burrow = burrow, climb = climb,
+    nocturn = nocturn, diurn = diurn, crepus = crepus)
+
+  env <- as.data.frame(ecto$environ)
+
+  data.frame(lon = lon, lat = lat, elev = elev,
+    mean_TC    = mean(env$TC, na.rm = TRUE),
+    max_TC     = max(env$TC, na.rm = TRUE),
+    min_TC     = min(env$TC, na.rm = TRUE),
+    forage_hrs = sum(env$ACT == 2, na.rm = TRUE),
+    bask_hrs   = sum(env$ACT == 1, na.rm = TRUE),
+    active_hrs = sum(env$ACT >= 1, na.rm = TRUE),
+    exceed_hrs = sum(env$TC > CT_max, na.rm = TRUE))
+}
+```
+
+# Parallel execution
+
+We set up a multisession plan so each worker runs in its own R process (this is important because NicheMapR uses Fortran code that may not be thread-safe within a single process).
+
+`future_lapply()` works exactly like `lapply()` but distributes iterations across workers.
+
+```{r parallel-run, message=FALSE, results='hide'}
+ncores <- parallel::detectCores() - 1
+plan(multisession, workers = ncores)
+cat("Using", ncores, "CPU cores\n")
+
+results_list <- future_lapply(seq_len(nrow(grid)), function(i) {
+  tryCatch({
+    run_cell(
+      lon  = grid$lon[i],
+      lat  = grid$lat[i],
+      elev = grid$elev[i]
+    )
+  }, error = function(e) {
+    cat("Cell", i, "failed:", conditionMessage(e), "\n")
+    data.frame(
+      lon = grid$lon[i], lat = grid$lat[i], elev = grid$elev[i],
+      mean_TC = NA, max_TC = NA, min_TC = NA,
+      forage_hrs = NA, bask_hrs = NA, active_hrs = NA, exceed_hrs = NA
+    )
+  })
+}, future.packages = "NicheMapR", future.seed = TRUE)
+```
+
+```{r combine-results}
+results <- do.call(rbind, results_list)
+rownames(results) <- NULL
+cat("Successful cells:", sum(!is.na(results$mean_TC)), "/", nrow(results), "\n")
+```
+
+# Raster maps
+
+We convert the scattered point results into raster surfaces using `terra`'s `rasterize()` function. We use the same 10 arc-minute grid as the climate data so the maps align perfectly with the underlying environmental layers.
+
+```{r build-rasters}
+# Template raster matching the climate grid
+template <- rast(xmin = -81, xmax = -75, ymin = -5, ymax = 2,
+                 resolution = 1 / 6, crs = "EPSG:4326")
+
+# Rasterize each variable
+r_mean_TC <- rasterize(results[, c("lon", "lat")], template,
+                       values = results$mean_TC, fun = mean, na.rm = TRUE)
+r_max_TC <- rasterize(results[, c("lon", "lat")], template,
+                      values = results$max_TC, fun = mean, na.rm = TRUE)
+r_forage <- rasterize(results[, c("lon", "lat")], template,
+                      values = results$forage_hrs, fun = mean, na.rm = TRUE)
+r_exceed <- rasterize(results[, c("lon", "lat")], template,
+                      values = results$exceed_hrs, fun = mean, na.rm = TRUE)
+```
+
+```{r plot-rasters, message=FALSE}
+par(mfrow = c(2, 2))
+
+plot(r_mean_TC, main = "Mean body temperature (°C)",
+     col = hcl.colors(20, "Plasma"), axes = TRUE)
+points(-78.261458, 0.008269, pch = 16, cex = 0.8, col = "white")
+points(-78.517833, -0.007361, pch = 16, cex = 0.8, col = "white")
+points(-79.171669, -3.338333, pch = 16, cex = 0.8, col = "white")
+
+plot(r_max_TC, main = "Maximum body temperature (°C)",
+     col = hcl.colors(20, "Inferno"), axes = TRUE)
+points(-78.261458, 0.008269, pch = 16, cex = 0.8, col = "white")
+points(-78.517833, -0.007361, pch = 16, cex = 0.8, col = "white")
+points(-79.171669, -3.338333, pch = 16, cex = 0.8, col = "white")
+
+plot(r_forage, main = "Foraging hours (12 representative days)",
+     col = hcl.colors(20, "YlOrRd"), axes = TRUE)
+points(-78.261458, 0.008269, pch = 16, cex = 0.8, col = "black")
+points(-78.517833, -0.007361, pch = 16, cex = 0.8, col = "black")
+points(-79.171669, -3.338333, pch = 16, cex = 0.8, col = "black")
+
+plot(r_exceed, main = "Hours above CTmax (12 representative days)",
+     col = hcl.colors(20, "Reds"), axes = TRUE)
+points(-78.261458, 0.008269, pch = 16, cex = 0.8, col = "black")
+points(-78.517833, -0.007361, pch = 16, cex = 0.8, col = "black")
+points(-79.171669, -3.338333, pch = 16, cex = 0.8, col = "black")
+```
+
+# Interpretation
+
+The raster maps reveal strong spatial structure driven by elevation:
+
+- **Mean body temperature** is hottest in the coastal lowlands and the eastern Amazon basin, and coldest in the high Andes.
+- **Foraging hours** peak in warm low-elevation areas where the lizard can reach its $T_{F,min}$ (28 °C) early in the day.
+- **Hours above CTmax** are rare or zero in most of the country — but may appear in the hottest lowland areas, especially during midday. This indicates where the species is closest to its thermal limit.
+
+The three reference sites (white/black points) lie along the thermal gradient: Jerusalem RP is warm, Calacalí intermediate, La Paz cool.
+
+# Challenges
+
+Try to answer each challenge yourself first. The code scaffolding is provided and solutions are given afterwards.
+
+
+## Challenge 1: Species comparison
+
+Repeat the parallel simulation using *Stenocercus festae* parameters (from La Paz). Create side-by-side raster maps comparing foraging hours between the two species. Which species has more suitable habitat area across Ecuador?
+
+**Hint:** Define a second set of species parameters, then call `run_cell()` again inside `future_lapply()` with the new values.
+
+```{r challenge1, message=FALSE, results='hide'}
+# Your code here
+```
+
+
+**Expected insight:** *S. festae* has a lower $T_{F,min}$ (20 vs 28 °C), so it can be active in cooler high-elevation areas where *S. guentheri* cannot. *S. guentheri*, with its higher $T_{pref}$, does better in warm lowlands. The species' thermal physiology determines its geographic potential.
+
+
+## Challenge 2: +3°C warming scenario
+
+Simulate a +3°C warming across Ecuador by modifying the microclimate output, then re-run the parallel simulation. Map the loss of foraging hours per cell. Which regions are most affected?
+
+```{r challenge2, message=FALSE, results='hide'}
+# Your code here
+```
+
+
+**Expected insight:** Warming reduces foraging hours in the hot lowlands (lizards overheat and must retreat) but may increase them in cool highlands (lizards reach their $T_{F,min}$ earlier). The net effect depends on the baseline climate of each cell — this is the **asymmetric impact** of climate change across a species' range.
+
+
+# Summary
+
+In this practical you have:
+
+1. **Extracted the spatial grid** from NicheMapR's global climate NetCDF and subset it to Ecuador
+2. **Written a reusable function** that runs `micro_global()` + `ectotherm()` for a single grid cell
+3. **Parallelised the computation** across hundreds of cells using `future.apply::future_lapply()`
+4. **Built raster maps** with `terra::rasterize()` to visualise spatial patterns
+5. **Compared two species** with different thermal physiologies across the landscape
+6. **Simulated a warming scenario** and mapped the spatially heterogeneous impact
+
+# Reference
+
+Guerra-Correa, E.S., Merino-Viteri, A., Andrango, M.B. & Torres-Carvajal, O. (2020). Thermal biology of two tropical lizards from the Ecuadorian Andes and their vulnerability to climate change. *PLOS ONE* 15(1): e0228043.
+
+Kearney, M. R. & Porter, W. P. (2017). NicheMapR — an R package for biophysical modelling: the ectotherm and dynamic energy budget models. *Ecography* 40: 1–12.

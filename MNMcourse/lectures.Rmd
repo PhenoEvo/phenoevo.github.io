@@ -10,5 +10,9 @@
     [(Rnw)](https://phenoevo.github.io/MNMcourse/day1/presentations/2_microclimate.Rnw)
 
 ### Day 2
-[1 - The animal model (pdf)](https://phenoevo.github.io/MNMcourse/day2/presentations/3_animal.pdf)
+[3 - The animal model (pdf)](https://phenoevo.github.io/MNMcourse/day2/presentations/3_animal.pdf)
     [(Rnw)](https://phenoevo.github.io/MNMcourse/day2/presentations/3_animal.Rnw)
+
+### Day 3
+[4 - Dynamic Energy Budget, DEB, theory (pdf)](https://phenoevo.github.io/MNMcourse/day3/presentations/4_deb.pdf)
+    [(Rnw)](https://phenoevo.github.io/MNMcourse/day3/presentations/4_deb.Rnw)
