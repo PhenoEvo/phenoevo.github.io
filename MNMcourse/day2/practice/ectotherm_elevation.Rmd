@@ -317,17 +317,12 @@ legend("topright", legend = c("Jerusalem (2278 m)", "La Paz (3100 m)"),
 
 # Climate change scenario
 
-Simulate +2$^\circ$C warming by modifying the microclimate output:
+Simulate +2$^\circ$C warming using the `warm` parameter:
 
 ```{r warming-sim, message=FALSE}
-# Copy the microclimate object and add 2°C to air and soil temps
-mic_jer_warm <- mic_jer
-mic_jer_warm$metout[, c("TALOC", "TAREF")] <-
-  mic_jer_warm$metout[, c("TALOC", "TAREF")] + 2
-mic_jer_warm$shadmet[, c("TALOC", "TAREF")] <-
-  mic_jer_warm$shadmet[, c("TALOC", "TAREF")] + 2
-mic_jer_warm$soil[, 3:12] <- mic_jer_warm$soil[, 3:12] + 2
-mic_jer_warm$shadsoil[, 3:12] <- mic_jer_warm$shadsoil[, 3:12] + 2
+# Re-run microclimate with +2°C warming
+mic_jer_warm <- micro_global(loc = c(jer_lon, jer_lat),
+  elev = jer_elev, timeinterval = 12, warm = 2)
 
 # Rerun ectotherm with warmed microclimate
 micro <- mic_jer_warm
