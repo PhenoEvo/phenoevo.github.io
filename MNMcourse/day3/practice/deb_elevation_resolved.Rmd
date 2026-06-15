@@ -1,0 +1,873 @@
+---
+title: "Practical 4: DEB model across elevation gradients"
+author: "Urtzi Enriquez-Urzelai"
+date: "`r Sys.Date()`"
+output: 
+  bookdown::pdf_document2:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 5)
+```
+
+# Introduction
+
+In this practical you will use **Dynamic Energy Budget (DEB)** theory --- the
+formal metabolic framework covered in today's lecture --- to model growth,
+reserve dynamics, and reproduction of a large tropical lizard, the Gold Tegu
+(*Tupinambis teguixin*), at three elevations in the Ecuadorian Andes.
+
+In the previous practical (Day 2), you used a **static energy budget**:
+a fixed body mass ($W_w$ = 40 g) with species-specific thermal preferences.
+That model answered *how hot or active* the animal is, but could not say
+*how big it grows, how much it eats, or when it reproduces*.
+
+DEB theory adds the **ontogenetic dimension**: starting from an egg, the model
+tracks three state variables
+
+- **Structure** ($V$) --- the metabolically active tissue,
+- **Reserve** ($E$) --- stored energy (yolk, fat),
+- **Maturity/Reproduction buffer** ($E_H$ / $E_R$) --- the energy invested
+  in development and eggs,
+
+as functions of **temperature** and **food**. The equations are those you saw
+in the lecture: the $\kappa$-rule, the von Bertalanffy growth emerging from
+the surface-area--volume conflict, and the Arrhenius temperature correction.
+
+**What you will learn:**
+
+- Extract DEB parameters from the Add-my-Pet (AmP) database
+- Run the DEB model stand-alone to predict growth and reproduction
+- Couple the DEB model with the NicheMapR ectotherm model
+- Compare life-history predictions across an elevation gradient
+- Explore the sensitivity of growth to temperature and food
+
+## Study sites
+
+We use the same three sites as Practical 3:
+
+| Site | Elev. |
+|------|-------|
+| Jerusalem RP | 2278 m |
+| Calacalí | 2950 m |
+| La Paz | 3100 m |
+
+## The species: *Tupinambis teguixin*
+
+The Gold Tegu is a large teiid lizard (up to ~50 cm snout--vent length,
+~4 kg) from northern South America. Its DEB parameters have recently been
+estimated in the AmP database. Because it is a tropical lowland species, we
+expect the cooler high-elevation sites to slow its growth, delay maturity,
+and reduce reproductive output.
+
+# Setting up
+
+```{r setup-load, message=FALSE}
+library(NicheMapR)
+```
+
+Define the three sites (same coordinates as Practical 3):
+
+```{r define-sites}
+# Jerusalem RP (low)
+jer_lon <- -78.261458
+jer_lat <- 0.008269
+jer_elev <- 2278
+
+# Calacalí (mid)
+cal_lon <- -78.517833
+cal_lat <- -0.007361
+cal_elev <- 2950
+
+# La Paz (high)
+paz_lon <- -79.171669
+paz_lat <- -3.338333
+paz_elev <- 3100
+```
+
+# Step 1: DEB parameters for *Tupinambis teguixin*
+
+The Add-my-Pet database provides estimated DEB parameters for thousands of
+species. The file `allStat.Rda` contains these estimates. Let us load it and
+extract the parameters for our species.
+
+```{r get-deb-pars, message=FALSE}
+load(path.expand("~/Documents/DEB/allStat.Rda"))
+
+species <- "Tupinambis.teguixin"
+
+allDEB.species <- dimnames(allStat$allStat)[[1]]
+allDEB.species <- allDEB.species[1:(length(allDEB.species) - 2)]
+
+species.slot <- which(allDEB.species == species)
+par.names <- unlist(labels(allStat$allStat[[species.slot]]))
+
+for (i in seq_along(par.names)) {
+  assign(par.names[i], unlist(allStat$allStat[[species.slot]][i]))
+}
+
+# The extraction above overwrites 'species' (underscore separator) ---
+# restore our variable name (dot separator)
+species <- "Tupinambis.teguixin"
+
+# Some parameters may be missing --- assign sensible defaults
+if (!exists("E.Hj")) E.Hj <- E.Hb
+if (!exists("E.He")) E.He <- E.Hb
+if (!exists("L.j"))  L.j  <- L.b
+
+cat("Species:", species, "\n")
+cat("Model type:", model, "\n")
+cat("Family:", family, "| Order:", order, "\n")
+cat("Max structural length L_i =", L.i, "cm\n")
+cat("Max wet weight Ww_i =", round(Ww.i, 1), "g\n")
+cat("Age at puberty a_p =", round(a.p), "days\n")
+cat("Age at 99% of L_i a_99 =", round(a.99), "days\n")
+cat("Max reproduction rate R_i =", round(R.i, 3), "eggs/day\n")
+```
+
+Here are the core DEB parameters (you learned them in the lecture):
+
+```{r core-pars-table, echo=FALSE, results='asis'}
+pars <- data.frame(
+  Parameter = c("Assimilation rate {p_Am}",
+                "Energy conductance v",
+                "Allocation fraction k",
+                "Somatic maintenance [p_M]",
+                "Cost of structure [E_G]",
+                "Maturity at birth E_H^b",
+                "Maturity at puberty E_H^p",
+                "Arrhenius temp. T_A"),
+  Symbol = c("{p_Am}", "v", "k", "[p_M]", "[E_G]", "E_H^b", "E_H^p", "T_A"),
+  Value = c(round(p.Am, 2), round(v, 4), round(kap, 3),
+            round(p.M, 2), round(E.G, 1), round(E.Hb, 1),
+            round(E.Hp, 1), T.A),
+  Unit = c("J cm-2 d-1", "cm d-1", "-", "J cm-3 d-1",
+           "J cm-3", "J", "J", "K")
+)
+knitr::kable(pars)
+```
+
+# Step 2: DEB at constant temperature
+
+Run the DEB model at a constant 25 °C with *ad libitum* food, starting from
+an egg (`start.stage = 0`). This is the classic DEB simulation --- the one that
+produces a von Bertalanffy growth curve.
+
+```{r deb-const, message=FALSE, results='hide'}
+ndays <- 365 * 14         # 14 years
+div <- 1
+Tbs <- rep(25, ndays * div)
+X <- 100                  # J/cm2, high food
+Xs <- rep(X, ndays * div)
+E_sm <- 350
+clutchsize <- 10
+mass.unit <- "g"
+length.unit <- "cm"
+Euler <- 0
+plot <- 0
+start.stage <- 0
+
+deb <- rundeb(species = species, ndays = ndays, div = div,
+              Tbs = Tbs, Xs = Xs, clutchsize = clutchsize,
+              mass.unit = mass.unit, length.unit = length.unit,
+              E_sm = E_sm, start.stage = start.stage,
+              Euler = Euler, plot = plot)
+
+debout <- as.data.frame(deb$debout)
+debpars <- as.data.frame(deb$pars)
+for (i in seq_along(deb$pars)) {
+  assign(names(deb$pars[i]), deb$pars[i])
+}
+```
+
+Now plot the predicted **growth in length**:
+
+```{r plot-growth-length}
+time <- seq(1, ndays) / div
+plot(time, debout$length, type = "l", lwd = 2,
+     xlab = "Age (days)", ylab = "Length (cm)",
+     main = "Growth at 25 °C")
+abline(v = which(debout$E_H > E.Hb)[1] / div, lty = 2, col = "grey")
+abline(v = which(debout$E_H > E.Hp)[1] / div, lty = 2, col = "grey")
+text(0, max(debout$length) * 1.02, "embryo", cex = 0.8)
+text(which(debout$E_H > E.Hp)[1] / div * 0.3,
+     max(debout$length), "juvenile", cex = 0.8)
+text(which(debout$E_H > E.Hp)[1] / div * 1.2,
+     max(debout$length), "adult", cex = 0.8)
+```
+
+And the partitioning of **mass** into structure, reserve, reproduction buffer
+and gut contents:
+
+```{r plot-growth-mass}
+plot(time, debout$V, type = "l", lwd = 2, col = "darkgreen",
+     ylim = c(0, max(debout$wetmass)),
+     xlab = "Age (days)", ylab = "Wet mass (g)",
+     main = "Mass partitioning at 25 °C")
+lines(time, debout$V + debout$wetstorage + debout$wetgonad + debout$wetgut,
+      lwd = 2, col = "pink")
+lines(time, debout$V + debout$wetstorage + debout$wetgut,
+      lwd = 2, col = "brown")
+lines(time, debout$V + debout$wetstorage, lwd = 2, col = "grey")
+abline(v = which(debout$E_H > E.Hb)[1] / div, lty = 2, col = "grey")
+abline(v = which(debout$E_H > E.Hp)[1] / div, lty = 2, col = "grey")
+legend("topleft",
+       c("repro. buffer", "food in gut", "reserve", "structure"),
+       lty = 1, col = c("pink", "brown", "grey", "darkgreen"), cex = 0.8)
+```
+
+> Notice how the embryo starts as mostly reserve (the yolk). After birth,
+> the reserve density stabilises and growth follows von Bertalanffy dynamics.
+> Once puberty is reached, the reproduction buffer begins to accumulate.
+
+Record the key life-history predictions:
+
+```{r lh-table, echo=FALSE, results='asis'}
+birth_day <- which(debout$E_H > E.Hb)[1] / div
+puberty_day <- which(debout$E_H > E.Hp)[1] / div
+final_length <- tail(debout$length, 1)
+final_mass <- tail(debout$wetmass, 1)
+
+lh <- data.frame(
+  Trait = c("Age at birth (days)", "Age at puberty (days)",
+            "Length at 14 yr (cm)", "Mass at 14 yr (g)"),
+  Value = c(round(birth_day), round(puberty_day),
+            round(final_length, 1), round(final_mass, 1))
+)
+knitr::kable(lh)
+```
+
+# Step 3: Microclimate at the three sites
+
+As in Practical 3, run the microclimate model for each elevation.
+We obtain one year of hourly data and then repeat it 14 times for the
+long-term DEB simulation.
+
+```{r micro-runs, message=FALSE, results='hide'}
+# nyears_micro <- 5
+
+mic_jer <- micro_global(loc = c(jer_lon, jer_lat),
+                        elev = jer_elev, timeinterval = 365, nyears=12)
+mic_cal <- micro_global(loc = c(cal_lon, cal_lat),
+                        elev = cal_elev, timeinterval = 365, nyears=12)
+mic_paz <- micro_global(loc = c(paz_lon, paz_lat),
+                        elev = paz_elev, timeinterval = 365, nyears=12)
+
+# # Repeat microclimate data to cover the full simulation period
+# rep_micro <- function(micro, n) {
+#   for (nm in names(micro)) {
+#     if (is.data.frame(micro[[nm]]) && nrow(micro[[nm]]) == 8760) {
+#       micro[[nm]] <- micro[[nm]][rep(seq_len(8760), n), ]
+#     } else if (is.vector(micro[[nm]]) && length(micro[[nm]]) == 8760) {
+#       micro[[nm]] <- rep(micro[[nm]], n)
+#     } else if (is.vector(micro[[nm]]) && length(micro[[nm]]) == 365) {
+#       micro[[nm]] <- rep(micro[[nm]], n)
+#     }
+#   }
+#   micro$ndays <- 365 * n
+#   micro$nyears <- n
+#   micro$timeinterval <- 365 * n
+#   micro
+# }
+#
+# mic_jer <- rep_micro(mic_jer, nyears_micro)
+# mic_cal <- rep_micro(mic_cal, nyears_micro)
+# mic_paz <- rep_micro(mic_paz, nyears_micro)
+```
+
+Plot the air temperature at local height for the first three days:
+
+```{r plot-micro}
+par(mfrow = c(1, 1))
+plot(mic_jer$metout[1:72, "TALOC"], type = "l", col = "red", lwd = 1.5,
+     ylim = c(0, 35), xlab = "Hour", ylab = "Temperature (°C)",
+     main = "Air temperature at local height (first 3 days)")
+lines(mic_cal$metout[1:72, "TALOC"], col = "blue", lwd = 1.5)
+lines(mic_paz$metout[1:72, "TALOC"], col = "forestgreen", lwd = 1.5)
+legend("topright",
+       legend = c("Jerusalem (2278 m)", "Calacalí (2950 m)",
+                  "La Paz (3100 m)"),
+       col = c("red", "blue", "forestgreen"), lty = 1, lwd = 1.5)
+```
+
+> The temperature gradient is the same environmental driver you worked with
+> in Practical 3. This time, instead of predicting body temperature alone,
+> we will predict how this gradient shapes growth and reproduction.
+
+# Step 4: Coupled DEB + ectotherm model
+
+Now we link the DEB model to the biophysical ectotherm model. The
+ectotherm model provides the **body temperature** (via heat-balance
+calculations with behaviour), which feeds into the **Arrhenius temperature
+correction** of the DEB rates. The DEB model, in turn, provides the
+**size-dependent** heat and mass exchange --- a feedback loop.
+
+First, define the morphological, behavioural, and thermal parameters.
+These are approximate for *T. teguixin* (a large tropical heliotherm).
+
+```{r ecto-params}
+# Morphology
+shape <- 3        # lizard shape
+alpha_min <- 0.85
+alpha_max <- 0.85
+pct_wet <- 0.2
+
+# Burrowing & behaviour
+mindepth <- 2
+maxdepth <- 10
+shade_seek <- 1
+burrow <- 1
+climb <- 0
+nocturn <- 0
+crepus <- 0
+diurn <- 1
+
+# Thermal biology (approximate for T. teguixin)
+T_pref  <- 35
+CT_max  <- 42
+CT_min  <- 10
+T_F_min <- 28
+T_F_max <- 37
+T_B_min <- 20
+T_RB_min <- 18
+```
+
+Prepare the DEB state to start from a hatchling (so we skip the long
+embryonic development):
+
+```{r deb-init}
+V_init <- L.b^3
+E_init <- E.m
+E_H_init <- E.Hb
+stage <- 1
+
+# Missing temperature-response parameters
+if (!exists("T.L"))  T.L  <- CT_min + 273.15
+if (!exists("T.H"))  T.H  <- CT_max + 273.15
+if (!exists("T.AL")) T.AL <- 5e4
+if (!exists("T.AH")) T.AH <- 9e4
+
+# Shape coefficient (not in allStat for this species)
+del.M <- 0.2
+
+# Reproduction mode --- T. teguixin is oviparous (egg-layer)
+viviparous <- 0
+photostart <- 3    # winter solstice
+photofinish <- 2   # autumnal equinox
+```
+
+Now run the coupled model at **Jerusalem RP** (low elevation):
+
+```{r ecto-jer, message=FALSE, results='hide', warning=FALSE}
+micro <- mic_jer
+
+ecto_jer <- ectotherm(
+  DEB = 1, viviparous = viviparous,
+  clutchsize = clutchsize, z.mult = 1,
+  # Morphology & behaviour
+  shape = shape, alpha_max = alpha_max, alpha_min = alpha_min,
+  pct_wet = pct_wet, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus,
+  # Thermal biology
+  T_F_max = T_F_max, T_F_min = T_F_min,
+  T_B_min = T_B_min, T_RB_min = T_RB_min,
+  CT_max = CT_max, CT_min = CT_min, T_pref = T_pref,
+  # DEB parameters from allStat
+  z = z, del_M = del.M, p_Xm = p.Xm, kap_X = kap.X,
+  v = v / 24, kap = kap, p_M = p.M / 24, E_G = E.G,
+  kap_R = kap.R, k_J = k.J / 24,
+  E_Hb = E.Hb, E_Hj = E.Hj, E_Hp = E.Hp, E_He = E.He,
+  h_a = h.a / (24^2), s_G = s.G,
+  T_REF = T.ref, T_A = T.A,
+  T_AL = T.AL, T_AH = T.AH, T_L = T.L, T_H = T.H,
+  E_0 = E.0, f = f,
+  d_V = d.V, d_E = d.E, d_Egg = d.E,
+  mu_X = mu.X, mu_E = mu.E, mu_V = mu.V, mu_P = mu.P,
+  kap_X_P = kap.P,
+  n_X = c(n.CX, n.HX, n.OX, n.NX),
+  n_E = c(n.CE, n.HE, n.OE, n.NE),
+  n_V = c(n.CV, n.HV, n.OV, n.NV),
+  n_P = c(n.CP, n.HP, n.OP, n.NP),
+  n_M_nitro = c(n.CN, n.HN, n.ON, n.NN),
+  L_b = L.b,
+  # Initial state (hatchling)
+  V_init = V_init, E_init = E_init,
+  E_H_init = E_H_init, stage = stage,
+  # Reproduction
+  photostart = photostart, photofinish = photofinish
+)
+
+deb_jer <- as.data.frame(ecto_jer$debout)
+```
+
+**Note:** The coupled model's DEB output uses different column names than
+`rundeb()`. The key columns are:
+
+- `L_W` --- physical length (cm)
+- `WETMASS` --- total wet mass (g)
+- `WETGONAD` --- reproduction buffer (g)
+- `WETGUT` --- gut contents (g)
+- `E_R` --- reproduction buffer energy (J)
+- `E_H` --- maturity energy (J)
+
+And at **Calacalí** (mid elevation):
+
+```{r ecto-cal, message=FALSE, results='hide', warning=FALSE}
+micro <- mic_cal
+
+ecto_cal <- ectotherm(
+  DEB = 1, viviparous = viviparous,
+  clutchsize = clutchsize, z.mult = 1,
+  shape = shape, alpha_max = alpha_max, alpha_min = alpha_min,
+  pct_wet = pct_wet, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus,
+  T_F_max = T_F_max, T_F_min = T_F_min,
+  T_B_min = T_B_min, T_RB_min = T_RB_min,
+  CT_max = CT_max, CT_min = CT_min, T_pref = T_pref,
+  z = z, del_M = del.M, p_Xm = p.Xm, kap_X = kap.X,
+  v = v / 24, kap = kap, p_M = p.M / 24, E_G = E.G,
+  kap_R = kap.R, k_J = k.J / 24,
+  E_Hb = E.Hb, E_Hj = E.Hj, E_Hp = E.Hp, E_He = E.He,
+  h_a = h.a / (24^2), s_G = s.G,
+  T_REF = T.ref, T_A = T.A,
+  T_AL = T.AL, T_AH = T.AH, T_L = T.L, T_H = T.H,
+  E_0 = E.0, f = f,
+  d_V = d.V, d_E = d.E, d_Egg = d.E,
+  mu_X = mu.X, mu_E = mu.E, mu_V = mu.V, mu_P = mu.P,
+  kap_X_P = kap.P,
+  n_X = c(n.CX, n.HX, n.OX, n.NX),
+  n_E = c(n.CE, n.HE, n.OE, n.NE),
+  n_V = c(n.CV, n.HV, n.OV, n.NV),
+  n_P = c(n.CP, n.HP, n.OP, n.NP),
+  n_M_nitro = c(n.CN, n.HN, n.ON, n.NN),
+  L_b = L.b,
+  V_init = V_init, E_init = E_init,
+  E_H_init = E_H_init, stage = stage,
+  photostart = photostart, photofinish = photofinish
+)
+
+deb_cal <- as.data.frame(ecto_cal$debout)
+```
+
+And at **La Paz** (high elevation):
+
+```{r ecto-paz, message=FALSE, results='hide', warning=FALSE}
+micro <- mic_paz
+
+ecto_paz <- ectotherm(
+  DEB = 1, viviparous = viviparous,
+  clutchsize = clutchsize, z.mult = 1,
+  shape = shape, alpha_max = alpha_max, alpha_min = alpha_min,
+  pct_wet = pct_wet, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus,
+  T_F_max = T_F_max, T_F_min = T_F_min,
+  T_B_min = T_B_min, T_RB_min = T_RB_min,
+  CT_max = CT_max, CT_min = CT_min, T_pref = T_pref,
+  z = z, del_M = del.M, p_Xm = p.Xm, kap_X = kap.X,
+  v = v / 24, kap = kap, p_M = p.M / 24, E_G = E.G,
+  kap_R = kap.R, k_J = k.J / 24,
+  E_Hb = E.Hb, E_Hj = E.Hj, E_Hp = E.Hp, E_He = E.He,
+  h_a = h.a / (24^2), s_G = s.G,
+  T_REF = T.ref, T_A = T.A,
+  T_AL = T.AL, T_AH = T.AH, T_L = T.L, T_H = T.H,
+  E_0 = E.0, f = f,
+  d_V = d.V, d_E = d.E, d_Egg = d.E,
+  mu_X = mu.X, mu_E = mu.E, mu_V = mu.V, mu_P = mu.P,
+  kap_X_P = kap.P,
+  n_X = c(n.CX, n.HX, n.OX, n.NX),
+  n_E = c(n.CE, n.HE, n.OE, n.NE),
+  n_V = c(n.CV, n.HV, n.OV, n.NV),
+  n_P = c(n.CP, n.HP, n.OP, n.NP),
+  n_M_nitro = c(n.CN, n.HN, n.ON, n.NN),
+  L_b = L.b,
+  V_init = V_init, E_init = E_init,
+  E_H_init = E_H_init, stage = stage,
+  photostart = photostart, photofinish = photofinish
+)
+
+deb_paz <- as.data.frame(ecto_paz$debout)
+```
+
+# Step 5: Life history across elevation
+
+Now compare the DEB outputs at the three sites. First, the body temperature
+that the lizards actually experience:
+
+```{r tc-compare}
+env_jer <- as.data.frame(ecto_jer$environ)
+env_cal <- as.data.frame(ecto_cal$environ)
+env_paz <- as.data.frame(ecto_paz$environ)
+
+par(mfrow = c(1, 1))
+plot(env_jer$TC[1:(365 * 24)], type = "l", col = "red", lwd = 1,
+     ylim = c(-5, 45), xlab = "Hour of year", ylab = "T_b (°C)",
+     main = "Body temperature at three elevations")
+lines(env_cal$TC[1:(365 * 24)], col = "blue", lwd = 1)
+lines(env_paz$TC[1:(365 * 24)], col = "forestgreen", lwd = 1)
+legend("topright",
+       legend = c("Jerusalem (2278 m)", "Calacalí (2950 m)",
+                  "La Paz (3100 m)"),
+       col = c("red", "blue", "forestgreen"), lty = 1, lwd = 1.5)
+```
+
+Next, the **physical length** (`L_W`) through time:
+
+```{r length-compare}
+time_hr <- seq_len(nrow(deb_jer)) / 24  # hours $\rightarrow$ days
+
+plot(time_hr, deb_jer$L_W, type = "l", col = "red", lwd = 2,
+     ylim = c(0, max(deb_jer$L_W)),
+     xlab = "Age (days)", ylab = "Length (cm)",
+     main = "Growth across elevation")
+lines(time_hr, deb_cal$L_W, col = "blue", lwd = 2)
+lines(time_hr, deb_paz$L_W, col = "forestgreen", lwd = 2)
+legend("topleft",
+       legend = c("Jerusalem (2278 m)", "Calacalí (2950 m)",
+                  "La Paz (3100 m)"),
+       col = c("red", "blue", "forestgreen"), lty = 1, lwd = 1.5)
+```
+
+And the **wet mass** (`WETMASS`):
+
+```{r mass-compare}
+plot(time_hr, deb_jer$WETMASS, type = "l", col = "red", lwd = 2,
+     ylim = c(0, max(deb_jer$WETMASS)),
+     xlab = "Age (days)", ylab = "Wet mass (g)",
+     main = "Mass growth across elevation")
+lines(time_hr, deb_cal$WETMASS, col = "blue", lwd = 2)
+lines(time_hr, deb_paz$WETMASS, col = "forestgreen", lwd = 2)
+legend("topleft",
+       legend = c("Jerusalem (2278 m)", "Calacalí (2950 m)",
+                  "La Paz (3100 m)"),
+       col = c("red", "blue", "forestgreen"), lty = 1, lwd = 1.5)
+```
+
+The **reproduction buffer** (`E_R`, in Joules) --- how much energy is
+allocated to egg production:
+
+```{r repro-compare}
+plot(time_hr, deb_jer$E_R, type = "l", col = "red", lwd = 2,
+     xlab = "Age (days)", ylab = "Reproduction buffer (J)",
+     main = "Reproductive investment across elevation")
+lines(time_hr, deb_cal$E_R, col = "blue", lwd = 2)
+lines(time_hr, deb_paz$E_R, col = "forestgreen", lwd = 2)
+legend("topleft",
+       legend = c("Jerusalem (2278 m)", "Calacalí (2950 m)",
+                  "La Paz (3100 m)"),
+       col = c("red", "blue", "forestgreen"), lty = 1, lwd = 1.5)
+```
+
+> Drops in the reproduction buffer indicate egg-laying events. The steeper
+> the rise, the faster the animal accumulates energy for reproduction.
+
+Record the summary at the end of the simulation:
+
+```{r summary-table, echo=FALSE, results='asis'}
+final <- data.frame(
+  Site = c("Jerusalem", "Calacalí", "La Paz"),
+  Elevation_m = c(2278, 2950, 3100),
+  Length_cm = round(c(tail(deb_jer$L_W, 1),
+                      tail(deb_cal$L_W, 1),
+                      tail(deb_paz$L_W, 1)), 2),
+  Mass_g = round(c(tail(deb_jer$WETMASS, 1),
+                   tail(deb_cal$WETMASS, 1),
+                   tail(deb_paz$WETMASS, 1)), 1),
+  Repro_buf_J = round(c(tail(deb_jer$E_R, 1),
+                        tail(deb_cal$E_R, 1),
+                        tail(deb_paz$E_R, 1)), 0)
+)
+knitr::kable(final)
+```
+
+> **Question:** Which elevation produces the largest tegu --- and the highest
+> reproductive investment? Relate this to the temperature dependence of DEB
+> rates (the Arrhenius correction you learned in the lecture). How does the
+> cooler high-elevation site affect the balance between assimilation,
+> maintenance, and growth?
+
+# Challenges
+
+Try to answer each challenge yourself first --- the code scaffolding is
+provided. Solutions are given afterwards.
+
+---
+
+## Challenge 1: Temperature sensitivity of growth
+
+Run the stand-alone DEB model (`rundeb()`) at four constant temperatures:
+20, 25, 30 and 35 °C. Plot the growth curves (length vs age) on the same
+axes. How does temperature affect the asymptotic length and the growth rate?
+
+```{r challenge1, message=FALSE, results='hide'}
+# Your code here
+temps <- c(20, 25, 30, 35)
+# ...
+```
+
+```{r challenge1-sol}
+# --- SOLUTION Challenge 1 ---
+# Run DEB at several constant temperatures
+deb_list <- list()
+for (i in seq_along(temps)) {
+  Tbs_tmp <- rep(temps[i], ndays * div)
+  deb_tmp <- rundeb(species = species, ndays = ndays, div = div,
+                    Tbs = Tbs_tmp, Xs = Xs,
+                    clutchsize = clutchsize,
+                    mass.unit = mass.unit, length.unit = length.unit,
+                    E_sm = E_sm, start.stage = start.stage,
+                    Euler = Euler, plot = 0)
+  deb_list[[i]] <- as.data.frame(deb_tmp$debout)
+}
+
+# Plot growth curves
+plot(time, deb_list[[1]]$length, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, max(deb_list[[4]]$length)),
+     xlab = "Age (days)", ylab = "Length (cm)",
+     main = "Growth at different temperatures")
+for (i in 2:length(temps)) {
+  lines(time, deb_list[[i]]$length, col = i + 1, lwd = 2)
+}
+legend("topleft", legend = paste0(temps, " °C"),
+       col = 2:5, lty = 1, lwd = 2)
+
+# Summary
+for (i in seq_along(temps)) {
+  cat(temps[i], "°C: final length =",
+      round(tail(deb_list[[i]]$length, 1), 2), "cm,",
+      "final mass =", round(tail(deb_list[[i]]$wetmass, 1), 1), "g\n")
+}
+```
+
+**Expected insight:** Higher temperature raises the assimilation and
+maintenance rates via Arrhenius. Growth is faster (steeper slope), but
+asymptotic length may be slightly smaller at very high temperatures because
+maintenance costs increase faster than assimilation (the temperature
+dependence of $[p_M]$ and $\{p_{Am}\}$ differs).
+
+---
+
+## Challenge 2: Food limitation
+
+Reduce food density from $X = 100$ to $X = 10$ J/cm2. How does food
+availability affect growth, reserve, and reproduction? Run `rundeb()`
+at 25 °C with both food levels and compare.
+
+```{r challenge2, message=FALSE, results='hide'}
+# Your code here
+```
+
+```{r challenge2-sol}
+# --- SOLUTION Challenge 2 ---
+Xs_low <- rep(10, ndays * div)
+
+deb_high <- rundeb(species = species, ndays = ndays, div = div,
+                   Tbs = Tbs, Xs = Xs,
+                   clutchsize = clutchsize,
+                   mass.unit = mass.unit, length.unit = length.unit,
+                   E_sm = E_sm, start.stage = start.stage,
+                   Euler = Euler, plot = 0)
+deb_low <- rundeb(species = species, ndays = ndays, div = div,
+                  Tbs = Tbs, Xs = Xs_low,
+                  clutchsize = clutchsize,
+                  mass.unit = mass.unit, length.unit = length.unit,
+                  E_sm = E_sm, start.stage = start.stage,
+                  Euler = Euler, plot = 0)
+
+dh <- as.data.frame(deb_high$debout)
+dl <- as.data.frame(deb_low$debout)
+
+par(mfrow = c(1, 2))
+plot(time, dh$length, type = "l", col = "darkgreen", lwd = 2,
+     ylim = c(0, max(dh$length)),
+     xlab = "Age (days)", ylab = "Length (cm)",
+     main = "Growth: high vs low food")
+lines(time, dl$length, col = "red", lwd = 2)
+legend("topleft", legend = c("X = 100", "X = 10"),
+       col = c("darkgreen", "red"), lty = 1, lwd = 2)
+
+plot(time, dh$fecundity, type = "l", col = "darkgreen", lwd = 2,
+     xlab = "Age (days)", ylab = "Cumulative eggs",
+     main = "Reproduction: high vs low food")
+lines(time, dl$fecundity, col = "red", lwd = 2)
+legend("topleft", legend = c("X = 100", "X = 10"),
+       col = c("darkgreen", "red"), lty = 1, lwd = 2)
+```
+
+**Expected insight:** Lower food reduces the assimilation flux, so reserve
+density drops, growth slows, asymptotic size is smaller, and reproduction
+may be zero (the animal never accumulates enough energy to reproduce).
+
+---
+
+## Challenge 3: +3 °C warming at the low site
+
+As in Practical 3, add 3 °C to the microclimate at Jerusalem RP and re-run
+the coupled DEB+ectotherm model. Compare growth and reproduction with the
+current-climate run.
+
+```{r challenge3, message=FALSE, results='hide'}
+# Your code here
+```
+
+```{r challenge3-sol}
+# --- SOLUTION Challenge 3 ---
+# Re-run microclimate with +3°C warming
+mic_jer_warm <- micro_global(loc = c(jer_lon, jer_lat),
+  elev = jer_elev, timeinterval = 365, nyears = 12, warm = 3)
+
+micro <- mic_jer_warm
+ecto_jer_warm <- ectotherm(
+  DEB = 1, viviparous = viviparous,
+  clutchsize = clutchsize, z.mult = 1,
+  shape = shape, alpha_max = alpha_max, alpha_min = alpha_min,
+  pct_wet = pct_wet, mindepth = mindepth, maxdepth = maxdepth,
+  shade_seek = shade_seek, burrow = burrow, climb = climb,
+  nocturn = nocturn, diurn = diurn, crepus = crepus,
+  T_F_max = T_F_max, T_F_min = T_F_min,
+  T_B_min = T_B_min, T_RB_min = T_RB_min,
+  CT_max = CT_max, CT_min = CT_min, T_pref = T_pref,
+  z = z, del_M = del.M, p_Xm = p.Xm, kap_X = kap.X,
+  v = v / 24, kap = kap, p_M = p.M / 24, E_G = E.G,
+  kap_R = kap.R, k_J = k.J / 24,
+  E_Hb = E.Hb, E_Hj = E.Hj, E_Hp = E.Hp, E_He = E.He,
+  h_a = h.a / (24^2), s_G = s.G,
+  T_REF = T.ref, T_A = T.A,
+  T_AL = T.AL, T_AH = T.AH, T_L = T.L, T_H = T.H,
+  E_0 = E.0, f = f,
+  d_V = d.V, d_E = d.E, d_Egg = d.E,
+  mu_X = mu.X, mu_E = mu.E, mu_V = mu.V, mu_P = mu.P,
+  kap_X_P = kap.P,
+  n_X = c(n.CX, n.HX, n.OX, n.NX),
+  n_E = c(n.CE, n.HE, n.OE, n.NE),
+  n_V = c(n.CV, n.HV, n.OV, n.NV),
+  n_P = c(n.CP, n.HP, n.OP, n.NP),
+  n_M_nitro = c(n.CN, n.HN, n.ON, n.NN),
+  L_b = L.b,
+  V_init = V_init, E_init = E_init,
+  E_H_init = E_H_init, stage = stage,
+  photostart = photostart, photofinish = photofinish
+)
+
+deb_jer_warm <- as.data.frame(ecto_jer_warm$debout)
+
+par(mfrow = c(1, 2))
+plot(time_hr, deb_jer$L_W, type = "l", col = "blue", lwd = 2,
+     ylim = c(0, max(deb_jer_warm$L_W)),
+     xlab = "Age (days)", ylab = "Length (cm)",
+     main = "Growth: current vs +3 °C")
+lines(time_hr, deb_jer_warm$L_W, col = "red", lwd = 2)
+legend("topleft", legend = c("Current", "+3 °C"),
+       col = c("blue", "red"), lty = 1, lwd = 2)
+
+plot(time_hr, deb_jer$E_R, type = "l", col = "blue", lwd = 2,
+     xlab = "Age (days)", ylab = "Reproduction buffer (J)",
+     main = "Repro. investment: current vs +3 °C")
+lines(time_hr, deb_jer_warm$E_R, col = "red", lwd = 2)
+legend("topleft", legend = c("Current", "+3 °C"),
+       col = c("blue", "red"), lty = 1, lwd = 2)
+```
+
+**Expected insight:** Moderate warming accelerates DEB rates --- growth may
+initially be faster, but higher maintenance costs could reduce ultimate size
+and reproduction. At some point (if Tb exceeds the upper thermal limit),
+growth would cease.
+
+---
+
+## Challenge 4: Compare with *Iguana iguana*
+
+The AmP database also has the Green Iguana (*Iguana iguana*). Get its DEB
+parameters, run `rundeb()` at 30 °C, and compare the growth trajectories of
+these two large tropical lizards.
+
+```{r challenge4, message=FALSE, results='hide'}
+# Your code here
+```
+
+```{r challenge4-sol}
+# --- SOLUTION Challenge 4 ---
+iguana <- "Iguana.iguana"
+iguana.slot <- which(allDEB.species == iguana)
+
+igu_par.names <- unlist(labels(allStat$allStat[[iguana.slot]]))
+for (i in seq_along(igu_par.names)) {
+  assign(paste0("igu_", igu_par.names[i]),
+         unlist(allStat$allStat[[iguana.slot]][i]))
+}
+
+# Set up simulation at 30 °C
+Tbs_30 <- rep(30, ndays * div)
+igu_Xs <- rep(100, ndays * div)
+
+deb_igu <- rundeb(species = iguana, ndays = ndays, div = div,
+                  Tbs = Tbs_30, Xs = igu_Xs,
+                  clutchsize = 10,
+                  mass.unit = mass.unit, length.unit = length.unit,
+                  E_sm = E_sm, start.stage = 0,
+                  Euler = Euler, plot = 0)
+
+di <- as.data.frame(deb_igu$debout)
+
+# Re-run T. teguixin at 30 °C for fair comparison
+Tbs_30 <- rep(30, ndays * div)
+deb_teg <- rundeb(species = species, ndays = ndays, div = div,
+                  Tbs = Tbs_30, Xs = Xs,
+                  clutchsize = 10,
+                  mass.unit = mass.unit, length.unit = length.unit,
+                  E_sm = E_sm, start.stage = 0,
+                  Euler = Euler, plot = 0)
+dt <- as.data.frame(deb_teg$debout)
+
+plot(time, dt$length, type = "l", col = "goldenrod", lwd = 3,
+     ylim = c(0, max(di$length)),
+     xlab = "Age (days)", ylab = "Length (cm)",
+     main = "T. teguixin vs I. iguana at 30 °C")
+lines(time, di$length, col = "forestgreen", lwd = 3)
+legend("topleft",
+       legend = c("Tupinambis teguixin", "Iguana iguana"),
+       col = c("goldenrod", "forestgreen"), lty = 1, lwd = 2)
+
+cat("T. teguixin final length:", round(tail(dt$length, 1), 1), "cm\n")
+cat("I. iguana  final length:", round(tail(di$length, 1), 1), "cm\n")
+cat("T. teguixin final mass:", round(tail(dt$wetmass, 1), 1), "g\n")
+cat("I. iguana  final mass:", round(tail(di$wetmass, 1), 1), "g\n")
+```
+
+**Expected insight:** The two species have different DEB parameters
+(zoom factor, $p_{Am}$, $E_G$, etc.), reflecting their different life
+histories. Which one grows faster? Which one reaches larger size? How
+do the differences relate to their ecologies (arboreal vs terrestrial)?
+
+---
+
+# Summary
+
+In this practical you have:
+
+1. **Extracted DEB parameters** for *T. teguixin* from the AmP database.
+2. **Run the DEB model stand-alone** to predict growth, reserve, and
+   reproduction at constant temperature.
+3. **Coupled DEB with the ectotherm model** to simulate life-history
+   trajectories under realistic microclimates at three elevations.
+4. **Compared life-history outcomes** across an elevation gradient.
+5. **Explored sensitivity** to temperature, food, and warming scenarios.
+
+DEB theory provides a **mechanistic link** between environment and
+life history that static energy budgets cannot. The same core equations
+($\kappa$-rule, reserve dynamics, Arrhenius correction) apply across the
+animal kingdom --- from zooplankton to whales.
+
+# References
+
+Kooijman, S. A. L. M. (2010). *Dynamic Energy Budget Theory for Metabolic
+Organisation*. Cambridge University Press.
+
+Marques, G. M. et al. (2018). The AmP project: comparing species on the
+basis of dynamic energy budget parameters. *PLOS Computational Biology*.
+
+Kearney, M. R. & Porter, W. P. (2019). NicheMapR -- an R package for
+biophysical modelling: the ectotherm and DEB models. *Ecography*.

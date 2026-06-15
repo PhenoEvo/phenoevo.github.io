@@ -1,0 +1,739 @@
+---
+title: "Practical 4: Behavioural thermoregulation with ectoR_devel"
+author: "Urtzi Enriquez-Urzelai"
+date: "`r Sys.Date()`"
+output:
+  bookdown::pdf_document2:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 5)
+```
+
+# Introduction
+
+The `ectoR_devel` function solves the steady-state energy balance for a single set of environmental conditions. Real animals, however, *behave* — they move between sun and shade, change posture, or retreat to water to control their body temperature.
+
+In this practical you will **wrap `ectoR_devel` in a time loop** and add state-dependent behavioural rules. You will compare two thermoregulatory strategies:
+
+| Strategy | Animal | Mechanism |
+|----------|--------|-----------|
+| **Shade-seeking** | Lizard | Move from sun to shade as body temperature rises |
+| **Water immersion** | Frog | Jump into cool water when too hot, return when cooled |
+
+# Setup
+
+```{r setup-load, message=FALSE}
+library(NicheMapR)
+```
+
+Define species parameters and thermal thresholds:
+
+```{r species-params}
+# Shared
+Ww_g <- 40
+alpha <- 0.85
+
+# Lizard — dry skin, reptile geometry
+liz_wet <- 5           # pct_wet (%)
+liz_shape <- 3          # lizard allometric
+liz_Tpref <- 34         # preferred body temperature (°C)
+liz_CTmax <- 42         # critical thermal maximum (°C)
+
+# Frog — moister skin, amphibian geometry
+frog_wet <- 70          # pct_wet (%)
+frog_shape <- 4         # frog allometric
+frog_Tpref <- 26        # preferred body temperature (°C)
+frog_CTmax <- 38        # critical thermal maximum (°C)
+
+# Water temperature for frog refuge
+T_water <- 20           # °C
+```
+
+---
+
+# Synthetic diel microclimate
+
+We need a full 24-hour cycle of environmental conditions. The simple models below capture the essential daily rhythm:
+
+```{r microclimate-gen}
+hour <- 0:23   # 0 = midnight
+
+# Solar radiation (W/m²) — bell curve from 06:00 to 18:00
+QSOLR <- ifelse(hour >= 6 & hour <= 18,
+  1000 * sin(pi * (hour - 6) / 12), 0)
+
+# Zenith angle (°) — 90° at horizon, ~10° at noon
+Z <- ifelse(hour >= 6 & hour <= 18,
+  90 - 80 * sin(pi * (hour - 6) / 12), 90)
+
+# Air temperature (°C) — max 30 at 14:00, min 18 at 02:00
+TA <- 24 + 6 * cos(2 * pi * (hour - 14) / 24)
+
+# Ground temperature (°C)
+TGRD <- TA + 2 * sin(pi * (hour - 8) / 14)
+TSUBST <- TGRD
+
+# Other variables (constant for simplicity)
+TSKY <- rep(-5, 24)     # sky temperature (°C)
+RH <- rep(60, 24)       # relative humidity (%)
+VEL <- rep(1, 24)       # wind speed (m/s)
+```
+
+Plot the diel cycle:
+
+```{r plot-micro, message=FALSE}
+par(mfrow = c(3, 2))
+plot(hour, QSOLR, type = "l", lwd = 2, col = "gold3",
+  xlab = "Hour", ylab = expression("QSOLR (W/m"^2 * ")"))
+plot(hour, Z, type = "l", lwd = 2, col = "skyblue",
+  xlab = "Hour", ylab = "Zenith angle (°)")
+plot(hour, TA, type = "l", lwd = 2, col = "firebrick",
+  xlab = "Hour", ylab = "TA (°C)", ylim = range(c(TA, TGRD)))
+lines(hour, TGRD, lwd = 2, col = "sienna")
+legend("topright", legend = c("TA", "TGRD"), col = c("firebrick", "sienna"),
+  lty = 1, lwd = 2)
+plot(hour, TSKY, type = "l", lwd = 2, col = "purple",
+  xlab = "Hour", ylab = "TSKY (°C)")
+plot(hour, RH, type = "l", lwd = 2, col = "steelblue",
+  xlab = "Hour", ylab = "RH (%)", ylim = c(0, 100))
+plot(hour, VEL, type = "l", lwd = 2, col = "darkgreen",
+  xlab = "Hour", ylab = "VEL (m/s)", ylim = c(0, 2))
+```
+
+# Null model -- no behaviour
+
+What happens if the animal does nothing at all? Loop over the 24 hours and call `ectoR_devel` with fixed parameters (full sun, no shade):
+
+```{r null-model, message=FALSE}
+tc_null <- numeric(24)
+
+for (h in 1:24) {
+  tc_null[h] <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+    pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+    TSKY = TSKY[h], VEL = VEL[h], RH = RH[h], QSOLR = QSOLR[h],
+    Z = Z[h], SHADE = 0)$TC
+}
+```
+
+```{r plot-null, message=FALSE}
+plot(hour, tc_null, type = "o", pch = 16, lwd = 2, col = "grey40",
+  xlab = "Hour", ylab = "Body temperature (°C)",
+  main = "Null model -- no behaviour")
+abline(h = liz_CTmax, lty = 2, col = "red")
+abline(h = frog_CTmax, lty = 2, col = "blue")
+text(0, liz_CTmax + 1, "Lizard CTmax", col = "red", cex = 0.7)
+text(0, frog_CTmax + 1, "Frog CTmax", col = "blue", cex = 0.7)
+```
+
+Without any behaviour, both species would overheat and die. The null model reaches `r round(max(tc_null), 1)` °C — far above both CTmax values.
+
+# Lizard — shade-seeking behaviour
+
+The lizard thermoregulates by moving between sun and shade. At each hour, the model **tries full sun first**, and if the resulting body temperature exceeds the threshold, it seeks shade (or retreats to a burrow).
+
+```{r lizard-model, message=FALSE}
+tc_liz <- numeric(24)
+shade_liz <- integer(24)
+
+for (h in 1:24) {
+  if (QSOLR[h] == 0) {
+    # Night: shelter (full shade, still air)
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 0.3, RH = RH[h], QSOLR = 0, Z = 90,
+      SHADE = 100)
+    tc_liz[h] <- out$TC; shade_liz[h] <- 100
+    next
+  }
+
+  # Try basking in full sun
+  out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+    pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+    TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+    Z = Z[h], SHADE = 0)
+
+  if (out$TC > 42) {
+    # Dangerously hot → retreat to burrow
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 0.3, RH = RH[h], QSOLR = QSOLR[h],
+      Z = Z[h], SHADE = 99)
+    sh <- 99
+  } else if (out$TC > 38) {
+    # Too warm → seek shade
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+      Z = Z[h], SHADE = 85)
+    sh <- 85
+  } else {
+    sh <- 0   # comfortable in sun
+  }
+
+  tc_liz[h] <- out$TC
+  shade_liz[h] <- sh
+}
+```
+
+```{r plot-lizard, message=FALSE}
+par(mfrow = c(2, 1))
+
+# TC with behaviour overlay
+plot(hour, tc_null, type = "l", lwd = 1.5, col = "grey", lty = 2,
+  xlab = "Hour", ylab = "Body temperature (°C)",
+  main = "Lizard: shade-seeking behaviour",
+  ylim = c(10, 45))
+lines(hour, tc_liz, type = "o", pch = 16, lwd = 2, col = "orange")
+abline(h = liz_CTmax, lty = 2, col = "red")
+abline(h = liz_Tpref, lty = 3, col = "orange")
+legend("topright", legend = c("Null (no behaviour)", "Lizard with behaviour",
+  "Tpref", "CTmax"), col = c("grey", "orange", "orange", "red"),
+  lty = c(2, 1, 3, 2), lwd = c(1.5, 2, 1, 1))
+
+# Shade level
+plot(hour, shade_liz, type = "s", lwd = 2, col = "darkgreen",
+  xlab = "Hour", ylab = "SHADE (%)", main = "Shade used by lizard",
+  ylim = c(0, 100))
+```
+
+The lizard basks in the morning, seeks shade during the hottest hours, and returns to sun in late afternoon. Its body temperature stays well below CTmax ($\max = `r round(max(tc_liz), 1)`$ °C).
+
+## 5. Frog — water immersion behaviour
+
+The frog uses a binary strategy: when it gets too hot on land, it jumps into cool water and cools instantly. Once in water, it stays until the land temperature would be comfortable again.
+
+```{r frog-model, message=FALSE}
+tc_frog <- numeric(24)
+in_water <- logical(24)
+in_water_prev <- FALSE    # track state across hours
+
+for (h in 1:24) {
+  if (QSOLR[h] == 0) {
+    # Night on land
+    out <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+      pct_wet = frog_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = 0, Z = 90,
+      SHADE = 100)
+    tc_frog[h] <- out$TC
+    in_water_prev <- FALSE
+    next
+  }
+
+  # Compute what TC would be on land
+  land <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+    pct_wet = frog_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+    TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+    Z = Z[h], SHADE = 0)
+
+  if (in_water_prev && land$TC < 25) {
+    # Cool enough to return to land
+    tc_frog[h] <- land$TC
+    in_water_prev <- FALSE
+  } else if (in_water_prev || land$TC > 30) {
+    # Stay in or jump to water
+    tc_frog[h] <- T_water
+    in_water_prev <- TRUE
+  } else {
+    tc_frog[h] <- land$TC
+    in_water_prev <- FALSE
+  }
+  in_water[h] <- in_water_prev
+}
+```
+
+```{r plot-frog, message=FALSE}
+par(mfrow = c(2, 1))
+
+# TC with water periods shaded
+plot(hour, tc_null, type = "l", lwd = 1.5, col = "grey", lty = 2,
+  xlab = "Hour", ylab = "Body temperature (°C)",
+  main = "Frog: water-immersion behaviour",
+  ylim = c(10, 45))
+# Shade water periods
+water_idx <- which(in_water)
+if (length(water_idx) > 0) {
+  rect(hour[water_idx] - 0.5, -5, hour[water_idx] + 0.5, 50,
+    col = rgb(0.3, 0.6, 1, 0.2), border = NA)
+}
+lines(hour, tc_frog, type = "o", pch = 16, lwd = 2, col = "dodgerblue")
+abline(h = frog_CTmax, lty = 2, col = "red")
+abline(h = frog_Tpref, lty = 3, col = "dodgerblue")
+abline(h = T_water, lty = 3, col = "cyan")
+legend("topright", legend = c("Null", "Frog with behaviour", "Tpref",
+  "CTmax", "Water"), col = c("grey", "dodgerblue", "dodgerblue", "red",
+  "cyan"), lty = c(2, 1, 3, 2, 3), lwd = c(1.5, 2, 1, 1, 1))
+text(0, T_water - 1, paste("T_water =", T_water), col = "cyan", cex = 0.7)
+
+# Water/land state
+plot(hour, as.integer(in_water), type = "s", lwd = 2, col = "dodgerblue",
+  xlab = "Hour", ylab = "State", main = "Frog: in water?",
+  yaxt = "n", ylim = c(-0.1, 1.1))
+axis(2, at = c(0, 1), labels = c("Land", "Water"))
+```
+
+The frog shows a classic **sawtooth** body temperature pattern: rapid heating on land, then a sharp drop when it jumps into the water refuge. It spends `r sum(in_water)` hours in the water.
+
+# Three-way comparison
+
+```{r comparison, message=FALSE}
+matplot(hour, cbind(tc_null, tc_liz, tc_frog), type = "o", pch = 16,
+  lwd = 2, col = c("grey70", "orange", "dodgerblue"),
+  xlab = "Hour", ylab = "Body temperature (°C)",
+  main = "Comparison: null vs lizard vs frog")
+abline(h = liz_CTmax, lty = 2, col = "red", lwd = 1.5)
+abline(h = frog_CTmax, lty = 2, col = "purple", lwd = 1.5)
+legend("topright", legend = c("Null", "Lizard (shade)", "Frog (water)",
+  "Lizard CTmax", "Frog CTmax"),
+  col = c("grey70", "orange", "dodgerblue", "red", "purple"),
+  lty = c(1, 1, 1, 2, 2), lwd = 2)
+```
+
+Both behavioural strategies keep body temperature within safe limits, but they work very differently. The lizard's shade-seeking produces a smooth diel curve, while the frog's water immersion creates an abrupt sawtooth.
+
+# Real microclimate from NicheMapR
+
+So far we used a synthetic diel cycle. Now let us run `micro_global()` to get a realistic microclimate for Jerusalem RP (the warmest of our sites) and drive the behaviour models with real data.
+
+## Run the microclimate model
+
+```{r run-micro-real, message=FALSE}
+jer_lon <- -78.261458
+jer_lat <- 0.008269
+jer_elev <- 2278
+
+mic <- micro_global(loc = c(jer_lon, jer_lat), elev = jer_elev,
+  timeinterval = 12)
+```
+
+The model extracts 12 days sampled across the year. Let us find the hottest:
+
+```{r find-hottest}
+met <- as.data.frame(mic$metout)
+day_means <- tapply(met$TALOC, met$DOY, mean)
+hot_doy <- as.numeric(names(which.max(day_means)))
+cat("Hottest day of year:", hot_doy, "\n")
+```
+
+## Extract the day's data
+
+```{r extract-day}
+idx <- which(met$DOY == hot_doy)
+hour_real <- met$TIME[idx] / 60
+TA_real <- met$TALOC[idx]
+QSOLR_real <- met$SOLR[idx]
+Z_real <- met$ZEN[idx]
+RH_real <- met$RHLOC[idx]
+VEL_real <- met$VLOC[idx]
+TSKY_real <- met$TSKYC[idx]
+
+# Ground temperature from soil surface
+soil_df <- as.data.frame(mic$soil)
+TGRD_real <- soil_df$D0cm[idx]
+```
+
+Plot the real diel cycle:
+
+```{r plot-real-micro, message=FALSE}
+par(mfrow = c(3, 2))
+plot(hour_real, TA_real, type = "l", lwd = 2, col = "firebrick",
+  xlab = "Hour", ylab = "TA (°C)")
+plot(hour_real, QSOLR_real, type = "l", lwd = 2, col = "gold3",
+  xlab = "Hour", ylab = expression("QSOLR (W/m"^2 * ")"))
+plot(hour_real, Z_real, type = "l", lwd = 2, col = "skyblue",
+  xlab = "Hour", ylab = "Zenith (°)")
+plot(hour_real, TGRD_real, type = "l", lwd = 2, col = "sienna",
+  xlab = "Hour", ylab = "TGRD (°C)")
+plot(hour_real, RH_real, type = "l", lwd = 2, col = "steelblue",
+  xlab = "Hour", ylab = "RH (%)", ylim = c(0, 100))
+plot(hour_real, VEL_real, type = "l", lwd = 2, col = "darkgreen",
+  xlab = "Hour", ylab = "VEL (m/s)")
+```
+
+Compare with the synthetic cycle: real solar radiation peaks at ~540 W/m² (not 1000), and air temperature reaches ~31 °C. The microclimate model accounts for cloud cover, atmospheric scattering, and local topography.
+
+## Lizard behaviour with real microclimate
+
+Run the same shade-seeking logic but with real environmental data:
+
+```{r lizard-real, message=FALSE}
+tc_liz_real <- numeric(24)
+shade_liz_real <- numeric(24)
+
+for (h in 1:24) {
+  if (QSOLR_real[h] == 0) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA_real[h], TGRD = TGRD_real[h],
+      TSUBST = TGRD_real[h], TSKY = TSKY_real[h], VEL = 0.3,
+      RH = RH_real[h], QSOLR = 0, Z = 90, SHADE = 100)
+    tc_liz_real[h] <- out$TC; shade_liz_real[h] <- 100
+    next
+  }
+  out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+    pct_wet = liz_wet, TA = TA_real[h], TGRD = TGRD_real[h],
+    TSUBST = TGRD_real[h], TSKY = TSKY_real[h], VEL = 1,
+    RH = RH_real[h], QSOLR = QSOLR_real[h], Z = Z_real[h], SHADE = 0)
+  if (out$TC > 42) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA_real[h], TGRD = TGRD_real[h],
+      TSUBST = TGRD_real[h], TSKY = TSKY_real[h], VEL = 0.3,
+      RH = RH_real[h], QSOLR = QSOLR_real[h], Z = Z_real[h], SHADE = 99)
+    sh <- 99
+  } else if (out$TC > 38) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA_real[h], TGRD = TGRD_real[h],
+      TSUBST = TGRD_real[h], TSKY = TSKY_real[h], VEL = 1,
+      RH = RH_real[h], QSOLR = QSOLR_real[h], Z = Z_real[h], SHADE = 85)
+    sh <- 85
+  } else {
+    sh <- 0
+  }
+  tc_liz_real[h] <- out$TC; shade_liz_real[h] <- sh
+}
+```
+
+## Frog behaviour with real microclimate
+
+```{r frog-real, message=FALSE}
+tc_frog_real <- numeric(24)
+in_water_real <- logical(24)
+in_water_prev <- FALSE
+
+for (h in 1:24) {
+  if (QSOLR_real[h] == 0) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+      pct_wet = frog_wet, TA = TA_real[h], TGRD = TGRD_real[h],
+      TSUBST = TGRD_real[h], TSKY = TSKY_real[h], VEL = 1,
+      RH = RH_real[h], QSOLR = 0, Z = 90, SHADE = 100)
+    tc_frog_real[h] <- out$TC; in_water_prev <- FALSE; next
+  }
+  land <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+    pct_wet = frog_wet, TA = TA_real[h], TGRD = TGRD_real[h],
+    TSUBST = TGRD_real[h], TSKY = TSKY_real[h], VEL = 1,
+    RH = RH_real[h], QSOLR = QSOLR_real[h], Z = Z_real[h], SHADE = 0)
+  if (in_water_prev && land$TC < 25) {
+    tc_frog_real[h] <- land$TC; in_water_prev <- FALSE
+  } else if (in_water_prev || land$TC > 30) {
+    tc_frog_real[h] <- T_water; in_water_prev <- TRUE
+  } else {
+    tc_frog_real[h] <- land$TC; in_water_prev <- FALSE
+  }
+  in_water_real[h] <- in_water_prev
+}
+```
+
+## Comparison: synthetic vs real
+
+```{r compare-synth-real, message=FALSE}
+par(mfrow = c(2, 1))
+
+# Lizard
+matplot(hour_real, cbind(tc_null, tc_liz, tc_liz_real), type = "o",
+  pch = 16, lwd = 2, col = c("grey70", "orange", "darkorange"),
+  xlab = "Hour", ylab = "Body temperature (°C)",
+  main = "Lizard: synthetic vs real microclimate")
+abline(h = liz_CTmax, lty = 2, col = "red")
+legend("topright", legend = c("Null (synthetic)", "Lizard (synthetic)",
+  "Lizard (real)"), col = c("grey70", "orange", "darkorange"),
+  lty = 1, lwd = 2, pch = 16)
+
+# Frog
+matplot(hour_real, cbind(tc_frog, tc_frog_real), type = "o",
+  pch = 16, lwd = 2, col = c("dodgerblue", "darkblue"),
+  xlab = "Hour", ylab = "Body temperature (°C)",
+  main = "Frog: synthetic vs real microclimate")
+abline(h = frog_CTmax, lty = 2, col = "red")
+abline(h = T_water, lty = 3, col = "cyan")
+legend("topright", legend = c("Frog (synthetic)", "Frog (real)"),
+  col = c("dodgerblue", "darkblue"), lty = 1, lwd = 2, pch = 16)
+```
+
+With real microclimate, solar radiation is lower (cloud cover, atmospheric effects), so both species stay cooler and need less behavioural intervention. The lizard rarely needs shade; the frog spends fewer hours in water.
+
+# Challenges
+
+## Challenge 1: Minimum shade
+
+What is the minimum shade percentage needed at noon to keep the lizard's body temperature below 38 °C? Loop over SHADE values from 0 to 100.
+
+```{r challenge1, message=FALSE}
+noon_idx <- which.max(QSOLR)
+tc_by_shade <- sapply(0:100, function(sh) {
+  ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+    pct_wet = liz_wet, TA = TA[noon_idx], TGRD = TGRD[noon_idx],
+    TSUBST = TSUBST[noon_idx], TSKY = TSKY[noon_idx], VEL = 1,
+    RH = RH[noon_idx], QSOLR = QSOLR[noon_idx], Z = Z[noon_idx],
+    SHADE = sh)$TC
+})
+
+min_shade <- which.min(tc_by_shade > 38) - 1
+cat("Minimum shade at noon to keep TC < 38°C:", min_shade, "%\n")
+plot(0:100, tc_by_shade, type = "l", col = "orange", lwd = 2,
+  xlab = "SHADE (%)", ylab = "Body temperature (°C)",
+  main = "Lizard TC at noon vs shade level")
+abline(h = 38, lty = 2, col = "red")
+abline(v = min_shade, lty = 3, col = "grey")
+```
+
+**Hint:** Find the index of noon (`which.max(QSOLR)`), then loop `SHADE = 0:100` using a single `ectoR_devel` call per value. Use `which.min(tc > 38) - 1` to find the answer.
+
+## Challenge 2: Deforestation
+
+What if the lizard has no shade at all? Set `SHADE = 0` for every daylight hour and record the TC time series. How many hours is TC above 40 °C?
+
+```{r challenge2, message=FALSE}
+tc_no_shade <- numeric(24)
+for (h in 1:24) {
+  if (QSOLR[h] == 0) {
+    tc_no_shade[h] <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = 0, Z = 90,
+      SHADE = 0)$TC
+  } else {
+    tc_no_shade[h] <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+      Z = Z[h], SHADE = 0)$TC
+  }
+}
+hours_above_40 <- sum(tc_no_shade > 40)
+cat("Hours with TC > 40°C:", hours_above_40, "\n")
+cat("Peak TC:", round(max(tc_no_shade), 1), "°C\n")
+```
+
+**Hint:** Re-run the null model but use the lizard's `pct_wet` and `shape`. Count hours with `sum(tc > 40)`.
+
+## Challenge 3: Frog without water
+
+Repeat the frog simulation *without* the water-immersion behaviour (just let it sit on land all day). Compare the peak TC and the number of hours above 35 °C to the frog with water access.
+
+```{r challenge3, message=FALSE}
+tc_frog_dry <- numeric(24)
+for (h in 1:24) {
+  if (QSOLR[h] == 0) {
+    tc_frog_dry[h] <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+      pct_wet = frog_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = 0, Z = 90,
+      SHADE = 0)$TC
+  } else {
+    tc_frog_dry[h] <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+      pct_wet = frog_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+      Z = Z[h], SHADE = 0)$TC
+  }
+}
+
+cat("Without water:\n")
+cat("  Peak TC:", round(max(tc_frog_dry), 1), "°C\n")
+cat("  Hours > 35°C:", sum(tc_frog_dry > 35), "\n")
+cat("With water:\n")
+cat("  Peak TC:", round(max(tc_frog), 1), "°C\n")
+cat("  Hours > 35°C:", sum(tc_frog > 35), "\n")
+```
+
+**Hint:** Run `ectoR_devel` in a loop with frog parameters and `SHADE = 0`, same as the null model for the lizard but with frog `shape` and `pct_wet`.
+
+## Challenge 4: Cloudy day
+
+Set `PDIF = 0.5` (50% of solar radiation is diffuse — overcast conditions) and re-run both the lizard and frog behaviour models. How does cloud cover affect each species' thermoregulatory strategy?
+
+```{r challenge4, message=FALSE}
+# Lizard with cloud cover (PDIF = 0.5)
+tc_liz_cld <- numeric(24)
+for (h in 1:24) {
+  if (QSOLR[h] == 0) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 0.3, RH = RH[h], QSOLR = 0, Z = 90,
+      SHADE = 100, PDIF = 0.5)
+    tc_liz_cld[h] <- out$TC; next
+  }
+  out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+    pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+    TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+    Z = Z[h], SHADE = 0, PDIF = 0.5)
+  if (out$TC > 42) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 0.3, RH = RH[h], QSOLR = QSOLR[h],
+      Z = Z[h], SHADE = 99, PDIF = 0.5)
+  } else if (out$TC > 38) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = liz_shape, alpha = alpha,
+      pct_wet = liz_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+      Z = Z[h], SHADE = 85, PDIF = 0.5)
+  }
+  tc_liz_cld[h] <- out$TC
+}
+
+# Frog with cloud cover (PDIF = 0.5)
+tc_frog_cld <- numeric(24)
+in_water_cld <- logical(24)
+in_water_prev <- FALSE
+for (h in 1:24) {
+  if (QSOLR[h] == 0) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+      pct_wet = frog_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = 0, Z = 90,
+      SHADE = 100, PDIF = 0.5)
+    tc_frog_cld[h] <- out$TC; in_water_prev <- FALSE; next
+  }
+  land <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+    pct_wet = frog_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+    TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+    Z = Z[h], SHADE = 0, PDIF = 0.5)
+  if (in_water_prev && land$TC < 25) {
+    tc_frog_cld[h] <- land$TC; in_water_prev <- FALSE
+  } else if (in_water_prev || land$TC > 30) {
+    tc_frog_cld[h] <- T_water; in_water_prev <- TRUE
+  } else {
+    tc_frog_cld[h] <- land$TC; in_water_prev <- FALSE
+  }
+  in_water_cld[h] <- in_water_prev
+}
+
+# Compare
+cat("Lizard peak TC:\n")
+cat("  Clear sky:", round(max(tc_liz), 1), "°C\n")
+cat("  Cloudy:   ", round(max(tc_liz_cld), 1), "°C\n")
+cat("Frog peak TC:\n")
+cat("  Clear sky:", round(max(tc_frog), 1), "°C\n")
+cat("  Cloudy:   ", round(max(tc_frog_cld), 1), "°C\n")
+cat("Frog hours in water:\n")
+cat("  Clear sky:", sum(in_water), "\n")
+cat("  Cloudy:   ", sum(in_water_cld), "\n")
+```
+
+**Hint:** Add `PDIF = 0.5` to every `ectoR_devel` call. Does the lizard need less shade? Does the frog overheat at all?
+
+# Bonus challenge: fixing `fluid = 1` (water mode)
+
+The `ectoR_devel` function has a `fluid` parameter (`fluid = 1` for water) but it triggers an error because the internal root-finding function `FUN_ecto` does not define `QRESP` when `FLTYPE != 0`.
+
+Your task: find and fix the bug, then re-run the frog simulation using `fluid = 1` instead of setting `TC = T_water`.
+
+## Step 1: Locate the bug
+
+```{r bonus-locate, message=FALSE}
+# View the relevant lines of FUN_ecto
+src <- deparse(FUN_ecto, width.cutoff = 500)
+fltype_lines <- grep("FLTYPE == 0|QRESP", src)
+cat(paste(fltype_lines, ": ", src[fltype_lines]), sep = "\n")
+```
+
+You should see that `QRESP` is only assigned inside `if (FLTYPE == 0)`. When `FLTYPE = 1`, `QRESP` is never created.
+
+## Step 2: Patch both bugs
+
+Two functions need fixing.
+
+**Bug 1 — `FUN_ecto`:** `QRESP` is only assigned inside `if (FLTYPE == 0)`. Insert a default before it:
+
+```{r bonus-patch-fun, message=FALSE}
+fltype_line <- grep("if \\(FLTYPE == 0\\)", src)[1]
+
+src_fixed <- c(
+  src[1:(fltype_line - 1)],
+  "    if (FLTYPE != 0) QRESP <- 0",
+  src[fltype_line:length(src)]
+)
+
+FUN_ecto_fixed <- eval(parse(text = src_fixed))
+assignInNamespace("FUN_ecto", FUN_ecto_fixed, ns = "NicheMapR")
+```
+
+**Bug 2 — `WATERPROP`:** The function computes the thermal expansion coefficient `BETA` but does not include it in the return list. `CONV_ecto` then receives `NULL` for `BETA`, causing the Rayleigh number calculation to fail.
+
+```{r bonus-patch-water, message=FALSE}
+src_wp <- deparse(WATERPROP, width.cutoff = 500)
+# Find the return statement and add BETA
+ret_line <- grep("return\\(list", src_wp)
+src_wp_fixed <- src_wp
+src_wp_fixed[ret_line] <- gsub("VISDYN = VISDYN\\)",
+  "VISDYN = VISDYN, BETA = BETA)", src_wp_fixed[ret_line])
+
+WATERPROP_fixed <- eval(parse(text = src_wp_fixed))
+assignInNamespace("WATERPROP", WATERPROP_fixed, ns = "NicheMapR")
+```
+
+## Step 3: Verify water mode works
+
+```{r bonus-verify, message=FALSE}
+out_water <- ectoR_devel(Ww_g = 40, shape = 4, TA = 22, TGRD = 22,
+  TSUBST = 22, TSKY = 22, VEL = 0.5, QSOLR = 0, Z = 90,
+  fluid = 1)
+cat("Water TC (should be ~22 °C):", round(out_water$TC, 1), "\n")
+```
+
+## Step 4: Re-run the frog with `fluid = 1`
+
+In water mode, set `TA = T_water`, `QSOLR = 0`, and `VEL = 0.5`:
+
+```{r bonus-frog-fluid, message=FALSE}
+tc_frog_fluid <- numeric(24)
+in_water_fl <- logical(24)
+in_water_prev <- FALSE
+
+for (h in 1:24) {
+  if (QSOLR[h] == 0) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+      pct_wet = frog_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+      TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = 0, Z = 90,
+      SHADE = 100)
+    tc_frog_fluid[h] <- out$TC
+    in_water_prev <- FALSE
+    next
+  }
+  land <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+    pct_wet = frog_wet, TA = TA[h], TGRD = TGRD[h], TSUBST = TSUBST[h],
+    TSKY = TSKY[h], VEL = 1, RH = RH[h], QSOLR = QSOLR[h],
+    Z = Z[h], SHADE = 0)
+
+  if (in_water_prev && land$TC < 25) {
+    tc_frog_fluid[h] <- land$TC
+    in_water_prev <- FALSE
+  } else if (in_water_prev || land$TC > 30) {
+    out <- ectoR_devel(Ww_g = Ww_g, shape = frog_shape, alpha = alpha,
+      pct_wet = frog_wet, TA = T_water, TGRD = T_water, TSUBST = T_water,
+      TSKY = T_water, VEL = 0.5, QSOLR = 0, Z = 90, fluid = 1)
+    tc_frog_fluid[h] <- out$TC
+    in_water_prev <- TRUE
+  } else {
+    tc_frog_fluid[h] <- land$TC
+    in_water_prev <- FALSE
+  }
+  in_water_fl[h] <- in_water_prev
+}
+```
+
+```{r bonus-compare, message=FALSE}
+# Compare with the TC = T_water approach
+par(mfrow = c(1, 1))
+plot(hour, tc_frog, type = "o", pch = 16, lwd = 2, col = "dodgerblue",
+  xlab = "Hour", ylab = "Body temperature (°C)",
+  main = "Frog: TC = T_water vs fluid = 1")
+lines(hour, tc_frog_fluid, type = "o", pch = 1, lwd = 2, col = "darkred")
+legend("topright", legend = c("TC = T_water", "fluid = 1 (patched)"),
+  col = c("dodgerblue", "darkred"), pch = c(16, 1), lwd = 2)
+```
+
+Both approaches should give nearly identical curves. The patch makes the water physics work correctly through `CONV_ecto` and `SEVAP_ecto`.
+
+# Summary
+
+You have learned to:
+
+1. Generate synthetic diel microclimate cycles
+2. Wrap `ectoR_devel` in a time loop to simulate a full day
+3. Implement **shade-seeking behaviour** (lizard) — continuous
+   thermoregulation by adjusting SHADE
+4. Implement **water-immersion behaviour** (frog) — binary
+   thermoregulation by switching between land and water
+5. Compare the two strategies and their effectiveness
+6. *(Bonus)* Find and fix a bug in `FUN_ecto` to enable true
+   water-mode physics
+
+# Reference
+
+Kearney, M. R. & Porter, W. P. (2017). NicheMapR — an R package for biophysical modelling: the ectotherm and dynamic energy budget models. *Ecography* 40: 1–12.

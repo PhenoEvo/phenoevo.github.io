@@ -4,17 +4,24 @@
 
 ### Day 1
 - [P1: Microclimate modelling under different conditions](https://phenoevo.github.io/MNMcourse/day1/practice/microclimate.Rmd)
+    - [Solutions](https://phenoevo.github.io/MNMcourse/day1/practice/microclimate_resolved.Rmd)
 
 - [P2: Elevation gradients and soil moisture](https://phenoevo.github.io/MNMcourse/day1/practice/microclimate_elevation.Rmd)
+    - [Solutions](https://phenoevo.github.io/MNMcourse/day1/practice/microclimate_elevation_resolved.Rmd)
 
 ### Day 2
 - [P3: Dissecting the ectotherm energy budget with ectoR_devel](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_devel.Rmd)
+    - [Solutions](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_devel_solved.Rmd)
 
 - [P4: Behavioural thermoregulation with ectoR_devel](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_behaviour.Rmd)
+    - [Solutions](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_behaviour_solved.Rmd)
 
 - [P5: Ectotherm model across elevation gradients](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_elevation.Rmd)
+    - [Solutions](https://phenoevo.github.io/MNMcourse/day2/practice/ectotherm_elevation_solved.Rmd)
 
 ### Day 3
 - [P6: DEB model across elevation gradients](https://phenoevo.github.io/MNMcourse/day3/practice/deb_elevation.Rmd)
+    - [Solutions](https://phenoevo.github.io/MNMcourse/day3/practice/deb_elevation_resolved.Rmd)
 
 - [P7: Country-wide ectotherm simulations with parallel computing](https://phenoevo.github.io/MNMcourse/day3/practice/ecuador_countrywide.Rmd)
+    - [Solutions](https://phenoevo.github.io/MNMcourse/day3/practice/ecuador_countrywide_resolved.Rmd)

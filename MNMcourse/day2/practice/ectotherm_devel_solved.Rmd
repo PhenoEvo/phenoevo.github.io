@@ -1,0 +1,602 @@
+---
+title: "Practical 3: Dissecting the ectotherm energy budget with ectoR_devel"
+author: "Urtzi Enriquez-Urzelai"
+date: "`r Sys.Date()`"
+output:
+  bookdown::pdf_document2:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 8, fig.height = 5)
+```
+
+# Introduction
+
+NicheMapR's `ectoR_devel` function breaks the ectotherm heat budget into independent modular components. Each component — geometry, solar radiation, longwave radiation, convection, conduction, metabolism, respiration, and evaporation — is a separate function you can call and explore on its own.
+
+**What you will learn:**
+
+- Open and read the help file and source code of `ectoR_devel`
+- Call the individual component functions directly
+- Understand how each term in the energy balance is computed
+- Create 2D and 3D plots of heat flux vs environmental variables
+- See how the components combine to determine body temperature
+
+# Setup
+
+```{r setup-load, message=FALSE}
+library(NicheMapR)
+```
+
+Look at the arguments of `ectoR_devel`:
+
+```{r show-args}
+args(ectoR_devel)
+```
+
+Run `?ectoR_devel` in your R console to open the full help page. You can also view the complete source code by typing `ectoR_devel` in the console (without parentheses).
+
+The function solves the steady-state energy balance:
+
+$$\dot{Q}_{solar} + \dot{Q}_{IR,in} + \dot{Q}_{met} = \dot{Q}_{resp} + \dot{Q}_{evap} + \dot{Q}_{IR,out} + \dot{Q}_{conv} + \dot{Q}_{cond}$$
+
+Body temperature ($T_c$) is the value that makes $\dot{Q}_{in} - \dot{Q}_{out} = 0$.
+
+The sub-functions are:
+
+| Function | Computes | Symbol |
+|----------|----------|--------|
+| `GEOM_ecto` | surface areas, volumes from mass and shape | — |
+| `SOLAR_ecto` | absorbed solar radiation | $\dot{Q}_{solar}$ |
+| `RADIN_ecto` | absorbed infrared (sky + ground) | $\dot{Q}_{IR,in}$ |
+| `CONV_ecto` | convective heat loss | $\dot{Q}_{conv}$ |
+| `RADOUT_ecto` | emitted infrared | $\dot{Q}_{IR,out}$ |
+| `COND_ecto` | conductive heat loss to substrate | $\dot{Q}_{cond}$ |
+| `MET_ecto` | metabolic heat production | $\dot{Q}_{met}$ |
+| `RESP_ecto` | respiratory heat and water loss | $\dot{Q}_{resp}$ |
+| `SEVAP_ecto` | evaporative water loss (skin + eyes) | $\dot{Q}_{evap}$ |
+
+Run a baseline model for reference:
+
+```{r baseline, message=FALSE}
+ref <- ectoR_devel(Ww_g = 40, shape = 3, alpha = 0.85, TA = 20,
+  TGRD = 30, TSUBST = 25, TSKY = -5, VEL = 1, RH = 30, QSOLR = 800, Z = 20)
+
+cat("Body temperature:", ref$TC, "°C\n")
+cat("Skin temperature:", ref$TSKIN, "°C\n")
+cat("Energy balance (W):\n")
+print(ref$enbal)
+```
+
+At equilibrium the `ENB` column is ~0 (within numerical tolerance).
+
+# Geometry: from mass to surface area
+
+`GEOM_ecto` converts mass and shape into areas, volumes, and dimensions that all subsequent functions need.
+
+```{r geom-default, message=FALSE}
+geom <- GEOM_ecto(AMASS = 0.04, GEOMETRY = 3, ANDENS = 1000)
+str(geom)
+```
+
+The key outputs are:
+
+- `AREA` — total surface area ($\mathrm{m}^2$)
+- `AV` — ventral area in contact with substrate ($\mathrm{m}^2$)
+- `ASILN` / `ASILP` — silhouette areas for two postures ($\mathrm{m}^2$)
+- `AL` — characteristic length for convection ($\mathrm{m}$)
+
+Now compare how total area changes with shape. Six geometries are available:
+
+| Shape | Description |
+|-|-|
+| 0 | flat plate |
+| 1 | cylinder |
+| 2 | ellipsoid |
+| 3 | lizard (allometric) |
+| 4 | frog (allometric) |
+| 5 | custom allometric |
+
+```{r geom-compare, message=FALSE}
+shapes <- 0:5
+areas <- sapply(shapes, function(s) {
+  GEOM_ecto(AMASS = 0.04, GEOMETRY = s, ANDENS = 1000)$AREA
+})
+
+barplot(areas, names.arg = shapes, col = "grey",
+  xlab = "Shape code", ylab = expression("Surface area (m"^2 * ")"),
+  main = "Area of a 40 g animal by shape type")
+```
+
+Lizards (shape 3) have more surface area per gram than a sphere (shape 2) because of their flattened body — this affects both heat gain and heat loss.
+
+# Convection: the dominant heat-loss pathway
+
+## Geometry needed first
+
+`CONV_ecto` needs the geometry outputs. Compute once and reuse:
+
+```{r conv-reuse}
+geom <- GEOM_ecto(AMASS = 0.04, GEOMETRY = 3)
+```
+
+The function signature is:
+
+```{r conv-args, message=FALSE}
+args(CONV_ecto)
+```
+
+## Convective heat loss vs wind speed
+
+```{r conv-2d, message=FALSE}
+vel_seq <- seq(0.1, 15, length.out = 50)
+qconv <- numeric(length(vel_seq))
+
+for (i in seq_along(vel_seq)) {
+  out <- CONV_ecto(GEOMETRY = 3, ATOT = geom$AREA, AV = geom$AV,
+    AL = geom$AL, AT = geom$AT, BP = 101325, ALT = 0, TA = 20,
+    VEL = vel_seq[i], FLTYPE = 0, TSKIN = 30, CONV_ENHANCE = 1)
+  qconv[i] <- out$QCONV
+}
+
+plot(vel_seq, qconv, type = "l", lwd = 2, col = "darkred",
+  xlab = "Wind speed (m/s)", ylab = "Convective heat loss (W)",
+  main = "QCONV vs wind speed at TA = 20 °C, TSKIN = 30 °C")
+```
+
+At low wind speeds the curve is nearly flat because **free convection** (buoyancy-driven) dominates. At higher speeds **forced convection** takes over and QCONV rises roughly as $\sqrt{VEL}$.
+
+## Free vs forced convection
+
+`CONV_ecto` outputs separate heat-transfer coefficients for free and forced convection so you can see which regime dominates:
+
+```{r conv-free-forced, message=FALSE}
+hcfree <- numeric(length(vel_seq))
+hcforc <- numeric(length(vel_seq))
+
+for (i in seq_along(vel_seq)) {
+  out <- CONV_ecto(GEOMETRY = 3, ATOT = geom$AREA, AV = geom$AV,
+    AL = geom$AL, AT = geom$AT, BP = 101325, ALT = 0, TA = 20,
+    VEL = vel_seq[i], FLTYPE = 0, TSKIN = 30, CONV_ENHANCE = 1)
+  hcfree[i] <- out$HCFREE
+  hcforc[i] <- out$HCFORC
+}
+
+matplot(vel_seq, cbind(hcfree, hcforc), type = "l", lty = 1:2,
+  col = c("dodgerblue", "red"), lwd = 2,
+  xlab = "Wind speed (m/s)", ylab = expression("HTC (W m"^{-2} * " K"^{-1} * ")"),
+  main = "Free vs forced convection coefficients")
+legend("topleft", legend = c("Free (HCFREE)", "Forced (HCFORC)"),
+  col = c("dodgerblue", "red"), lty = 1:2, lwd = 2)
+abline(h = 0, lty = 3, col = "grey")
+```
+
+The free coefficient (HCFREE) is nearly constant — it depends only on the temperature gradient. The forced coefficient (HCFORC) grows with wind speed. The crossover point is where both contribute equally.
+
+## QCONV as function of wind speed and air temperature
+
+Now vary both VEL and TA simultaneously to see the interaction:
+
+```{r conv-3d, message=FALSE}
+vel_seq <- seq(0.1, 15, length.out = 25)
+ta_seq <- seq(0, 40, length.out = 25)
+z_conv <- matrix(NA, nrow = 25, ncol = 25)
+
+for (i in 1:25) {
+  for (j in 1:25) {
+    out <- CONV_ecto(GEOMETRY = 3, ATOT = geom$AREA, AV = geom$AV,
+      AL = geom$AL, AT = geom$AT, BP = 101325, ALT = 0,
+      TA = ta_seq[j], VEL = vel_seq[i], FLTYPE = 0, TSKIN = 30,
+      CONV_ENHANCE = 1)
+    z_conv[i, j] <- out$QCONV
+  }
+}
+```
+
+```{r conv-3d-plot, message=FALSE}
+persp(vel_seq, ta_seq, z_conv, theta = 35, phi = 25, col = "lightblue",
+  shade = 0.4, ticktype = "detailed", expand = 0.5,
+  xlab = "VEL (m/s)", ylab = "TA (°C)", zlab = "QCONV (W)",
+  main = expression("Convective heat loss" ~ Q[conv] * " (W)"))
+
+# library(rgl)
+# open3d()
+# surface3d(vel_seq, ta_seq, z_conv,
+#           col = "lightblue",
+#           alpha = 1)
+# axes3d()
+# title3d(xlab = "VEL (m/s)", ylab = "TA (°C)", zlab = "QCONV (W)")
+# grid3d(c("x", "y", "z"))
+```
+
+```{r conv-3d-image, message=FALSE}
+image(vel_seq, ta_seq, z_conv, col = topo.colors(30),
+  xlab = "Wind speed (m/s)", ylab = "Air temperature (°C)",
+  main = expression(Q[conv] * " as function of VEL and TA"))
+contour(vel_seq, ta_seq, z_conv, nlevels = 10, add = TRUE)
+```
+
+When TA = TSKIN (= 30 °C), QCONV is zero — no temperature gradient, no convection. When TA > TSKIN the animal gains heat from the air (QCONV < 0). When TA < TSKIN the animal loses heat (QCONV > 0). Cooling is strongest at low TA and high wind speed.
+
+# Solar radiation: how the sun heats the animal
+
+`SOLAR_ecto` computes absorbed solar radiation from direct beam, diffuse sky, and reflected components.
+
+```{r solar-args, message=FALSE}
+args(SOLAR_ecto)
+```
+
+Call it with the geometry we already have:
+
+```{r solar-call, message=FALSE}
+sol <- SOLAR_ecto(ATOT = geom$AREA, ASIL = geom$ASILN, AV = geom$AV,
+  AT = geom$AT, ABSAN = 0.85, ABSSB = 0.2, FATOSK = 0.4, FATOSB = 0.4,
+  FATOBJ = 0, ZEN = 20 * pi / 180, QSOLR = 1000, PDIF = 0.1, SHADE = 0,
+  LIVE = 1)
+
+cat("Total absorbed solar (QSOLAR):", sol$QSOLAR, "W\n")
+cat("  from direct beam:", sol$QSDIR, "W\n")
+cat("  from diffuse sky:", sol$QSSKY, "W\n")
+cat("  reflected from substrate:", sol$QSRSB, "W\n")
+```
+
+Now vary sun angle and shade together:
+
+```{r solar-3d, message=FALSE}
+z_seq <- seq(0, 80, length.out = 25) # zenith 0–80°
+shade_seq <- seq(0, 100, length.out = 25) # shade 0–100%
+z_solar <- matrix(NA, nrow = 25, ncol = 25)
+
+for (i in 1:25) {
+  for (j in 1:25) {
+    out <- SOLAR_ecto(ATOT = geom$AREA, ASIL = geom$ASILN, AV = geom$AV,
+      AT = geom$AT, ABSAN = 0.85, ABSSB = 0.2, FATOSK = 0.4, FATOSB = 0.4,
+      FATOBJ = 0, ZEN = z_seq[i] * pi / 180, QSOLR = 1000, PDIF = 0.1,
+      SHADE = shade_seq[j], LIVE = 1)
+    z_solar[i, j] <- out$QSOLAR
+  }
+}
+```
+
+```{r solar-3d-plot, message=FALSE}
+persp(z_seq, shade_seq, z_solar, theta = 35, phi = 25, col = "gold",
+  shade = 0.4, ticktype = "detailed", expand = 0.5,
+  xlab = "Zenith (°)", ylab = "Shade (%)", zlab = "QSOLAR (W)",
+  main = expression("Absorbed solar" ~ Q[solar] * " (W)"))
+```
+
+```{r solar-image, message=FALSE}
+image(z_seq, shade_seq, z_solar, col = heat.colors(30),
+  xlab = "Zenith angle (°)", ylab = "Shade (%)",
+  main = expression(Q[solar] * " as function of zenith and shade"))
+contour(z_seq, shade_seq, z_solar, nlevels = 10, add = TRUE)
+```
+
+Solar heating is strongest at low zenith (sun overhead) and no shade. The function saturates at high zenith because the beam is nearly parallel to the lizard's back (low projected area). Shade reduces both direct and diffuse components linearly.
+
+# Longwave (infrared) radiation
+
+Two functions handle infrared: `RADIN_ecto` (incoming from sky + ground) and `RADOUT_ecto` (outgoing emitted by the animal). The net is $\dot{Q}_{IR,in} - \dot{Q}_{IR,out}$.
+
+```{r lw-call, message=FALSE}
+qirin <- RADIN_ecto(ATOT = geom$AREA, AV = geom$AV, AT = geom$AT,
+  FATOSK = 0.4, FATOSB = 0.4, FATOBJ = 0, EMISAN = 0.95,
+  EMISSB = 0.95, EMISSK = 0.8, TSKY = -5, TGRD = 30)
+
+qirout <- RADOUT_ecto(TSKIN = 30, ATOT = geom$AREA, AV = geom$AV,
+  AT = geom$AT, FATOSK = 0.4, FATOSB = 0.4, EMISAN = 0.95)
+
+cat("IR absorbed (QIRIN):", qirin, "W\n")
+cat("IR emitted (QIROUT):", qirout, "W\n")
+cat("Net IR:", qirin - qirout, "W\n")
+```
+
+Vary sky temperature and ground temperature to see the effect on net IR:
+
+```{r lw-2d, message=FALSE}
+tsky_seq <- seq(-20, 30, length.out = 50)
+qirin_seq <- sapply(tsky_seq, function(ts) {
+  RADIN_ecto(ATOT = geom$AREA, AV = geom$AV, AT = geom$AT,
+    FATOSK = 0.4, FATOSB = 0.4, FATOBJ = 0, EMISAN = 0.95,
+    EMISSB = 0.95, EMISSK = 0.8, TSKY = ts, TGRD = 30)
+})
+
+plot(tsky_seq, qirin_seq, type = "l", lwd = 2, col = "darkgreen",
+  xlab = "Sky temperature (°C)", ylab = "Incoming IR (W)",
+  main = "QIRIN as function of TSKY")
+abline(h = qirout, lty = 2, col = "red")
+text(-10, qirout + 0.1, "QIROUT (fixed at TSKIN = 30 °C)", col = "red", cex = 0.7)
+```
+
+The sky is usually much colder than the ground (especially in clear conditions), so most IR comes from the substrate. Net IR is almost always negative (the animal emits more than it absorbs), providing a cooling pathway.
+
+# Conduction to the substrate
+
+Conduction is computed by a simple Fourier's law:
+
+$$\dot{Q}_{cond} = A_v \cdot \frac{K_{sub}}{d} \cdot (T_{skin} - T_{subst})$$
+
+```{r cond-simple, message=FALSE}
+COND_ecto(AV = geom$AV, DEP = 0.025, TSKIN = 30, TSUBST = 25, SUBTK = 0.5)
+```
+
+Vary substrate conductivity and substrate temperature:
+
+```{r cond-3d, message=FALSE}
+k_seq <- seq(0.05, 2, length.out = 25)
+tsub_seq <- seq(0, 40, length.out = 25)
+z_cond <- outer(k_seq, tsub_seq, function(k, ts) {
+  COND_ecto(AV = geom$AV, DEP = 0.025, TSKIN = 30, TSUBST = ts, SUBTK = k)
+})
+
+persp(k_seq, tsub_seq, z_cond, theta = 35, phi = 25, col = "tan",
+  shade = 0.4, ticktype = "detailed", expand = 0.5,
+  xlab = expression(K[sub] * " (W/mK)"), ylab = expression(T[subst] * " (°C)"),
+  zlab = "QCOND (W)", main = expression("Conductive heat loss" ~ Q[cond]))
+```
+
+When TSUBST = TSKIN (= 30 °C), conduction is zero. When the ground is cooler, the animal loses heat. When the ground is warmer, it gains heat. Higher K_sub means more conductive substrate (e.g., rock vs sand).
+
+# Evaporative cooling: dry vs wet skin
+
+Evaporative water loss provides powerful cooling, but its effectiveness depends on skin wetness (`pct_wet`, the percentage of skin surface that is wet). Compare a dry-skinned ectotherm (lizard, `pct_wet` = 5%) with a wet-skinned one (amphibian, `pct_wet` = 80%) across a range of air temperatures:
+
+```{r evap-dry-wet, message=FALSE}
+ta_seq <- seq(20, 40, length.out = 30)
+tc_dry <- tc_wet <- qevap_dry <- qevap_wet <- numeric(30)
+
+for (i in seq_along(ta_seq)) {
+  d <- ectoR_devel(Ww_g = 40, shape = 3, pct_wet = 5, TA = ta_seq[i],
+    TGRD = ta_seq[i] + 5, TSUBST = ta_seq[i], TSKY = -5, VEL = 1,
+    RH = 50, QSOLR = 600, Z = 20, SHADE = 0)
+  w <- ectoR_devel(Ww_g = 40, shape = 3, pct_wet = 80, TA = ta_seq[i],
+    TGRD = ta_seq[i] + 5, TSUBST = ta_seq[i], TSKY = -5, VEL = 1,
+    RH = 50, QSOLR = 600, Z = 20, SHADE = 0)
+  tc_dry[i] <- d$TC; tc_wet[i] <- w$TC
+  qevap_dry[i] <- d$enbal[1, "QEVAP"]
+  qevap_wet[i] <- w$enbal[1, "QEVAP"]
+}
+```
+
+```{r evap-plot, message=FALSE}
+par(mfrow = c(1, 2))
+
+# Left: body temperature
+plot(ta_seq, tc_dry, type = "l", col = "red", lwd = 2, ylim = c(20, 50),
+  xlab = "Air temperature (°C)", ylab = "Body temperature (°C)",
+  main = expression(T[c] * " vs TA: dry vs wet skin"))
+lines(ta_seq, tc_wet, col = "dodgerblue", lwd = 2)
+abline(0, 1, lty = 2, col = "grey")
+legend("topleft", legend = c("Dry (pct_wet = 5%)", "Wet (pct_wet = 80%)"),
+  col = c("red", "dodgerblue"), lty = 1, lwd = 2)
+
+# Right: evaporative heat loss
+plot(ta_seq, qevap_dry, type = "l", col = "red", lwd = 2,
+  ylim = c(0, max(qevap_wet) * 1.1),
+  xlab = "Air temperature (°C)", ylab = "Evaporative heat loss (W)",
+  main = expression(Q[evap] * " vs TA: dry vs wet skin"))
+lines(ta_seq, qevap_wet, col = "dodgerblue", lwd = 2)
+legend("topleft", legend = c("Dry (pct_wet = 5%)", "Wet (pct_wet = 80%)"),
+  col = c("red", "dodgerblue"), lty = 1, lwd = 2)
+```
+
+The wet-skinned animal stays 5–8 °C cooler than the dry-skinned one at high air temperatures. Evaporative heat loss is ~20× larger for wet skin, providing a powerful cooling mechanism — but at the cost of much higher water loss.
+
+You can also call `SEVAP_ecto` directly to see the dependency on skin wetness and the convective mass-transfer coefficient `HD` (which comes from `CONV_ecto`):
+
+```{r sevap-direct, message=FALSE}
+# Walk the pipeline manually
+geom <- GEOM_ecto(AMASS = 0.04, GEOMETRY = 3)
+conv <- CONV_ecto(GEOMETRY = 3, ATOT = geom$AREA, AV = geom$AV,
+  AL = geom$AL, AT = geom$AT, BP = 101325, ALT = 0, TA = 30,
+  VEL = 1, FLTYPE = 0, TSKIN = 32, CONV_ENHANCE = 1)
+
+# Dry skin
+s_dry <- SEVAP_ecto(TC = 32, TSKIN = 32, GEVAP = 1e-9, PSI_BODY = -707,
+  SKINW = 0.05, AEFF = geom$AEFF, ATOT = geom$AREA, HD = conv$HD,
+  PEYES = 0, LEAF = 0, G_VS_AB = 0.3, G_VS_AD = 0,
+  TA = 30, RELHUM = 50, VEL = 1, BP = 101325)
+
+# Wet skin, humid air
+s_wet <- SEVAP_ecto(TC = 32, TSKIN = 32, GEVAP = 1e-9, PSI_BODY = -707,
+  SKINW = 0.8, AEFF = geom$AEFF, ATOT = geom$AREA, HD = conv$HD,
+  PEYES = 0, LEAF = 0, G_VS_AB = 0.3, G_VS_AD = 0,
+  TA = 30, RELHUM = 80, VEL = 1, BP = 101325)
+
+cat("Dry skin QSEVAP:", round(s_dry$QSEVAP, 4), "W\n")
+cat("Wet skin QSEVAP:", round(s_wet$QSEVAP, 4), "W\n")
+```
+
+# Metabolism: the allometric curve
+
+```{r met-curve, message=FALSE}
+temp_seq <- seq(0, 45, length.out = 100)
+qmetab <- sapply(temp_seq, function(t) {
+  MET_ecto(AMASS = 0.04, XTRY = t, M_1 = 0.013, M_2 = 0.8, M_3 = 0.038, M_4 = 0)
+})
+
+plot(temp_seq, qmetab, type = "l", lwd = 2, col = "darkgreen",
+  xlab = "Body temperature (°C)", ylab = "Metabolic heat (W)",
+  main = expression("Metabolic heat production" ~ Q[met] * " vs " * T[c]))
+```
+
+Metabolism roughly doubles every 8–10 °C (the Q10 effect). At Tb = 30 °C a 40 g lizard produces ~0.03 W of metabolic heat — negligible compared to solar (several W) in the energy budget, but critical for the mass budget (oxygen consumption, water loss).
+
+# Full model: body temperature sensitivity
+
+Now use `ectoR_devel` to see how all the components interact. Vary one environmental parameter at a time and track body temperature:
+
+## Body temperature vs wind speed
+
+```{r full-tc-vs-vel, message=FALSE}
+vel_seq <- seq(0.1, 10, length.out = 30)
+tc_vel <- numeric(length(vel_seq))
+
+for (i in seq_along(vel_seq)) {
+  tc_vel[i] <- ectoR_devel(Ww_g = 40, shape = 3, alpha = 0.85,
+    TA = 30, TGRD = 35, TSUBST = 30, TSKY = -5, VEL = vel_seq[i],
+    RH = 30, QSOLR = 800, Z = 20)$TC
+}
+
+plot(vel_seq, tc_vel, type = "l", lwd = 2, col = "darkblue",
+  xlab = "Wind speed (m/s)", ylab = "Body temperature (°C)",
+  main = expression(T[c] * " vs wind speed (TA = 30 °C, QSOLR = 800 W/m"^2 * ")"))
+abline(h = 30, lty = 2, col = "grey")
+```
+
+At low wind, convection is weak and the lizard heats up well above air temperature (solar gain dominates). As wind increases, convective cooling removes more heat and Tc approaches TA.
+
+## Body temperature vs solar radiation
+
+```{r full-tc-vs-solar, message=FALSE}
+qsolr_seq <- seq(200, 1200, length.out = 30)
+tc_sol <- numeric(length(qsolr_seq))
+
+for (i in seq_along(qsolr_seq)) {
+  tc_sol[i] <- ectoR_devel(Ww_g = 40, shape = 3, alpha = 0.85,
+    TA = 25, TGRD = 30, TSUBST = 25, TSKY = -5, VEL = 1,
+    RH = 30, QSOLR = qsolr_seq[i], Z = 20)$TC
+}
+
+plot(qsolr_seq, tc_sol, type = "l", lwd = 2, col = "darkorange",
+  xlab = expression("Solar radiation (W/m"^2 * ")"),
+  ylab = "Body temperature (°C)",
+  main = expression(T[c] * " vs solar radiation (TA = 25 °C, VEL = 1 m/s)"))
+```
+
+Solar radiation has a strong, roughly linear effect on Tc in still air. At 200 W/m² (overcast) Tc $\approx$ TA; at 1200 W/m² (bright sun) the lizard can be 10–15 °C above air temperature.
+
+# Challenges
+
+## Challenge 1: Which shape loses heat fastest by convection?
+
+For a 40 g animal, compute QCONV at VEL = 0.5 and VEL = 10 for each of the six shape types. Plot both sets of results as a barplot.
+
+```{r challenge1, message=FALSE}
+shapes <- 0:5
+qconv_low <- qconv_high <- numeric(6)
+
+for (i in seq_along(shapes)) {
+  g <- GEOM_ecto(AMASS = 0.04, GEOMETRY = shapes[i])
+  out_low <- CONV_ecto(GEOMETRY = shapes[i], ATOT = g$AREA, AV = g$AV,
+    AL = g$AL, AT = g$AT, BP = 101325, ALT = 0, TA = 20,
+    VEL = 0.5, FLTYPE = 0, TSKIN = 30, CONV_ENHANCE = 1)
+  qconv_low[i] <- out_low$QCONV
+  out_high <- CONV_ecto(GEOMETRY = shapes[i], ATOT = g$AREA, AV = g$AV,
+    AL = g$AL, AT = g$AT, BP = 101325, ALT = 0, TA = 20,
+    VEL = 10, FLTYPE = 0, TSKIN = 30, CONV_ENHANCE = 1)
+  qconv_high[i] <- out_high$QCONV
+}
+
+barplot(rbind(qconv_low, qconv_high), beside = TRUE, names.arg = shapes,
+  col = c("lightblue", "navy"), xlab = "Shape code", ylab = "QCONV (W)",
+  main = "Convective heat loss by shape at VEL = 0.5 and 10 m/s")
+legend("topright", fill = c("lightblue", "navy"),
+  legend = c("VEL = 0.5 m/s", "VEL = 10 m/s"))
+```
+
+**Hint:** For each shape, first call `GEOM_ecto(AMASS = 0.04, GEOMETRY = s)`, then `CONV_ecto(...)` with the resulting geometry.
+
+## Challenge 2: Crossover wind speed
+
+At what wind speed does forced convection equal free convection (HCFORC $\approx$ HCFREE)? Estimate it from the matplot in section 3.3, then refine by searching near the crossing.
+
+```{r challenge2, message=FALSE}
+geom <- GEOM_ecto(AMASS = 0.04, GEOMETRY = 3)
+vel_seq <- seq(0.1, 15, length.out = 200)
+hcfree <- hcforc <- numeric(200)
+
+for (i in seq_along(vel_seq)) {
+  out <- CONV_ecto(GEOMETRY = 3, ATOT = geom$AREA, AV = geom$AV,
+    AL = geom$AL, AT = geom$AT, BP = 101325, ALT = 0, TA = 20,
+    VEL = vel_seq[i], FLTYPE = 0, TSKIN = 30, CONV_ENHANCE = 1)
+  hcfree[i] <- out$HCFREE
+  hcforc[i] <- out$HCFORC
+}
+
+idx <- which.min(abs(hcfree - hcforc))
+cat("Crossover wind speed:", round(vel_seq[idx], 2), "m/s\n")
+cat("HCFREE at crossover:", round(hcfree[idx], 4), "\n")
+cat("HCFORC at crossover:", round(hcforc[idx], 4), "\n")
+```
+
+**Hint:** `which.min(abs(hcfree - hcforc))` gives the index closest to the crossover, then `vel_seq[idx]` gives the wind speed.
+
+## Challenge 3: Substrate conductivity and body temperature
+
+Use `ectoR_devel` to simulate a 40 g lizard on three substrates:
+- Sand (K_sub $\approx$ 0.3 W/mK)
+- Soil (K_sub $\approx$ 0.8 W/mK)
+- Rock (K_sub $\approx$ 2.5 W/mK)
+
+Keep all other parameters at their defaults. How does Tc change?
+
+```{r challenge3, message=FALSE}
+k_vals <- c(0.3, 0.8, 2.5)
+substrates <- c("Sand", "Soil", "Rock")
+
+for (i in seq_along(k_vals)) {
+  tc <- ectoR_devel(Ww_g = 40, shape = 3, alpha = 0.85, TA = 30,
+    TGRD = 35, TSUBST = 30, TSKY = -5, VEL = 1, RH = 30,
+    QSOLR = 800, Z = 20, K_sub = k_vals[i])$TC
+  cat(substrates[i], "(K_sub =", k_vals[i], "): TC =", round(tc, 2), "°C\n")
+}
+```
+
+**Hint:** `ectoR_devel` doesn't take K_sub directly. You need to pass it through the function or modify the code. Actually, `ectoR_devel` passes `K_sub` to `COND_ecto` via the internal function call. Look at the source code — the parameter is called `K_sub` in `ectoR_devel`!
+
+Let us check the argument list again:
+
+```{r check-ksub, message=FALSE}
+# Find K_sub in ectoR_devel arguments
+args(ectoR_devel)
+```
+
+## Challenge 4: Water vs air (aquatic mode)
+
+Set `fluid = 1` and compare QCONV and TC with the default air mode (`fluid = 0`). Use TA = 25 °C, VEL = 0.5 m/s.
+
+```{r challenge4, message=FALSE}
+# Air mode (fluid = 0)
+tc_air <- ectoR_devel(Ww_g = 40, shape = 3, alpha = 0.85, TA = 25,
+  TGRD = 25, TSUBST = 25, TSKY = -5, VEL = 0.5, RH = 50,
+  QSOLR = 0, Z = 90, fluid = 0)
+cat("Air mode (fluid = 0):\n")
+cat("  TC:", round(tc_air$TC, 2), "°C\n")
+cat("  QCONV:", round(tc_air$enbal[1, "QCONV"], 4), "W\n")
+
+# Water mode (fluid = 1) -- may fail without patching FUN_ecto
+# See the Bonus Challenge in ectotherm_behaviour.Rmd for the fix
+tryCatch({
+  tc_water <- ectoR_devel(Ww_g = 40, shape = 3, alpha = 0.85, TA = 25,
+    TGRD = 25, TSUBST = 25, TSKY = 25, VEL = 0.5, RH = 50,
+    QSOLR = 0, Z = 90, fluid = 1)
+  cat("Water mode (fluid = 1):\n")
+  cat("  TC:", round(tc_water$TC, 2), "°C\n")
+  cat("  QCONV:", round(tc_water$enbal[1, "QCONV"], 4), "W\n")
+}, error = function(e) {
+  cat("Water mode (fluid = 1) failed:", e$message, "\n")
+  cat("Apply the FUN_ecto patch from Practical 5's Bonus Challenge\n")
+})
+```
+
+**Hint:** `fluid = 1` may trigger a missing `QRESP` variable in the internal `FUN_ecto`. This is intentional — can you find where in the source code the fix should go?
+
+# Summary
+
+In this practical you have learned to:
+
+1. Open and read the source code of NicheMapR functions
+2. Call individual energy-budget components directly (`GEOM_ecto`,
+   `CONV_ecto`, `SOLAR_ecto`, `RADIN_ecto`, etc.)
+3. Create 2D line plots and 3D perspective plots of heat fluxes
+4. Separate free and forced convection contributions
+5. Understand what drives body temperature in the full `ectoR_devel` model
+6. Compare dry-skinned vs wet-skinned evaporative cooling
+
+The modular structure of `ectoR_devel` makes it easy to modify, extend, or replace individual components — a foundation for building your own custom ectotherm models.
+
+# Reference
+
+Kearney, M. R. & Porter, W. P. (2017). NicheMapR — an R package for biophysical modelling: the ectotherm and dynamic energy budget models. *Ecography* 40: 1–12.
